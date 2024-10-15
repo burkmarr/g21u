@@ -1,0 +1,55 @@
+<!doctype  html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>G21v2 location test</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json" />
+</head>
+
+<body>
+  <h1>G21v2 location test</h1>
+  <div id="msg"></div>
+  <div id="latitude"></div>
+  <div id="longitude"></div>
+  <div id="accuracy"></div>
+  <div id="altitude"></div>
+  <div id="gridref"></div>
+  <div id="timestamp"></div>
+  <div id="datetime"></div>
+  <div id="filename"></div>
+  <div id="elapsedSinceUpdated"></div>
+
+  <div>
+    <input type="checkbox" id="glcont" name="glcont" onclick="glcontChanged()" />
+    <label for="glcont">Continuous geolocation</label>
+  </div>
+
+  <button onclick="getLocation()" >Get location</button>
+
+  <button id="recording-button" onclick="recordAudio()">Record</button>
+  <br/>
+  <audio controls id="audio-element"></audio>
+  <br/>
+  <button id="recording-button" onclick="downloadFile()">Download</button>
+  <a id="download-link" style="display:none"></a>
+  
+
+  <br/><br/>
+  <a href="/index.html">Home</a>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js")
+    }
+  </script>
+
+  <script src="js/location.js" defer></script>
+  <script src="js/sound.js" defer></script>
+  <script src="js/rec1.js" defer></script>
+  <script src="js/bigr.min.umd.js"></script>
+  <script src="js/webm2wav.umd.js"></script>
+</body>
+</html>

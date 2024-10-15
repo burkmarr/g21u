@@ -1,0 +1,106 @@
+body {
+  font-family: Arial;
+}
+
+#home-links a {
+  font-size: 1.5em !important;
+}
+
+div#home-links a {
+  display: block;
+  font-size: 18px;
+  margin: 0.5em;
+}
+
+.g21-simp-centre {
+  text-align: center;
+}
+
+#g21-simp-buttons {
+  width: 285px;
+  margin: 6em auto 2em auto;
+}
+
+#g21-simp-bin {
+  padding-left: 20px;
+  /* padding-right: 10px; */
+  width: 100px;
+}
+#g21-simp-record {
+  /* padding-left: 10px; */
+  width: 150px;
+}
+#g21-simp-gps {
+  display: block;
+  fill: lightgray;
+  margin: 1em auto;
+}
+
+#g21-simp-gr {
+  margin-top: 10px;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+#g21-simp-prefix, #g21-simp-e3, #g21-simp-n3 {
+  font-size: 24px;
+}
+#g21-simp-e4, #g21-simp-n4 {
+  font-size: 20px;
+  color: red;
+  position: relative;
+  top: -3px;
+}
+#g21-simp-e5, #g21-simp-n5 {
+  font-size: 16px;
+  color: orange;
+  position: relative;
+  top: -6px;
+}
+#g21-simp-accuracy {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+#g21-simp-altitude {
+  font-size: 16px;
+}
+
+#g21-simp-latlon {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+#g21-simp-elapsed {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+#g21-simp-msg {
+  margin: 2em;
+  font-size: 14px;
+}
+
+#g21-simp-home {
+  margin-top: 7em;
+}
+
+@keyframes flash-mic {0%{opacity:1;} 50%{opacity:0.3;} 100%{opacity:1;}}
+@keyframes blink-gps {0%{fill: lightgray;} 50%{fill:rgb(12, 237, 12);} 100%{fill: lightgray;}}
+
+.flashing {
+  animation-name: flash-mic;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+.blink-gps {
+  animation-name: blink-gps;
+  animation-duration: 0.4s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+}
+
+.hide {
+  visibility: hidden;
+}

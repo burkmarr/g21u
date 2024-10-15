@@ -1,0 +1,39 @@
+<!doctype  html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>G21v2 location test</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json" />
+</head>
+
+<body>
+  <h1>G21v2 wav download</h1>
+  <div id="msg"></div>
+  <div id="latitude"></div>
+  <div id="longitude"></div>
+  <div id="accuracy"></div>
+  <div id="altitude"></div>
+  <div id="gridref"></div>
+  <div id="timestamp"></div>
+  <div id="datetime"></div>
+  <div id="filename"></div>
+  <div id="elapsedSinceUpdated"></div>
+  <br/>
+  <button id="recording-button" onclick="recordAudioWav()">Make new record</button>
+  <br/><br/>
+  <a href="/index.html">Home</a>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js")
+    }
+  </script>
+
+  <script src="js/rec2.js" defer></script>
+  <script src="js/bigr.min.umd.js"></script>
+  <script src="js/webm2wav.min.umd.js"></script>
+</body>
+</html>

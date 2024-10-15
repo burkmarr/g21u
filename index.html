@@ -1,0 +1,36 @@
+<!doctype  html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>G21v2</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg" href="images/icon-512x512.svg" />
+</head>
+
+<body>
+  <h1>G21v2 concept testing</h1>
+  <div id="home-links">
+    <a href="/simple.html">Simple</a>
+    <a href="/rec2.html">Rec2</a>
+    <a href="/rec1.html">Rec1</a>
+    <a href="/location.html">Geolocation</a>
+    <a href="/sound.html">Sound recording</a>
+  </div>
+
+  <!-- <button id="update-sw">Update</button> -->
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js")
+        // .then(registration => {
+        //   document.getElementById("update-sw").onclick = () => {
+        //     registration.update()
+        //   }
+        // })
+    }
+  </script>
+</body>
+</html>

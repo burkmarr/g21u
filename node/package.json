@@ -1,0 +1,27 @@
+{
+  "name": "nodelibs",
+  "version": "1.0.0",
+  "description": "Wrapper for webm-to-wav-converter",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "rollup --config"
+  },
+  "author": "R Burkmar",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.25.8",
+    "@babel/preset-env": "^7.25.8",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^28.0.0",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.24.0"
+  },
+  "dependencies": {
+    "d3-ease": "^3.0.1",
+    "d3-selection": "^3.0.0",
+    "d3-transition": "^3.0.1",
+    "webm-to-wav-converter": "^1.1.0"
+  }
+}
