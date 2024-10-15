@@ -1,21 +1,15 @@
-const VERSION = "v0.0.49"
+const VERSION = "v0.0.51"
 const CACHE_NAME = `g21-${VERSION}`
 const APP_STATIC_RESOURCES = [
   "/",
   "/index.html",
   "/location.html",
-  "/sound.html",
-  "/rec1.html",
-  "/rec2.html",
-  "/simple.html",
+  "/options.html",
   "/style.css",
   "/js/location.js",
-  "/js/sound.js",
-  "/js/rec1.js",
-  "/js/rec2.js",
-  "/js/simple.js",
-  "/js/bigr.min.umd.js",
-  "/js/nodelibs.min.umd.js",
+  "/js/record.js",
+  "/js/menu.js",
+  "/js/nl.min.js",
   "/manifest.json",
   "/images/icon-512x512.svg",
   "/images/icon-512x512.png",
@@ -29,8 +23,6 @@ const APP_STATIC_RESOURCES = [
   "/images/record-grey.png",
   "/images/record-green.png",
   "/images/record-red.png",
-  "/images/gps-red.png",
-  "/images/gps-green.png",
 ]
 
 self.addEventListener("install", (event) => {

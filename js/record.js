@@ -1,8 +1,7 @@
-const wavRecorder = nodelibs.getWavRecorder()
-let toggle = document.getElementById('recording-button')
+import { selectAll, transition, easeLinear, getWavRecorder, getGr } from './nl.min.js'
+
+const wavRecorder = getWavRecorder()
 let state = ""
-let glcontWatchId
-//let lastUpdated = 0
 let filename
 let isGeolocated = false
 
@@ -15,20 +14,6 @@ navigator.geolocation.watchPosition(geolocated, geolocateFailure, {
   enableHighAccuracy: true
 })
 
-// Update time elapsed indicator.
-// Shows user when location last updated
-// window.setInterval(function(){
-//   if (lastUpdated) {
-//     updateElapsed()
-//   }
-// }, 1000)
-
-// function updateElapsed() {
-//   const elapsed = Math.floor((Date.now() - lastUpdated) / 1000)
-//   // Update gui time elapsed
-//   document.getElementById("g21-simp-elapsed").innerHTML = `Updated: ${elapsed} seconds ago`
-// }
-
 function geolocated(position) {
   if (!isGeolocated) {
     // First time in
@@ -38,22 +23,19 @@ function geolocated(position) {
   
   // Can't find a way to do this transition/animation with CSS because of
   // the need to chain transitions, so using D3
-  const t = nodelibs.transition().duration(200).ease(nodelibs.easeLinear)
-  nodelibs.selectAll(".gps-path")
+  const t = transition().duration(200).ease(easeLinear)
+  selectAll(".gps-path")
     .transition(t).style("fill", "#00FF21")
     .transition(t).style("fill", "lightgrey")
 
   // Update position
-  console.log('position')
-  //lastUpdated = position.timestamp
-  //updateElapsed()
   let lat = position.coords.latitude
   let lon =  position.coords.longitude
   lat = Math.round(lat * 100000) / 100000
   lon = Math.round(lon * 100000) / 100000
   const accuracy = Math.ceil(position.coords.accuracy)
   const altitude = position.coords.altitude ? Math.floor(position.coords.altitude) : null
-  const gr = bigr.getGrFromCoords(lon, lat, 'wg', 'gb', [1]).p1
+  const gr = getGr(lon, lat, 'wg', 'gb', [1]).p1
   const dte = new Date()
   const year = dte.getFullYear()
   let month = String(dte.getMonth() + 1)
@@ -94,7 +76,7 @@ function geolocateFailure(err) {
   document.getElementById("g21-simp-msg").innerHTML = err.message
 }
 
-async function recordAudioWav(cancel){
+export async function recordAudioWav(cancel){
   if (state === "recording"){
     // STOP recording
     state = ""
@@ -129,7 +111,7 @@ async function recordAudioWav(cancel){
   }
 }
 
-function cancelRecording() {
+export function cancelRecording() {
   if (state = "recording") {
     recordAudioWav(true)
     document.getElementById("g21-simp-bin").src = "/images/bin-grey.png"
