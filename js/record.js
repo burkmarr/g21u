@@ -1,9 +1,13 @@
-import { selectAll, transition, easeLinear, getWavRecorder, getGr } from './nl.min.js'
+import { selectAll, transition, easeLinear, wavMediaRecorder, registerWavEncoder, getGr } from './nl.min.js'
 
-const wavRecorder = getWavRecorder()
 let state = ""
-let filename
 let isGeolocated = false
+let filename
+
+let mediaRecorder = null
+let audioBlobs = []
+let capturedStream = null
+let encoderRegistered = false
 
 // Start continuous geolocation. I think it's safe to do this
 // without draining battery because I think it doesn't operate
@@ -76,38 +80,86 @@ function geolocateFailure(err) {
   document.getElementById("g21-simp-msg").innerHTML = err.message
 }
 
+export async function startRecording() {
+
+  if (!encoderRegistered) {
+    await registerWavEncoder()
+    encoderRegistered = true
+  }
+
+  return navigator.mediaDevices.getUserMedia({
+    audio: {
+      echoCancellation: true,
+    }
+  }).then(stream => {
+      audioBlobs = []
+      capturedStream = stream
+      mediaRecorder = wavMediaRecorder(stream)
+
+      // Add audio blobs while recording 
+      mediaRecorder.addEventListener('dataavailable', event => {
+        audioBlobs.push(event.data)
+      })
+
+      mediaRecorder.start()
+  }).catch((e) => {
+    console.error(e)
+  })
+}
+
+export function stopRecording() {
+  return new Promise(resolve => {
+    if (!mediaRecorder) {
+      resolve(null)
+      return
+    }
+    mediaRecorder.addEventListener('stop', () => {
+      const mimeType = mediaRecorder.mimeType
+      const audioBlob = new Blob(audioBlobs, { type: mimeType })
+      if (capturedStream) {
+        capturedStream.getTracks().forEach(track => track.stop())
+      }
+      resolve(audioBlob)
+    })
+    mediaRecorder.stop()
+  })
+}
+
+export function playAudio(audioBlob) {
+  if (audioBlob) {
+    const audio = new Audio()
+    audio.src = URL.createObjectURL(audioBlob)
+    audio.play()
+  }
+
+  //audio.addEventListener('ended', PlayNext);
+  //sound.pause();
+  //sound.currentTime = 0;
+}
+
 export async function recordAudioWav(cancel){
   if (state === "recording"){
     // STOP recording
+    const audioBlob = await stopRecording()
+    if (!cancel) {
+      playAudio(audioBlob)
+      downloadBlob(audioBlob, filename)
+    }
+    
     state = ""
     document.getElementById("g21-simp-bin").src = "/images/bin-grey.png"
     const elMicrophone = document.getElementById("g21-simp-record")
     elMicrophone.src = "/images/record-green.png"
     elMicrophone.classList.remove("flashing")
-
-    // Although wavRecorder.stop() is asynchronous, it does not return
-    // a promise so we can't detect when completed. However it sets
-    // the reference to wavRecorder to undefined when it completes, so
-    // we can poll for that to happen and then download the file
-    wavRecorder.stop()
-    if (!cancel) {
-      const si = setInterval(() => {
-        if (!wavRecorder.mediaRecorder) {
-          wavRecorder.download(filename, true)
-          clearInterval(si)
-        }
-      },100)
-    }
   }
   else {
     // START recording
+    await startRecording()
     state = "recording"
-     document.getElementById("g21-simp-bin").src = "/images/bin-orange.png"
+    document.getElementById("g21-simp-bin").src = "/images/bin-orange.png"
     const elMicrophone = document.getElementById("g21-simp-record")
     elMicrophone.src = "/images/record-red.png"
     elMicrophone.classList.add("flashing")
-
-    wavRecorder.start()
   }
 }
 
@@ -116,5 +168,28 @@ export function cancelRecording() {
     recordAudioWav(true)
     document.getElementById("g21-simp-bin").src = "/images/bin-grey.png"
   }
+}
+
+function downloadBlob(blob, name) {
+  // Convert your blob into a Blob URL (a special url that points to an object in the browser's memory)
+  const blobUrl = URL.createObjectURL(blob)
+  // Create a link element
+  const link = document.createElement("a")
+  // Set link's href to point to the Blob URL
+  link.href = blobUrl
+  link.download = name
+  // Append link to the body
+  document.body.appendChild(link)
+  // Dispatch click event on the link
+  // This is necessary as link.click() does not work on the latest firefox
+  link.dispatchEvent(
+    new MouseEvent('click', { 
+      bubbles: true, 
+      cancelable: true, 
+      view: window 
+    })
+  )
+  // Remove link from body
+  document.body.removeChild(link)
 }
 

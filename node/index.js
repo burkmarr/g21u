@@ -1,25 +1,20 @@
-
-import { downloadWav, WavRecorder } from "webm-to-wav-converter"
 import { getGrFromCoords } from "brc-atlas-bigr"
+import {MediaRecorder, register} from 'extendable-media-recorder'
+import {connect} from 'extendable-media-recorder-wav-encoder'
 
-//const { downloadWav, WavRecorder } = require("webm-to-wav-converter")
-//export * from "webm-to-wav-converter-mod"
 export * from "d3-selection"
 export * from "d3-transition"
 export * from "d3-ease"
 
-export function convertAndDownload(data, flag) {
-  downloadWav(data, flag)
+export async function registerWavEncoder() {
+  await register(await connect())
 }
-
-export function getWavRecorder() {
-  const wavRecorder = new WavRecorder()
-  return wavRecorder
+export function wavMediaRecorder(stream) {
+  const mediaRecorder = new MediaRecorder(stream, {
+    mimeType: 'audio/wav'
+  })
+  return mediaRecorder
 }
-
 export function getGr(lon, lat, from, to, precisions) {
   return getGrFromCoords(lon, lat, from, to, precisions)
 }
-
-
-

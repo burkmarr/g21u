@@ -23,6 +23,8 @@
     "d3-ease": "^3.0.1",
     "d3-selection": "^3.0.0",
     "d3-transition": "^3.0.1",
+    "extendable-media-recorder": "^9.2.13",
+    "extendable-media-recorder-wav-encoder": "^7.0.118",
     "webm-to-wav-converter": "^1.1.0"
   }
 }
