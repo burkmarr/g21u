@@ -1,4 +1,4 @@
-const VERSION = "v0.0.52"
+const VERSION = "v0.0.79"
 const CACHE_NAME = `g21-${VERSION}`
 const APP_STATIC_RESOURCES = [
   "/",
@@ -9,8 +9,11 @@ const APP_STATIC_RESOURCES = [
   "/js/location.js",
   "/js/record.js",
   "/js/menu.js",
+  "js/tone.js",
   "/js/nl.min.js",
   "/manifest.json",
+  "/beeps/beep-2.mp3",
+  "/beeps/beep-3.mp3",
   "/images/icon-512x512.svg",
   "/images/icon-512x512.png",
   "/images/icon-192x192.png",

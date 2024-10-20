@@ -1,13 +1,17 @@
 import { selectAll, transition, easeLinear, wavMediaRecorder, registerWavEncoder, getGr } from './nl.min.js'
+import { beep, beep2, beep3, beep4 } from './tone.js'
 
-let state = ""
 let isGeolocated = false
 let filename
 
 let mediaRecorder = null
 let audioBlobs = []
 let capturedStream = null
-let encoderRegistered = false
+
+// Register the wav encoder
+await registerWavEncoder()
+
+document.getElementById("g21-simp-record").addEventListener('click', startRecording)
 
 // Start continuous geolocation. I think it's safe to do this
 // without draining battery because I think it doesn't operate
@@ -57,7 +61,6 @@ function geolocated(position) {
   filename = `${dateTime}_${lat}_${lon}_${accuracy}_${altitude ? altitude : 'none'}.wav`
   
   // Update gui GR
-  console.log(gr)
   document.getElementById("g21-simp-prefix").innerHTML = gr.substring(0,2)
   document.getElementById("g21-simp-e3").innerHTML = gr.substring(2,5)
   document.getElementById("g21-simp-e4").innerHTML = gr.substring(5,6)
@@ -82,47 +85,74 @@ function geolocateFailure(err) {
 
 export async function startRecording() {
 
-  if (!encoderRegistered) {
-    await registerWavEncoder()
-    encoderRegistered = true
-  }
+  console.log('startRecording')
 
-  return navigator.mediaDevices.getUserMedia({
+  const stream = await  navigator.mediaDevices.getUserMedia({
     audio: {
       echoCancellation: true,
     }
-  }).then(stream => {
-      audioBlobs = []
-      capturedStream = stream
-      mediaRecorder = wavMediaRecorder(stream)
-
-      // Add audio blobs while recording 
-      mediaRecorder.addEventListener('dataavailable', event => {
-        audioBlobs.push(event.data)
-      })
-
-      mediaRecorder.start()
-  }).catch((e) => {
-    console.error(e)
   })
+
+  audioBlobs = []
+  capturedStream = stream
+  mediaRecorder = wavMediaRecorder(stream)
+  // Add audio blobs while recording 
+  mediaRecorder.addEventListener('dataavailable', event => {
+    audioBlobs.push(event.data)
+  })
+
+  //await beep3('2')
+  mediaRecorder.start()
+
+  const elMicrophone = document.getElementById("g21-simp-record")
+  elMicrophone.src = "/images/record-red.png"
+  beep4(440, 0.3)
+  elMicrophone.classList.add("flashing")
+  elMicrophone.removeEventListener('click', startRecording)
+  elMicrophone.addEventListener('click', stopRecording)
+
+  const elBin = document.getElementById("g21-simp-bin")
+  elBin.src = "/images/bin-orange.png"
+  elBin.addEventListener('click', cancelRecording)
 }
 
-export function stopRecording() {
-  return new Promise(resolve => {
-    if (!mediaRecorder) {
-      resolve(null)
-      return
+async function stopRecording(e) {
+
+  console.log('stopRecording')
+
+  mediaRecorder.addEventListener('stop', () => {
+    const mimeType = mediaRecorder.mimeType
+    const audioBlob = new Blob(audioBlobs, { type: mimeType })
+    if (capturedStream) {
+      capturedStream.getTracks().forEach(track => track.stop())
     }
-    mediaRecorder.addEventListener('stop', () => {
-      const mimeType = mediaRecorder.mimeType
-      const audioBlob = new Blob(audioBlobs, { type: mimeType })
-      if (capturedStream) {
-        capturedStream.getTracks().forEach(track => track.stop())
-      }
-      resolve(audioBlob)
-    })
-    mediaRecorder.stop()
+ 
+    if (e) {
+      // if(e) evalulates to false if called from cancelRecording
+      // and true if called from click event handler to stop recording
+      playAudio(audioBlob)
+      downloadBlob(audioBlob, filename)
+    }
   })
+  mediaRecorder.stop()
+
+  const elMicrophone = document.getElementById("g21-simp-record")
+  elMicrophone.src = "/images/record-green.png"
+  elMicrophone.classList.remove("flashing")
+  elMicrophone.removeEventListener('click', stopRecording)
+  elMicrophone.addEventListener('click', startRecording)
+
+  const elBin = document.getElementById("g21-simp-bin")
+  elBin.src = "/images/bin-grey.png"
+  elBin.removeEventListener('click', cancelRecording)
+}
+
+export function cancelRecording() {
+
+  console.log('cancelRecording')
+
+  beep4(220, 0.3)
+  stopRecording()
 }
 
 export function playAudio(audioBlob) {
@@ -131,43 +161,9 @@ export function playAudio(audioBlob) {
     audio.src = URL.createObjectURL(audioBlob)
     audio.play()
   }
-
   //audio.addEventListener('ended', PlayNext);
   //sound.pause();
   //sound.currentTime = 0;
-}
-
-export async function recordAudioWav(cancel){
-  if (state === "recording"){
-    // STOP recording
-    const audioBlob = await stopRecording()
-    if (!cancel) {
-      playAudio(audioBlob)
-      downloadBlob(audioBlob, filename)
-    }
-    
-    state = ""
-    document.getElementById("g21-simp-bin").src = "/images/bin-grey.png"
-    const elMicrophone = document.getElementById("g21-simp-record")
-    elMicrophone.src = "/images/record-green.png"
-    elMicrophone.classList.remove("flashing")
-  }
-  else {
-    // START recording
-    await startRecording()
-    state = "recording"
-    document.getElementById("g21-simp-bin").src = "/images/bin-orange.png"
-    const elMicrophone = document.getElementById("g21-simp-record")
-    elMicrophone.src = "/images/record-red.png"
-    elMicrophone.classList.add("flashing")
-  }
-}
-
-export function cancelRecording() {
-  if (state = "recording") {
-    recordAudioWav(true)
-    document.getElementById("g21-simp-bin").src = "/images/bin-grey.png"
-  }
 }
 
 function downloadBlob(blob, name) {

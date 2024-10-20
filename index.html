@@ -11,8 +11,8 @@
 
 <body>
   <div id="g21-simp-buttons">
-    <img id="g21-simp-bin" src="/images/bin-grey.png" onclick="cancelRecording()"/>
-    <img id="g21-simp-record" src="/images/record-grey.png" onclick="recordAudioWav()"/>
+    <img id="g21-simp-bin" src="/images/bin-grey.png"/>
+    <img id="g21-simp-record" src="/images/record-grey.png"/>
   </div>
   <div id="g21-simp-gr" class="g21-simp-centre">
     <span id="g21-simp-prefix">AB</span><span id="g21-simp-e3">012</span><span id="g21-simp-e4">3</span><span id="g21-simp-e5">4</span><span id="g21-simp-n3">567</span><span id="g21-simp-n4">8</span><span id="g21-simp-n5">9</span>
@@ -28,12 +28,18 @@
 
   <div id="menu"></div>
 
+  <!-- <audio id="beep-record" src="/beeps/beep-2.mp3" volume="0.5"></audio>
+  <audio id="beep-bin" src="/beeps/beep-3.mp3" volume="0.5"></audio> -->
+
+  <!-- <audio id="beep" volume="0.5" type="audio/mpeg"></audio> -->
+
+  <script src="js/record.js" type="module" defer></script>
+
   <script type="module">
-    import { recordAudioWav, cancelRecording } from "./js/record.js"
+    //import { startRecording } from "./js/record.js"
     import { menu } from "./js/menu.js"
     menu()
-    window.recordAudioWav = recordAudioWav
-    window.cancelRecording = cancelRecording
+    //window.startRecording = startRecording
 
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js")
