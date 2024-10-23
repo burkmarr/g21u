@@ -137,3 +137,20 @@ div#home-links a {
   color: white;
 }
 
+.menu-icon {
+  width: 30px;
+}
+
+.menu-icon path {
+  stroke: white;
+}
+
+.menu-icon circle {
+  stroke: white;
+}
+
+#navbar-inner {
+  /* width: 186px; */
+  width: 124px;
+  margin: 0 auto;
+}

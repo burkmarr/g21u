@@ -1,19 +1,17 @@
-const VERSION = "v0.0.79"
+const VERSION = "v0.0.91"
 const CACHE_NAME = `g21-${VERSION}`
 const APP_STATIC_RESOURCES = [
   "/",
   "/index.html",
   "/location.html",
   "/options.html",
-  "/style.css",
+  "/css/style.css",
   "/js/location.js",
   "/js/record.js",
   "/js/menu.js",
-  "js/tone.js",
+  "js/play.js",
   "/js/nl.min.js",
   "/manifest.json",
-  "/beeps/beep-2.mp3",
-  "/beeps/beep-3.mp3",
   "/images/icon-512x512.svg",
   "/images/icon-512x512.png",
   "/images/icon-192x192.png",
@@ -26,6 +24,7 @@ const APP_STATIC_RESOURCES = [
   "/images/record-grey.png",
   "/images/record-green.png",
   "/images/record-red.png",
+  "/images/playback-red.png",
 ]
 
 self.addEventListener("install", (event) => {

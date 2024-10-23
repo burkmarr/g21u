@@ -1,17 +1,17 @@
 import { selectAll, transition, easeLinear, wavMediaRecorder, registerWavEncoder, getGr } from './nl.min.js'
-import { beep, beep2, beep3, beep4 } from './tone.js'
+import { beep, doubleBeep, playBlob } from './play.js'
 
 let isGeolocated = false
 let filename
 
 let mediaRecorder = null
 let audioBlobs = []
+let audioBlob
 let capturedStream = null
+let playback
 
 // Register the wav encoder
 await registerWavEncoder()
-
-document.getElementById("g21-simp-record").addEventListener('click', startRecording)
 
 // Start continuous geolocation. I think it's safe to do this
 // without draining battery because I think it doesn't operate
@@ -25,6 +25,7 @@ navigator.geolocation.watchPosition(geolocated, geolocateFailure, {
 function geolocated(position) {
   if (!isGeolocated) {
     // First time in
+    document.getElementById("g21-simp-record").addEventListener('click', startRecording)
     document.getElementById("g21-simp-record").src = "/images/record-green.png"
     isGeolocated = true
   }
@@ -85,14 +86,17 @@ function geolocateFailure(err) {
 
 export async function startRecording() {
 
-  console.log('startRecording')
+  console.log('start recording')
 
   const stream = await  navigator.mediaDevices.getUserMedia({
     audio: {
-      echoCancellation: true,
+      // Echo cancellation, if switched on, causes problems when
+      // recording starts because it is about preventing interference
+      // between recording and playback, so ensure this is off.
+      echoCancellation: false,
     }
   })
-
+  
   audioBlobs = []
   capturedStream = stream
   mediaRecorder = wavMediaRecorder(stream)
@@ -101,14 +105,12 @@ export async function startRecording() {
     audioBlobs.push(event.data)
   })
 
-  //await beep3('2')
-  mediaRecorder.start()
-
   const elMicrophone = document.getElementById("g21-simp-record")
-  elMicrophone.src = "/images/record-red.png"
-  beep4(440, 0.3)
-  elMicrophone.classList.add("flashing")
   elMicrophone.removeEventListener('click', startRecording)
+  await beep(600, 0.3) // Await ensures that beep won't be on playback
+  mediaRecorder.start()
+  elMicrophone.src = "/images/record-red.png"
+  elMicrophone.classList.add("flashing")
   elMicrophone.addEventListener('click', stopRecording)
 
   const elBin = document.getElementById("g21-simp-bin")
@@ -116,54 +118,83 @@ export async function startRecording() {
   elBin.addEventListener('click', cancelRecording)
 }
 
-async function stopRecording(e) {
+async function stopRecording() {
 
-  console.log('stopRecording')
-
-  mediaRecorder.addEventListener('stop', () => {
+  mediaRecorder.addEventListener('stop', async () => {
     const mimeType = mediaRecorder.mimeType
-    const audioBlob = new Blob(audioBlobs, { type: mimeType })
+    audioBlob = new Blob(audioBlobs, { type: mimeType })
     if (capturedStream) {
       capturedStream.getTracks().forEach(track => track.stop())
     }
- 
-    if (e) {
-      // if(e) evalulates to false if called from cancelRecording
-      // and true if called from click event handler to stop recording
-      playAudio(audioBlob)
+    const playbackOpt = true // Replace with option
+    if (playbackOpt) {
+      playback = new Audio()
+      await playBlob(playback, audioBlob, 1)
+      playback = null
+      beep(600, 0.2)
+      const elMicrophone = document.getElementById("g21-simp-record")
+      elMicrophone.removeEventListener('click', stopPlayback)
+      elMicrophone.src = "/images/record-green.png"
+      elMicrophone.classList.remove("flashing")
+      elMicrophone.addEventListener('click', startRecording)
+    }
+    const mode = 'download' // Replace with option
+    if (mode === 'download') {
       downloadBlob(audioBlob, filename)
     }
   })
   mediaRecorder.stop()
-
+  doubleBeep(600, 0.15)
   const elMicrophone = document.getElementById("g21-simp-record")
+  elMicrophone.removeEventListener('click', stopRecording)
+  elMicrophone.classList.remove("flashing")
+  const elBin = document.getElementById("g21-simp-bin")
+  elBin.src = "/images/bin-grey.png"
+  elBin.removeEventListener('click', cancelRecording)
+  const playbackOpt = true // Replace with option
+  if (playbackOpt) {
+    elMicrophone.src = "/images/playback-red.png"
+    elMicrophone.classList.add("flashing")
+    elMicrophone.addEventListener('click', stopPlayback)
+  } else {
+    elMicrophone.src = "/images/record-green.png"
+    elMicrophone.addEventListener('click', startRecording)
+  }
+}
+
+function stopPlayback() {
+  console.log('stop playback')
+
+  playback.pause()
+  playback.currentTime = 0
+  playback = null
+
+  beep(600, 0.2)
+  const elMicrophone = document.getElementById("g21-simp-record")
+  elMicrophone.removeEventListener('click', stopPlayback)
   elMicrophone.src = "/images/record-green.png"
   elMicrophone.classList.remove("flashing")
+  elMicrophone.addEventListener('click', startRecording)
+
+  const mode = 'download' // Replace with option
+  if (mode === 'download') {
+    downloadBlob(audioBlob, filename)
+  }
+}
+
+function cancelRecording() {
+  beep(450, 0.4)
+  
+  const elMicrophone = document.getElementById("g21-simp-record")
   elMicrophone.removeEventListener('click', stopRecording)
+  elMicrophone.src = "/images/record-green.png"
+  elMicrophone.classList.remove("flashing")
+  console.log('Add startRecording from cancelRecording')
   elMicrophone.addEventListener('click', startRecording)
 
   const elBin = document.getElementById("g21-simp-bin")
   elBin.src = "/images/bin-grey.png"
   elBin.removeEventListener('click', cancelRecording)
-}
-
-export function cancelRecording() {
-
-  console.log('cancelRecording')
-
-  beep4(220, 0.3)
-  stopRecording()
-}
-
-export function playAudio(audioBlob) {
-  if (audioBlob) {
-    const audio = new Audio()
-    audio.src = URL.createObjectURL(audioBlob)
-    audio.play()
-  }
-  //audio.addEventListener('ended', PlayNext);
-  //sound.pause();
-  //sound.currentTime = 0;
 }
 
 function downloadBlob(blob, name) {
