@@ -58,7 +58,10 @@ function geolocated(position) {
   minute = minute.length === 2 ? minute : `0${minute}`
   second = second.length === 2 ? second : `0${second}`
   const dateTime = `${year}-${month}-${day}_${hour}-${minute}-${second}`
-   //2015-02-14_20-54-45_53.59675_-2.51646_15_0.wav
+
+  //2015-02-14_20-54-29_SD65821128_18_0.wav
+  //2015-02-14_20-54-45_53.59675_-2.51646_15_0.wav
+
   filename = `${dateTime}_${lat}_${lon}_${accuracy}_${altitude ? altitude : 'none'}.wav`
   
   // Update gui GR

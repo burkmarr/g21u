@@ -118,27 +118,13 @@ div#home-links a {
 #navbar a {
   float: left;
   display: block;
-  color: #f2f2f2;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
-  font-size: 17px;
-}
-
-/* Change the color of links on hover */
-#navbar a:hover {
-  background-color: #ddd;
-  color: black;
-}
-
-/* Add a green background color to the active link */
-#navbar a.active {
-  background-color: #04AA6D;
-  color: white;
 }
 
 .menu-icon {
-  width: 30px;
+  width: 36px;
 }
 
 .menu-icon path {
@@ -150,7 +136,43 @@ div#home-links a {
 }
 
 #navbar-inner {
-  /* width: 186px; */
-  width: 124px;
+  /* width: 194px; */
+  width: 136px;
   margin: 0 auto;
+}
+
+#opts-div {
+  margin: 1em;
+  font-size: 1.2em;
+}
+
+.opts-category {
+  font-size: 1.3em;
+  font-weight: bold;
+}
+.opts-label {
+  margin: 0.3em 0;
+}
+
+a.selected .menu-icon path {
+    stroke: rgb(12, 237, 12);
+}
+
+a.selected .menu-icon circle {
+  stroke: rgb(12, 237, 12);
+}
+
+select {
+  /* background-color: white; */
+  /* border: thin solid blue; */
+  border-radius: 4px;
+  /* display: inline-block; */
+  /* font: inherit; */
+  font-size: inherit;
+  /* line-height: 1.2em; */
+  padding: 0.5em 3.5em 0.5em 1em;
+  margin: 0;      
+  box-sizing: border-box;
+  width: 200px;
+  appearance: none; /* removes arrow */
 }

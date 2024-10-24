@@ -10,9 +10,16 @@
 </head>
 
 <body>
-  <h3>Options</h3>
+  <div id="opts-div">
+    <div class="opts-category">Output file</div>
+    <hr/>
+    <div class="opts-label"><b>Filename format:</b> indicate whether sound files should use with OSGR or lat/lon in their names.</div>
+    <select id="filename-format">
+      <option value="gr">OSGR</option>
+      <option value="latlon">Lat/lon</option>
+    </select>
+  </div>
   <div id="menu"></div>
-  
   <script type="module">
     import { menu } from './js/menu.js'
     menu()
