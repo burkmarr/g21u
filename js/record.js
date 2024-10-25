@@ -1,5 +1,6 @@
 import { selectAll, transition, easeLinear, wavMediaRecorder, registerWavEncoder, getGr } from './nl.min.js'
 import { beep, doubleBeep, playBlob } from './play.js'
+import { getOpt } from "./common.js"
 
 let isGeolocated = false
 let filename
@@ -44,7 +45,9 @@ function geolocated(position) {
   lon = Math.round(lon * 100000) / 100000
   const accuracy = Math.ceil(position.coords.accuracy)
   const altitude = position.coords.altitude ? Math.floor(position.coords.altitude) : null
-  const gr = getGr(lon, lat, 'wg', 'gb', [1]).p1
+  const gr = getGr(lon, lat, 'wg', 'gb', [1,10])
+  const gr10 = gr.p1
+  const gr8 = gr.p10
   const dte = new Date()
   const year = dte.getFullYear()
   let month = String(dte.getMonth() + 1)
@@ -59,19 +62,22 @@ function geolocated(position) {
   second = second.length === 2 ? second : `0${second}`
   const dateTime = `${year}-${month}-${day}_${hour}-${minute}-${second}`
 
-  //2015-02-14_20-54-29_SD65821128_18_0.wav
-  //2015-02-14_20-54-45_53.59675_-2.51646_15_0.wav
-
-  filename = `${dateTime}_${lat}_${lon}_${accuracy}_${altitude ? altitude : 'none'}.wav`
+  if (getOpt('filename-format') === 'osgr') {
+    //2015-02-14_20-54-29_SD65821128_18_0.wav
+    filename = `${dateTime}_${gr8}_${accuracy}_${altitude ? altitude : 'none'}.wav`
+  } else {
+     //2015-02-14_20-54-45_53.59675_-2.51646_15_0.wav
+    filename = `${dateTime}_${lat}_${lon}_${accuracy}_${altitude ? altitude : 'none'}.wav`
+  }
   
   // Update gui GR
-  document.getElementById("g21-simp-prefix").innerHTML = gr.substring(0,2)
-  document.getElementById("g21-simp-e3").innerHTML = gr.substring(2,5)
-  document.getElementById("g21-simp-e4").innerHTML = gr.substring(5,6)
-  document.getElementById("g21-simp-e5").innerHTML = gr.substring(6,7)
-  document.getElementById("g21-simp-n3").innerHTML = gr.substring(7,10)
-  document.getElementById("g21-simp-n4").innerHTML = gr.substring(10,11)
-  document.getElementById("g21-simp-n5").innerHTML = gr.substring(11,12)
+  document.getElementById("g21-simp-prefix").innerHTML = gr10.substring(0,2)
+  document.getElementById("g21-simp-e3").innerHTML = gr10.substring(2,5)
+  document.getElementById("g21-simp-e4").innerHTML = gr10.substring(5,6)
+  document.getElementById("g21-simp-e5").innerHTML = gr10.substring(6,7)
+  document.getElementById("g21-simp-n3").innerHTML = gr10.substring(7,10)
+  document.getElementById("g21-simp-n4").innerHTML = gr10.substring(10,11)
+  document.getElementById("g21-simp-n5").innerHTML = gr10.substring(11,12)
   // Update gui accuracy
   document.getElementById("g21-simp-accuracy").innerHTML = `Accuracy: ${accuracy} m`
   // Update gui altitude
@@ -129,10 +135,9 @@ async function stopRecording() {
     if (capturedStream) {
       capturedStream.getTracks().forEach(track => track.stop())
     }
-    const playbackOpt = true // Replace with option
-    if (playbackOpt) {
+    if (getOpt('automatic-playback') === "true") {
       playback = new Audio()
-      await playBlob(playback, audioBlob, 1)
+      await playBlob(playback, audioBlob, getOpt('playback-volume'))
       playback = null
       beep(600, 0.2)
       const elMicrophone = document.getElementById("g21-simp-record")
@@ -154,8 +159,7 @@ async function stopRecording() {
   const elBin = document.getElementById("g21-simp-bin")
   elBin.src = "/images/bin-grey.png"
   elBin.removeEventListener('click', cancelRecording)
-  const playbackOpt = true // Replace with option
-  if (playbackOpt) {
+  if (getOpt('automatic-playback') === "true") {
     elMicrophone.src = "/images/playback-red.png"
     elMicrophone.classList.add("flashing")
     elMicrophone.addEventListener('click', stopPlayback)

@@ -1,4 +1,4 @@
-const VERSION = "v0.0.96"
+const VERSION = "v0.0.97"
 const CACHE_NAME = `g21-${VERSION}`
 const APP_STATIC_RESOURCES = [
   "/",
@@ -9,6 +9,8 @@ const APP_STATIC_RESOURCES = [
   "/js/location.js",
   "/js/record.js",
   "/js/menu.js",
+  "/js/common.js",
+  "/js/options.js",
   "js/play.js",
   "/js/nl.min.js",
   "/manifest.json",

@@ -13,15 +13,34 @@
   <div id="opts-div">
     <div class="opts-category">Output file</div>
     <hr/>
-    <div class="opts-label"><b>Filename format:</b> indicate whether sound files should use with OSGR or lat/lon in their names.</div>
-    <select id="filename-format">
-      <option value="gr">OSGR</option>
+    <div class="opts-label"><b>Filename format:</b> indicate whether sound files should use OSGR or lat/lon in their names.</div>
+    <select id="filename-format" onchange="filenameFormat()">
+      <option value="osgr">OSGR</option>
       <option value="latlon">Lat/lon</option>
     </select>
+    <div class="opts-category">Playback</div>
+    <hr/>
+    <div class="opts-label"><b>Automatic playback:</b> indicate whether or not to automatically playback at end of recording.</div>
+    <label class="switch">
+      <input id="automatic-playback" type="checkbox" onchange="automaticPlayback()">
+      <span class="slider round"></span>
+    </label>
+    <div class="opts-label"><b>Playback volume:</b> set volume level for recording playback.</div>
+    <input type="range" min="0" max="1" step="0.1" id="playback-volume" onchange="playbackVolume()">
+    <div class="opts-category">Sounds</div>
+    <hr/>
+    <div class="opts-label"><b>Sounds signal volume:</b> set volume level for sound signals.</div>
+    <input type="range" min="0" max="1" step="0.1" id="beep-volume" onchange="beepVolume()">
   </div>
   <div id="menu"></div>
+  <script src="js/options.js" type="module" defer></script>
   <script type="module">
     import { menu } from './js/menu.js'
+    import { filenameFormat, automaticPlayback, playbackVolume, beepVolume } from './js/options.js'
+    window.filenameFormat = filenameFormat
+    window.automaticPlayback = automaticPlayback
+    window.playbackVolume = playbackVolume
+    window.beepVolume = beepVolume
     menu()
   </script>
 </body>

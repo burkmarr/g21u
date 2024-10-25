@@ -1,3 +1,5 @@
+import { getOpt } from "./common.js"
+
 export async function playFile(audio, path, mimeType, volume) {
   audio.type = mimeType
   audio.volume = volume
@@ -30,7 +32,11 @@ export function beep(freq, duration) {
   const oscillator = audioCtx.createOscillator()
   oscillator.type = "sine"
   oscillator.frequency.value = freq
-  oscillator.connect(audioCtx.destination)
+
+  const gainNode = audioCtx.createGain()
+  gainNode.gain.value =  Number(getOpt('beep-volume'))
+  oscillator.connect(gainNode)
+  gainNode.connect(audioCtx.destination)
   oscillator.start(audioCtx.currentTime)
   oscillator.stop(audioCtx.currentTime + duration)
   return new Promise(resolve => { 
