@@ -31,16 +31,24 @@
     <hr/>
     <div class="opts-label"><b>Sounds signal volume:</b> set volume level for sound signals.</div>
     <input type="range" min="0" max="1" step="0.1" id="beep-volume" onchange="beepVolume()">
+    <div class="opts-category">File handling</div>
+    <hr/>
+    <div class="opts-label"><b>Storage:</b> indicate how sound files are to be handled on creation.</div>
+    <select id="file-handling" onchange="fileHandling()">
+      <option value="download">Immediate download</option>
+      <option value="pofs">Private origin file system</option>
+    </select>
   </div>
   <div id="menu"></div>
   <script src="js/options.js" type="module" defer></script>
   <script type="module">
     import { menu } from './js/menu.js'
-    import { filenameFormat, automaticPlayback, playbackVolume, beepVolume } from './js/options.js'
+    import { filenameFormat, automaticPlayback, playbackVolume, beepVolume, fileHandling } from './js/options.js'
     window.filenameFormat = filenameFormat
     window.automaticPlayback = automaticPlayback
     window.playbackVolume = playbackVolume
     window.beepVolume = beepVolume
+    window.fileHandling = fileHandling
     menu()
   </script>
 </body>

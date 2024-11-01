@@ -111,7 +111,12 @@ div#home-links a {
   position: fixed;
   left: 0;
   bottom: 0;
+  height: 68px;
   width: 100%;
+}
+
+body {
+  padding-bottom:68px;
 }
 
 /* Style the links inside the navigation bar */
@@ -234,4 +239,8 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+#file-handling, #filename-format  {
+  width: 100%;
 }
