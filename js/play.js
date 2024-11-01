@@ -45,6 +45,8 @@ export function beep(freq, duration) {
 }
 
 export function doubleBeep(freq, duration) {
+
+  return
   const audioCtx = getAudioContext()
 
   const beep1 = audioCtx.createOscillator()

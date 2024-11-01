@@ -141,8 +141,7 @@ body {
 }
 
 #navbar-inner {
-  /* width: 194px; */
-  width: 136px;
+  width: 204px;
   margin: 0 auto;
 }
 
@@ -174,7 +173,7 @@ select {
   padding: 0.5em 3.5em 0.5em 1em;
   margin: 0;      
   box-sizing: border-box;
-  width: 200px;
+  width: 100%;
   appearance: none; /* removes arrow */
 }
 
@@ -239,8 +238,4 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
-}
-
-#file-handling, #filename-format  {
-  width: 100%;
 }

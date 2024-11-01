@@ -1,6 +1,7 @@
 import { selectAll, transition, easeLinear, wavMediaRecorder, registerWavEncoder, getGr } from './nl.min.js'
 import { beep, doubleBeep, playBlob } from './play.js'
 import { getOpt } from "./common.js"
+import { downloadBlob, opfsSaveFile } from './file-handling.js'
 
 let isGeolocated = false
 let filename
@@ -146,9 +147,11 @@ async function stopRecording() {
       elMicrophone.classList.remove("flashing")
       elMicrophone.addEventListener('click', startRecording)
     }
-    const mode = 'download' // Replace with option
+    const mode = getOpt('file-handling')
     if (mode === 'download') {
       downloadBlob(audioBlob, filename)
+    } else if (mode === 'opfs') {
+      opfsSaveFile(audioBlob, filename)
     }
   })
   mediaRecorder.stop()
@@ -183,9 +186,11 @@ function stopPlayback() {
   elMicrophone.classList.remove("flashing")
   elMicrophone.addEventListener('click', startRecording)
 
-  const mode = 'download' // Replace with option
+  const mode = getOpt('file-handling')
   if (mode === 'download') {
     downloadBlob(audioBlob, filename)
+  } else if (mode === 'opfs') {
+    opfsSaveFile(audioBlob, filename)
   }
 }
 
@@ -203,27 +208,3 @@ function cancelRecording() {
   elBin.src = "/images/bin-grey.png"
   elBin.removeEventListener('click', cancelRecording)
 }
-
-function downloadBlob(blob, name) {
-  // Convert your blob into a Blob URL (a special url that points to an object in the browser's memory)
-  const blobUrl = URL.createObjectURL(blob)
-  // Create a link element
-  const link = document.createElement("a")
-  // Set link's href to point to the Blob URL
-  link.href = blobUrl
-  link.download = name
-  // Append link to the body
-  document.body.appendChild(link)
-  // Dispatch click event on the link
-  // This is necessary as link.click() does not work on the latest firefox
-  link.dispatchEvent(
-    new MouseEvent('click', { 
-      bubbles: true, 
-      cancelable: true, 
-      view: window 
-    })
-  )
-  // Remove link from body
-  document.body.removeChild(link)
-}
-
