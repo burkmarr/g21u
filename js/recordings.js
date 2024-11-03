@@ -1,24 +1,113 @@
-import { opfsListFiles, opfsGetFiles } from './file-handling.js'
+import { opfsGetFiles, opfsDeleteFiles, downloadBlob } from './file-handling.js'
 import { selectAll, transition, easeLinear } from './nl.min.js'
-
-// recordings-div
-
-// Populate with files from origin private file system (root folder)
+import { getOpt } from './common.js'
+import { playBlob } from './play.js'
 
 
-export function testFlash(el) {
-  flash(el.id)
+let opfsFiles
+const recordingDiv = document.getElementById('recordings-div')
+initialiseDisplay()
+
+async function initialiseDisplay() {
+  // Populate with files from origin private file system (root folder)
+  recordingDiv.innerHTML = ''
+  opfsFiles = await opfsGetFiles()
+
+  opfsFiles.forEach((f,i) => {
+    // Create div
+    const fileDiv = document.createElement('div')
+    fileDiv.setAttribute('id', `file-div-${i}`)
+    fileDiv.classList.add('opfs-div')
+    // Play image
+    const playImage = document.createElement('img')
+    playImage.setAttribute('src', '/images/playback-green.png')
+    playImage.setAttribute('data-index', i)
+    playImage.setAttribute('id', `opfs-play-image-${i}`)
+    playImage.classList.add('opfs-play-image')
+    playImage.addEventListener('click', playRecording)
+    fileDiv.appendChild(playImage)
+    // Logo
+    const logoImage = document.createElement('img')
+    logoImage.setAttribute('src', '/images/gilbert.png')
+    logoImage.classList.add('opfs-logo')
+    fileDiv.appendChild(logoImage)
+    // Text
+    const sName = f.name.split('_')
+    const date = `${sName[0].substring(8,10)}/${sName[0].substring(5,7)}/${sName[0].substring(0,4)}`
+    const time = sName[1].replace(/-/g, ':')
+    let location
+    if (sName.length === 5) {
+      // Name is in GR
+      location = sName[2]
+    } else {
+      // Name is lat/lon format
+      location = `${sName[2]}/${sName[3]}`
+    }
+    const textDiv = document.createElement('div')
+    textDiv.classList.add('opfs-div-text')
+    textDiv.innerHTML=`${date} ${time}<br/>${location}`
+    fileDiv.appendChild(textDiv)
+    // Select checkbox
+    const check = document.createElement('input')
+    check.setAttribute('type', 'checkbox')
+    check.setAttribute('id', `opfs-checkbox-${i}`)
+    check.classList.add('opfs-checkbox')
+    fileDiv.appendChild(check)
+    
+    recordingDiv.appendChild(fileDiv)
+  })
 }
 
-export function deleteSelected(el) {
-  console.log('delete', el.id)
+export async function deleteSelected(el) {
   flash(el.id)
+
+  const names = []
+  opfsFiles.forEach((f,i) => {
+    if (document.getElementById(`opfs-checkbox-${i}`).checked) {
+      names.push(f.name)
+    }
+  })
+  await opfsDeleteFiles(names)
+  initialiseDisplay()
 }
 
 export async function shareSelected(el) {
   flash(el.id)
-  const files = await opfsGetFiles()
+
+  const files = []
+  opfsFiles.forEach((f,i) => {
+    if (document.getElementById(`opfs-checkbox-${i}`).checked) {
+      files.push(f.file)
+    }
+  })
   navigator.share({files: files})
+}
+
+export async function downloadSelected(el) {
+  flash(el.id)
+
+  const files = []
+  opfsFiles.forEach((f,i) => {
+    if (document.getElementById(`opfs-checkbox-${i}`).checked) {
+      downloadBlob(f.file, f.name)
+    }
+  })
+}
+
+export function uncheckAll(el) {
+  flash(el.id)
+  const checkboxes = document.getElementsByClassName('opfs-checkbox')
+  for(let i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = false
+  }
+}
+
+export function checkAll(el) {
+  flash(el.id)
+  const checkboxes = document.getElementsByClassName('opfs-checkbox')
+  for(let i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = true
+  }
 }
 
 function flash(id) {
@@ -31,7 +120,37 @@ function flash(id) {
     .transition(t).style("fill", "white")
 }
 
+async function playRecording(e) {
+  console.log('Playback', e.target.getAttribute('data-index'))
 
-//console.log(files)
+  const i = Number(e.target.getAttribute('data-index'))
+  const playbackImage = document.getElementById(`opfs-play-image-${i}`)
 
+  playbackImage.removeEventListener('click', playRecording)
+  playbackImage.src = "/images/playback-red.png"
+  playbackImage.classList.add("flashing")
+  playbackImage.addEventListener('click', stopPlayback)
 
+  opfsFiles[i].playback = new Audio()
+  await playBlob(opfsFiles[i].playback, opfsFiles[i].file, getOpt('playback-volume'))
+
+  playbackImage.removeEventListener('click', stopPlayback)
+  playbackImage.src = "/images/playback-green.png"
+  playbackImage.classList.remove("flashing")
+  playbackImage.addEventListener('click', playRecording)
+}
+
+function stopPlayback(e) {
+
+  const i = Number(e.target.getAttribute('data-index'))
+  const playbackImage = document.getElementById(`opfs-play-image-${i}`)
+
+  opfsFiles[i].playback.pause()
+  opfsFiles[i].playback.currentTime = 0
+  opfsFiles[i].playback = null
+
+  playbackImage.removeEventListener('click', stopPlayback)
+  playbackImage.src = "/images/playback-green.png"
+  playbackImage.classList.remove("flashing")
+  playbackImage.addEventListener('click', playRecording)
+}

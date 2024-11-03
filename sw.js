@@ -1,4 +1,4 @@
-const VERSION = "v0.0.99"
+const VERSION = "v0.0.100"
 const CACHE_NAME = `g21-${VERSION}`
 const APP_STATIC_RESOURCES = [
   "/",
@@ -29,7 +29,10 @@ const APP_STATIC_RESOURCES = [
   "/images/record-grey.png",
   "/images/record-green.png",
   "/images/record-red.png",
+  "/images/playback-red-padded.png",
   "/images/playback-red.png",
+  "/images/playback-green.png",
+  "/images/gilbert.png"
 ]
 
 self.addEventListener("install", (event) => {

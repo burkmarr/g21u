@@ -29,14 +29,11 @@ export async function opfsSaveFile(blob, name) {
   await writable.close()
 }
 
-export async function opfsListFiles () {
+export async function opfsDeleteFiles(names) {
   const opfsRoot = await navigator.storage.getDirectory()
-  const entries = opfsRoot.values()
-  const files = []
-  for await (const entry of entries) {
-    files.push(entry)
+  for (const name of names) {
+    await opfsRoot.removeEntry(name)
   }
-  return files
 }
 
 export async function opfsGetFiles () {
@@ -46,7 +43,10 @@ export async function opfsGetFiles () {
   for await (const entry of entries) {
     const existingFileHandle = await opfsRoot.getFileHandle(entry.name)
     const file = await existingFileHandle.getFile()
-    files.push(file)
+    files.push({
+      name: entry.name,
+      file: file
+    })
   }
   return files
 }

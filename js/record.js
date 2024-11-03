@@ -163,7 +163,7 @@ async function stopRecording() {
   elBin.src = "/images/bin-grey.png"
   elBin.removeEventListener('click', cancelRecording)
   if (getOpt('automatic-playback') === "true") {
-    elMicrophone.src = "/images/playback-red.png"
+    elMicrophone.src = "/images/playback-red-padded.png"
     elMicrophone.classList.add("flashing")
     elMicrophone.addEventListener('click', stopPlayback)
   } else {

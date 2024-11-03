@@ -118,6 +118,7 @@ div#home-links a {
 }
 #recordings-navbar {
   top: 0;
+  z-index: 100;
 }
 
 body {
@@ -188,7 +189,7 @@ body#recordings {
 }
 
 a.selected .menu-icon path {
-    stroke: rgb(12, 237, 12);
+  stroke: rgb(12, 237, 12);
 }
 
 a.selected .menu-icon circle {
@@ -266,4 +267,26 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.opfs-div {
+  background-image: linear-gradient(white, lightgray);
+  height: 70px;
+  display: flex;
+  align-items: center; 
+}
+.opfs-play-image {
+  width: 60px;
+}
+.opfs-logo {
+  margin-left: 10px;
+  width: 50px;
+}
+.opfs-div-text {
+  margin-left: 20px;
+}
+.opfs-checkbox {
+  position: absolute;
+  right: 25px;
+  transform: scale(2);
 }
