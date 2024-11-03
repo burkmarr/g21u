@@ -1,4 +1,4 @@
-const VERSION = "v0.0.98"
+const VERSION = "v0.0.99"
 const CACHE_NAME = `g21-${VERSION}`
 const APP_STATIC_RESOURCES = [
   "/",

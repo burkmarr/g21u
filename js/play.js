@@ -29,6 +29,7 @@ export function playBlob(audio, audioBlob, volume) {
 
 export function beep(freq, duration) {
   const audioCtx = getAudioContext()
+
   const oscillator = audioCtx.createOscillator()
   oscillator.type = "sine"
   oscillator.frequency.value = freq
@@ -36,6 +37,7 @@ export function beep(freq, duration) {
   const gainNode = audioCtx.createGain()
   gainNode.gain.value =  Number(getOpt('beep-volume'))
   oscillator.connect(gainNode)
+
   gainNode.connect(audioCtx.destination)
   oscillator.start(audioCtx.currentTime)
   oscillator.stop(audioCtx.currentTime + duration)
@@ -46,20 +48,29 @@ export function beep(freq, duration) {
 
 export function doubleBeep(freq, duration) {
 
-  return
   const audioCtx = getAudioContext()
 
   const beep1 = audioCtx.createOscillator()
   beep1.type = "sine"
   beep1.frequency.value = freq
-  beep1.connect(audioCtx.destination)
+
+  const gainNode1 = audioCtx.createGain()
+  gainNode1.gain.value = Number(getOpt('beep-volume'))
+  beep1.connect(gainNode1)
+
+  gainNode1.connect(audioCtx.destination)
   beep1.start(audioCtx.currentTime)
   beep1.stop(audioCtx.currentTime + duration)
 
   const beep2 = audioCtx.createOscillator()
   beep2.type = "sine"
   beep2.frequency.value = freq
-  beep2.connect(audioCtx.destination)
+
+  const gainNode2 = audioCtx.createGain()
+  gainNode2.gain.value =  Number(getOpt('beep-volume'))
+  beep2.connect(gainNode2)
+
+  gainNode2.connect(audioCtx.destination)
   beep2.start(audioCtx.currentTime + duration * 1.5)
   beep2.stop(audioCtx.currentTime + duration * 2.5)
 

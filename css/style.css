@@ -105,18 +105,27 @@ div#home-links a {
   visibility: hidden;
 }
 
-#navbar {
+#navbar, #recordings-navbar {
   background-color: #333;
   overflow: hidden;
   position: fixed;
   left: 0;
-  bottom: 0;
   height: 68px;
   width: 100%;
+}
+#navbar {
+  bottom: 0;
+}
+#recordings-navbar {
+  top: 0;
 }
 
 body {
   padding-bottom:68px;
+}
+
+body#recordings {
+  padding-top:68px;
 }
 
 /* Style the links inside the navigation bar */
@@ -128,8 +137,18 @@ body {
   text-decoration: none;
 }
 
-.menu-icon {
+/* Style the links inside the recordings navigation bar */
+#recordings-navbar svg {
+  float: left;
+  display: block;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+.menu-icon, .menu-icon-2 {
   width: 36px;
+  cursor: pointer;
 }
 
 .menu-icon path {
@@ -140,8 +159,17 @@ body {
   stroke: white;
 }
 
+.menu-icon-2 path {
+  fill: white;
+}
+
 #navbar-inner {
   width: 204px;
+  margin: 0 auto;
+}
+
+#recordings-navbar-inner {
+  width: 340px;
   margin: 0 auto;
 }
 
