@@ -136,6 +136,12 @@ async function stopRecording() {
     if (capturedStream) {
       capturedStream.getTracks().forEach(track => track.stop())
     }
+    const mode = getOpt('file-handling')
+    if (mode === 'download') {
+      downloadBlob(audioBlob, filename)
+    } else if (mode === 'opfs') {
+      opfsSaveFile(audioBlob, filename)
+    }
     if (getOpt('automatic-playback') === "true") {
       playback = new Audio()
       await playBlob(playback, audioBlob, getOpt('playback-volume'))
@@ -146,12 +152,6 @@ async function stopRecording() {
       elMicrophone.src = "/images/record-green.png"
       elMicrophone.classList.remove("flashing")
       elMicrophone.addEventListener('click', startRecording)
-    }
-    const mode = getOpt('file-handling')
-    if (mode === 'download') {
-      downloadBlob(audioBlob, filename)
-    } else if (mode === 'opfs') {
-      opfsSaveFile(audioBlob, filename)
     }
   })
   mediaRecorder.stop()
@@ -185,13 +185,6 @@ function stopPlayback() {
   elMicrophone.src = "/images/record-green.png"
   elMicrophone.classList.remove("flashing")
   elMicrophone.addEventListener('click', startRecording)
-
-  const mode = getOpt('file-handling')
-  if (mode === 'download') {
-    downloadBlob(audioBlob, filename)
-  } else if (mode === 'opfs') {
-    opfsSaveFile(audioBlob, filename)
-  }
 }
 
 function cancelRecording() {
