@@ -6,6 +6,8 @@ import { playBlob } from './play.js'
 
 let opfsFiles
 const recordingDiv = document.getElementById('recordings-div')
+const deleteConfirmDialog = document.getElementById('delete-confirm-dialog')
+
 initialiseDisplay()
 
 async function initialiseDisplay() {
@@ -60,38 +62,53 @@ async function initialiseDisplay() {
 
 export async function deleteSelected(el) {
   flash(el.id)
+  const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`opfs-checkbox-${i}`).checked ? a+1 : a, 0)
+  if (n) {
+    document.getElementById('file-num').innerText = n
+    document.getElementById('file-text').innerText = n === 1 ? 'file' : 'files'
+    deleteConfirmDialog.showModal()
+  }
+}
 
-  const names = []
-  opfsFiles.forEach((f,i) => {
-    if (document.getElementById(`opfs-checkbox-${i}`).checked) {
-      names.push(f.name)
-    }
-  })
-  await opfsDeleteFiles(names)
-  initialiseDisplay()
+export async function deleteYesNo(e) {
+  deleteConfirmDialog.close()
+  if (e.getAttribute('id') === 'delete-confirm') {
+    const names = []
+    opfsFiles.forEach((f,i) => {
+      if (document.getElementById(`opfs-checkbox-${i}`).checked) {
+        names.push(f.name)
+      }
+    })
+    await opfsDeleteFiles(names)
+    initialiseDisplay()
+  }
 }
 
 export async function shareSelected(el) {
   flash(el.id)
-
-  const files = []
-  opfsFiles.forEach((f,i) => {
-    if (document.getElementById(`opfs-checkbox-${i}`).checked) {
-      files.push(f.file)
-    }
-  })
-  navigator.share({files: files})
+  const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`opfs-checkbox-${i}`).checked ? a+1 : a, 0)
+  if (n) {
+    const files = []
+    opfsFiles.forEach((f,i) => {
+      if (document.getElementById(`opfs-checkbox-${i}`).checked) {
+        files.push(f.file)
+      }
+    })
+    navigator.share({files: files})
+  }
 }
 
 export async function downloadSelected(el) {
   flash(el.id)
-
-  const files = []
-  opfsFiles.forEach((f,i) => {
-    if (document.getElementById(`opfs-checkbox-${i}`).checked) {
-      downloadBlob(f.file, f.name)
-    }
-  })
+  const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`opfs-checkbox-${i}`).checked ? a+1 : a, 0)
+  if (n) {
+    const files = []
+    opfsFiles.forEach((f,i) => {
+      if (document.getElementById(`opfs-checkbox-${i}`).checked) {
+        downloadBlob(f.file, f.name)
+      }
+    })
+  }
 }
 
 export function uncheckAll(el) {

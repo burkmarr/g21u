@@ -10,6 +10,11 @@
 </head>
 
 <body id="recordings">
+  <dialog id="delete-confirm-dialog" align="end">
+    <p>Are you sure that you want to delete <span id="file-num"></span> <span id="file-text"></span>?</p>
+    <button id="delete-reject" onclick="deleteYesNo(this)">No</button>
+    <button id="delete-confirm" onclick="deleteYesNo(this)">Yes</button>
+  </dialog>
   <div id="recordings-navbar">
     <div id="recordings-navbar-inner">
       <svg viewBox="0 0 512 512" class="menu-icon" id="delete-selected" onclick="deleteSelected(this)">
@@ -35,12 +40,13 @@
   <script src="js/recordings.js" type="module" defer></script>
   <script type="module">
     import { menu } from './js/menu.js'
-    import { downloadSelected, shareSelected, deleteSelected, uncheckAll, checkAll } from './js/recordings.js'
+    import { downloadSelected, shareSelected, deleteSelected, uncheckAll, checkAll, deleteYesNo } from './js/recordings.js'
     window.shareSelected = shareSelected
     window.deleteSelected = deleteSelected
     window.downloadSelected = downloadSelected
     window.uncheckAll = uncheckAll
     window.checkAll = checkAll
+    window.deleteYesNo = deleteYesNo
     menu()
   </script>
 </body>
