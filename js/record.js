@@ -28,7 +28,7 @@ function geolocated(position) {
   if (!isGeolocated) {
     // First time in
     document.getElementById("g21-simp-record").addEventListener('click', startRecording)
-    document.getElementById("g21-simp-record").src = "/images/record-green.png"
+    document.getElementById("g21-simp-record").src = "images/record-green.png"
     isGeolocated = true
   }
   
@@ -119,12 +119,12 @@ export async function startRecording() {
   elMicrophone.removeEventListener('click', startRecording)
   await beep(600, 0.3) // Await ensures that beep won't be on playback
   mediaRecorder.start()
-  elMicrophone.src = "/images/record-red.png"
+  elMicrophone.src = "images/record-red.png"
   elMicrophone.classList.add("flashing")
   elMicrophone.addEventListener('click', stopRecording)
 
   const elBin = document.getElementById("g21-simp-bin")
-  elBin.src = "/images/bin-orange.png"
+  elBin.src = "images/bin-orange.png"
   elBin.addEventListener('click', cancelRecording)
 }
 
@@ -149,7 +149,7 @@ async function stopRecording() {
       beep(600, 0.2)
       const elMicrophone = document.getElementById("g21-simp-record")
       elMicrophone.removeEventListener('click', stopPlayback)
-      elMicrophone.src = "/images/record-green.png"
+      elMicrophone.src = "images/record-green.png"
       elMicrophone.classList.remove("flashing")
       elMicrophone.addEventListener('click', startRecording)
     }
@@ -160,14 +160,14 @@ async function stopRecording() {
   elMicrophone.removeEventListener('click', stopRecording)
   elMicrophone.classList.remove("flashing")
   const elBin = document.getElementById("g21-simp-bin")
-  elBin.src = "/images/bin-grey.png"
+  elBin.src = "images/bin-grey.png"
   elBin.removeEventListener('click', cancelRecording)
   if (getOpt('automatic-playback') === "true") {
-    elMicrophone.src = "/images/playback-red-padded.png"
+    elMicrophone.src = "images/playback-red-padded.png"
     elMicrophone.classList.add("flashing")
     elMicrophone.addEventListener('click', stopPlayback)
   } else {
-    elMicrophone.src = "/images/record-green.png"
+    elMicrophone.src = "images/record-green.png"
     elMicrophone.addEventListener('click', startRecording)
   }
 }
@@ -182,7 +182,7 @@ function stopPlayback() {
   beep(600, 0.2)
   const elMicrophone = document.getElementById("g21-simp-record")
   elMicrophone.removeEventListener('click', stopPlayback)
-  elMicrophone.src = "/images/record-green.png"
+  elMicrophone.src = "images/record-green.png"
   elMicrophone.classList.remove("flashing")
   elMicrophone.addEventListener('click', startRecording)
 }
@@ -192,12 +192,12 @@ function cancelRecording() {
   
   const elMicrophone = document.getElementById("g21-simp-record")
   elMicrophone.removeEventListener('click', stopRecording)
-  elMicrophone.src = "/images/record-green.png"
+  elMicrophone.src = "images/record-green.png"
   elMicrophone.classList.remove("flashing")
   console.log('Add startRecording from cancelRecording')
   elMicrophone.addEventListener('click', startRecording)
 
   const elBin = document.getElementById("g21-simp-bin")
-  elBin.src = "/images/bin-grey.png"
+  elBin.src = "images/bin-grey.png"
   elBin.removeEventListener('click', cancelRecording)
 }

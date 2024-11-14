@@ -22,7 +22,7 @@ async function initialiseDisplay() {
     fileDiv.classList.add('opfs-div')
     // Play image
     const playImage = document.createElement('img')
-    playImage.setAttribute('src', '/images/playback-green.png')
+    playImage.setAttribute('src', 'images/playback-green.png')
     playImage.setAttribute('data-index', i)
     playImage.setAttribute('id', `opfs-play-image-${i}`)
     playImage.classList.add('opfs-play-image')
@@ -30,7 +30,7 @@ async function initialiseDisplay() {
     fileDiv.appendChild(playImage)
     // Logo
     const logoImage = document.createElement('img')
-    logoImage.setAttribute('src', '/images/gilbert.png')
+    logoImage.setAttribute('src', 'images/gilbert.png')
     logoImage.classList.add('opfs-logo')
     fileDiv.appendChild(logoImage)
     // Text
@@ -144,7 +144,7 @@ async function playRecording(e) {
   const playbackImage = document.getElementById(`opfs-play-image-${i}`)
 
   playbackImage.removeEventListener('click', playRecording)
-  playbackImage.src = "/images/playback-red.png"
+  playbackImage.src = "images/playback-red.png"
   playbackImage.classList.add("flashing")
   playbackImage.addEventListener('click', stopPlayback)
 
@@ -152,7 +152,7 @@ async function playRecording(e) {
   await playBlob(opfsFiles[i].playback, opfsFiles[i].file, getOpt('playback-volume'))
 
   playbackImage.removeEventListener('click', stopPlayback)
-  playbackImage.src = "/images/playback-green.png"
+  playbackImage.src = "images/playback-green.png"
   playbackImage.classList.remove("flashing")
   playbackImage.addEventListener('click', playRecording)
 }
@@ -167,7 +167,7 @@ function stopPlayback(e) {
   opfsFiles[i].playback = null
 
   playbackImage.removeEventListener('click', stopPlayback)
-  playbackImage.src = "/images/playback-green.png"
+  playbackImage.src = "images/playback-green.png"
   playbackImage.classList.remove("flashing")
   playbackImage.addEventListener('click', playRecording)
 }
