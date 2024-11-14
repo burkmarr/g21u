@@ -1,5 +1,6 @@
-const VERSION = "v0.0.102"
-const CACHE_NAME = `g21-${VERSION}`
+const VERSION = "v1.0.0"
+const BUILD = 16
+const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "/",
   "/index.html",
@@ -80,22 +81,25 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   console.log(`Request of ${event.request.url}`)
-  // For every other request type
-  event.respondWith(
-    (async () => {
-      const cache = await caches.open(CACHE_NAME)
-      const cachedResponse = await cache.match(event.request.url)
-      if (cachedResponse) {
-        // Return the cached response if it's available.
-        return cachedResponse
-      } else {
-        // This is where we would implement a request to network
-        // for resource in a cache first then network strategy
-        // fetch(event.request)
-        console.log('No cache present for this resource')
-      }
-      // Respond with a HTTP 404 response status.
-      return new Response(null, { status: 404 })
-    })(),
-  )
+  if (event.request.url.endsWith('version')) {
+    event.respondWith(new Response(JSON.stringify({version: CACHE_NAME}), { status: 200 }))
+  } else {
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(CACHE_NAME)
+        const cachedResponse = await cache.match(event.request.url)
+        if (cachedResponse) {
+          // Return the cached response if it's available.
+          return cachedResponse
+        } else {
+          // This is where we would implement a request to network
+          // for resource in a cache first then network strategy
+          // fetch(event.request)
+          console.log('No cache present for this resource')
+        }
+        // Respond with a HTTP 404 response status.
+        return new Response(null, { status: 404 })
+      })()
+    )
+  }
 })

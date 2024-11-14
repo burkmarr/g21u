@@ -11,6 +11,7 @@
 
 <body>
   <div id="opts-div">
+    <div id="version"></div>
     <div class="opts-category">Output file</div>
     <hr/>
     <div class="opts-label"><b>Filename format:</b> indicate whether sound files should use OSGR or lat/lon in their names.</div>
@@ -50,6 +51,11 @@
     window.beepVolume = beepVolume
     window.fileHandling = fileHandling
     menu()
+
+    fetch('version').then(r => r.json()).then(json => {
+      document.getElementById('version').innerText = json.version
+    })
+
   </script>
 </body>
 </html>
