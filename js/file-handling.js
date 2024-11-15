@@ -25,6 +25,9 @@ export async function opfsSaveFile(blob, name) {
   const opfsRoot = await navigator.storage.getDirectory()
   const fileHandle = await opfsRoot.getFileHandle(name, {create: true})
   const writable = await fileHandle.createWritable()
+  // https://developer.mozilla.org/en-US/docs/Web/API/FileSystemWritableFileStream/write
+  // May not work on iOS 
+  // Writes a zero byte file on tested iPhone
   await writable.write(blob)
   await writable.close()
 }

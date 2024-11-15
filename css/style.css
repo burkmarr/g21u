@@ -22,13 +22,11 @@ div#home-links a {
 }
 
 #g21-simp-bin {
-  padding-left: 20px;
-  /* padding-right: 10px; */
-  width: 100px;
+  width: 140px;
 }
 #g21-simp-record {
   /* padding-left: 10px; */
-  width: 150px;
+  width: 140px;
 }
 #g21-simp-gps {
   display: block;
