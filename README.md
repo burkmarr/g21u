@@ -25,6 +25,9 @@ Although the app should be easy to understand intuitively, there follow some ins
 
 The app has three screens, each of which is covered below.
 
+## Issues
+If you use this app and find any problems or want to share information that may help other users use it on particular devices, browsers or operating systems, please use the *GitHub Issues* associated with this repository to open a new issue.
+
 ### The main recording screen
 The main recording screen is the default that opens when you first visit the app. It can also be reached by tapping the small microphone icon on the bottom navigation bar.
 
@@ -53,18 +56,24 @@ This indicates the volume that recordings should be played back at. (The actual 
 #### Sounds signal volume
 This indicates the volume used for sounds signals which are emitted, for example, when you start and end (or delete) a recording on the recording screen. For no sound, turn this right down.
 
-### Storage
+#### Storage
 This option determines how recorded WAV files are handled. 
 
-If set to *Private origin file system*, created files are stored in a file system on your device that is visible only to the G21 app (you won't be able to find the files with a file browser). The advantage of doing this is that you can use the *manage recordings* screen to review, playback and, if necessary, delete recordings. (You will also be able to export and download the files from there - see below for further details.)
+If set to *private origin file system*, created files are stored in a file system on your device that is visible only to the G21 app (you won't be able to find the files with a file browser). The advantage of doing this is that you can use the *manage recordings* screen to review, playback and, if necessary, delete recordings. (You will also be able to export and download the files from there - see below for further details.)
 
 Unfortunately the *private origin file system* has not worked properly on iPhone when I've tested it (the files are created in the file system but they are zero bytes). Until a fix for this can be found, you will need to use the next option if you are using iPhone.
 
-If set to *Immediate download*, files are downloaded to your device from the browser immediately on creation. In Chrome on Android this happens immediately but on iOS you will likely be presented with a download dialog.
+If set to *immediate download*, files are downloaded to your device from the browser immediately on creation. In Chrome on Android this happens immediately but on iOS you will likely be presented with a download dialog.
 
-If you use the *Immediate download* option, you will need to devise a workflow for moving your WAV files to where you want them, e.g. by using a file manager that allows you to share them, e.g. by email or by sending to cloud storage such as Google Drive.
+If you use the *immediate download* option, you will need to devise a workflow for moving your WAV files to where you want them, e.g. by using a file manager that allows you to share them, e.g. by email or by sending to cloud storage such as Google Drive.
 
 ### The manage recordings screen
+The manage recordings screen can be reached by tapping the small list icon on the bottom navigation bar. 
 
+This screen lists all recordings you have made and saved using the *private origin file system* storage option. Recordings made using the *immediate download* storage option do not appear hear.
 
+You can play back recordings by tapping on the green speaker icon on the relevant record item. Whist playing back, the icon turns red and flashes. If you tap on the red speaker, it stops the playback and turns green again.
 
+You can select or deselect recordings indivdually by tapping the checkboxes on the right on the record item. Or you can select/deselect them all at once using the two icons on the right of the top toolbar.
+
+Selected icons can be deleted, downloaded or shared using the three icons on the left of the top toolbar. Sharing items invokes your browser's standard share dialog. I have found this a great way to easily transfer recordings to Google Drive from where I can access them on my desktop.
