@@ -13,7 +13,8 @@
       padding: 0;
       /* box-sizing: border-box; */
     }
-    .search-form {
+    #search-input {
+      display: inline-block;
       max-width: 400px;
       margin: 50px auto;
     }
@@ -58,28 +59,28 @@
 
 <body>
 
-  <form action="" class="search-form">
+  <div id="search-input">
     <input type="text" id="taxon-search" placeholder="Taxon">
-    <ul class="suggestions">
-      <li>Filter for city</li>
-      <li>or state</li>
-    </ul>
-  </form>
+    <ul class="suggestions"></ul>
+  <div>
 
   <div id="g21-simp-home" class="g21-simp-centre"><a href="/index.html" >Home</a></div> 
 
   <script>
     async function displayMatches() {
-      console.log('run')
-      const endpoint = `https://species-ws.nbnatlas.org/search/auto?q=${this.value}`
-      const data = await fetch(endpoint).then(data => data.json())
+      const nbnapi = `https://species-ws.nbnatlas.org/search/auto?q=${this.value}&limit=20`
+      const data = await fetch(nbnapi).then(data => data.json())
       console.log(data)
-      const html = data.autoCompleteList.map(place => {
-        const cityName = place.name
-        const stateName = place.commonName
+      const html = data.autoCompleteList.map(taxon => {
+        const scientificName = taxon.name
+        const commonName = taxon.commonName
         return `
           <li>
-            <span class="name">${cityName}, ${stateName}</span>
+            <div>
+              <span class="name"><i>${scientificName}</i></span>
+              <br/>
+              <span class="name">${commonName}</span>
+            </div>
           </li>
         `
       }).join('')
