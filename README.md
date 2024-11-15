@@ -9,8 +9,13 @@ Further development of this G21 PWA will concentrate on replacing some of the fu
 
 ## Installing the app on your phone
 To install this app, open the browser on your phone when you have an internet connection and navigate to this URL:
+https://burkmarr.github.io/g21u
 
-asdf
+As a PWA the app will cache all of the resources it needs to run offiline when you first open it. So you will be able to use it in the field even when you have no internet connection.
+
+Another PWA feature is that you should be able to install the app to your phone so that its icon appears on your homescreen just like any other app.
+
+If you are using Chrome on Android, click the three dots in the top right ofthe browser and look for the **Add to Home Screen** link. When you click that, you should be offered the option to install to your phone.
 
 ## How to use the app
 Although the app should be easy to understand intuitively, there follow some instructions on how to use it. In particuarl there are several ways in which the sound files it produces might be exported to your desktop environment (e.g. for use with the Gilbert 21 desktop).

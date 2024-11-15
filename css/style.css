@@ -295,3 +295,10 @@ input:checked + .slider:before {
   width: 100px;
   height: 40px;
 }
+
+/* cursor:pointer required on iOS browsers otherwise
+click event not recognised */
+#g21-simp-bin, #g21-simp-record, .opfs-play-image {
+  cursor: pointer;
+}
+

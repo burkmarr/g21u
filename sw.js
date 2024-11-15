@@ -1,7 +1,8 @@
 const VERSION = "v1.0.0"
-const BUILD = 17
+const BUILD = 19
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
+  "./",
   "index.html",
   "location.html",
   "options.html",
