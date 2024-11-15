@@ -11,7 +11,7 @@ Further development of this G21 PWA will concentrate on replacing some of the fu
 To install this app, open the browser on your phone when you have an internet connection and navigate to this URL:
 https://burkmarr.github.io/g21u
 
-As a PWA the app will cache all of the resources it needs to run offiline when you first open it. So you will be able to use it in the field even when you have no internet connection just by navigating to this URL in your browser. But another PWA feature is that you can install the app to your phone so that its icon appears on your homescreen just like any other app. When you've done that, you can start the app just by tapping the icon and although it is opened by a browser, it will look more like a native app without the usual browser controls.
+As a PWA the app will cache all of the resources it needs to run offiline when you first open it. So you will be able to use it in the field even when you have no internet connection just by navigating to this URL in your browser. But another PWA feature is that you can install the app to your phone so that it's icon appears on your homescreen just like any other app. When you've done that, you can start the app just by tapping the icon and although, it is opened by a browser under the hood, it will look more like a native app without the usual browser controls.
 
 If you are using Chrome on Android, click the three dots in the top right of the browser and look for the **Add to Home Screen** link. When you click that, you should be offered the option to install to your phone. There are similar features on both Safari and Chrome on iOS.
 
@@ -54,7 +54,17 @@ This indicates the volume that recordings should be played back at. (The actual 
 This indicates the volume used for sounds signals which are emitted, for example, when you start and end (or delete) a recording on the recording screen. For no sound, turn this right down.
 
 ### Storage
-This option determines how recorded WAV files are handled. If set to *Private origin file system*, created files are stored 
+This option determines how recorded WAV files are handled. 
+
+If set to *Private origin file system*, created files are stored in a file system on your device that is visible only to the G21 app (you won't be able to find the files with a file browser). The advantage of doing this is that you can use the *manage recordings* screen to review, playback and, if necessary, delete recordings. (You will also be able to export and download the files from there - see below for further details.)
+
+Unfortunately the *private origin file system* has not worked properly on iPhone when I've tested it (the files are created in the file system but they are zero bytes). Until a fix for this can be found, you will need to use the next option if you are using iPhone.
+
+If set to *Immediate download*, files are downloaded to your device from the browser immediately on creation. In Chrome on Android this happens immediately but on iOS you will likely be presented with a download dialog.
+
+If you use the *Immediate download* option, you will need to devise a workflow for moving your WAV files to where you want them, e.g. by using a file manager that allows you to share them, e.g. by email or by sending to cloud storage such as Google Drive.
+
+### The manage recordings screen
 
 
 
