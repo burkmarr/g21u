@@ -1,0 +1,93 @@
+<!doctype  html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>G21v2 Taxa test</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      /* box-sizing: border-box; */
+    }
+    .search-form {
+      max-width: 400px;
+      margin: 50px auto;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      &#taxon-search {
+        margin: 0;
+        /* text-align: center; */
+        border: 10px solid #F7F7F7;
+        font-size: 14px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.12), inset 0 0 2px rgba(0, 0, 0, 0.19);
+      }
+    }
+    .suggestions {
+      li {
+        background:white;
+        list-style: none;
+        border-bottom: 1px solid #D8D8D8;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.03);
+        margin:0;
+        padding:20px;
+        transition:background 0.2s;
+        display:flex;
+        justify-content:space-between;
+        text-transform: capitalize;
+        &:nth-child(even) {
+          transform: perspective(100px) rotateX(3deg) translateY(2px) scale(1.001);
+          background: linear-gradient(to bottom,  #ffffff 0%,#EFEFEF 100%);
+        }
+        &:nth-child(odd) {
+          transform: perspective(100px) rotateX(-3deg) translateY(3px);
+          background: linear-gradient(to top,  #ffffff 0%,#EFEFEF 100%);
+        }
+      }
+    }
+    .highlight {
+      background-color: #fbc93d;
+    }
+  </style>
+</head>
+
+<body>
+
+  <form action="" class="search-form">
+    <input type="text" id="taxon-search" placeholder="Taxon">
+    <ul class="suggestions">
+      <li>Filter for city</li>
+      <li>or state</li>
+    </ul>
+  </form>
+
+  <div id="g21-simp-home" class="g21-simp-centre"><a href="/index.html" >Home</a></div> 
+
+  <script>
+    async function displayMatches() {
+      console.log('run')
+      const endpoint = `https://species-ws.nbnatlas.org/search/auto?q=${this.value}`
+      const data = await fetch(endpoint).then(data => data.json())
+      console.log(data)
+      const html = data.autoCompleteList.map(place => {
+        const cityName = place.name
+        const stateName = place.commonName
+        return `
+          <li>
+            <span class="name">${cityName}, ${stateName}</span>
+          </li>
+        `
+      }).join('')
+      document.querySelector('.suggestions').innerHTML = html
+    }
+    const taxonSearch = document.getElementById('taxon-search')
+    taxonSearch.addEventListener('change', displayMatches)
+    taxonSearch.addEventListener('keyup', displayMatches)
+  </script>
+</body>
+</html>
