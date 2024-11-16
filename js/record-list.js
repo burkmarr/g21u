@@ -3,9 +3,8 @@ import { selectAll, transition, easeLinear } from './nl.min.js'
 import { getOpt } from './common.js'
 import { playBlob } from './play.js'
 
-
 let opfsFiles
-const recordingDiv = document.getElementById('recordings-div')
+const recordingDiv = document.getElementById('records-div')
 const deleteConfirmDialog = document.getElementById('delete-confirm-dialog')
 
 initialiseDisplay()
@@ -20,6 +19,8 @@ async function initialiseDisplay() {
     const fileDiv = document.createElement('div')
     fileDiv.setAttribute('id', `file-div-${i}`)
     fileDiv.classList.add('opfs-div')
+    fileDiv.addEventListener('click', recordSelected)
+
     // Play image
     const playImage = document.createElement('img')
     playImage.setAttribute('src', 'images/playback-green.png')
@@ -54,6 +55,7 @@ async function initialiseDisplay() {
     check.setAttribute('type', 'checkbox')
     check.setAttribute('id', `opfs-checkbox-${i}`)
     check.classList.add('opfs-checkbox')
+    check.addEventListener('click', recordChecked)
     fileDiv.appendChild(check)
     
     recordingDiv.appendChild(fileDiv)
@@ -137,8 +139,22 @@ function flash(id) {
     .transition(t).style("fill", "white")
 }
 
+function recordChecked(e) {
+  e.stopPropagation()
+}
+
+function recordSelected(e) {
+  const currentSelected = document.getElementsByClassName("record-selected")
+  if (currentSelected.length) {
+    currentSelected[0].classList.remove("record-selected")
+  }
+  e.target.classList.add("record-selected")
+}
+
 async function playRecording(e) {
   console.log('Playback', e.target.getAttribute('data-index'))
+
+  e.stopPropagation()
 
   const i = Number(e.target.getAttribute('data-index'))
   const playbackImage = document.getElementById(`opfs-play-image-${i}`)
@@ -158,6 +174,8 @@ async function playRecording(e) {
 }
 
 function stopPlayback(e) {
+
+  e.stopPropagation()
 
   const i = Number(e.target.getAttribute('data-index'))
   const playbackImage = document.getElementById(`opfs-play-image-${i}`)

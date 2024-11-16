@@ -1,12 +1,12 @@
 const VERSION = "v1.0.0"
-const BUILD = 21
+const BUILD = 22
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
+  "favicon.ico",
   "index.html",
-  "location.html",
   "options.html",
-  "recordings.html",
+  "manage.html",
   "css/style.css",
   "js/location.js",
   "js/record.js",
@@ -14,7 +14,7 @@ const APP_STATIC_RESOURCES = [
   "js/common.js",
   "js/options.js",
   "js/file-handling.js",
-  "js/recordings.js",
+  "js/record-list.js",
   "js/play.js",
   "js/nl.min.js",
   "manifest.json",

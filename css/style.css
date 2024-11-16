@@ -103,7 +103,7 @@ div#home-links a {
   visibility: hidden;
 }
 
-#navbar, #recordings-navbar {
+#navbar, #menu-record-list {
   background-color: #333;
   overflow: hidden;
   position: fixed;
@@ -114,7 +114,7 @@ div#home-links a {
 #navbar {
   bottom: 0;
 }
-#recordings-navbar {
+#menu-record-list {
   top: 0;
   z-index: 100;
 }
@@ -123,8 +123,27 @@ body {
   padding-bottom:68px;
 }
 
-body#recordings {
+body#manage {
   padding-top:68px;
+}
+
+#records-div {
+  overflow-y: auto; 
+  overflow-x: hidden; 
+  height: calc(100vh - 152px);
+}
+
+#record-details {
+  margin-left: 8px;
+}
+@media only screen and (max-width: 600px) {
+  #record-details {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+
 }
 
 /* Style the links inside the navigation bar */
@@ -137,7 +156,7 @@ body#recordings {
 }
 
 /* Style the links inside the recordings navigation bar */
-#recordings-navbar svg {
+#menu-record-list svg {
   float: left;
   display: block;
   text-align: center;
@@ -167,7 +186,7 @@ body#recordings {
   margin: 0 auto;
 }
 
-#recordings-navbar-inner {
+#menu-record-list-inner {
   width: 340px;
   margin: 0 auto;
 }
@@ -272,16 +291,25 @@ input:checked + .slider:before {
   height: 70px;
   display: flex;
   align-items: center; 
+  position: relative;
+  min-width: 350px;
 }
+.opfs-div.record-selected {
+  background-image: linear-gradient(white, rgb(238, 238, 120));
+}
+
+
 .opfs-play-image {
   width: 60px;
 }
 .opfs-logo {
   margin-left: 10px;
   width: 50px;
+  pointer-events: none;
 }
 .opfs-div-text {
   margin-left: 20px;
+  pointer-events: none;
 }
 .opfs-checkbox {
   position: absolute;

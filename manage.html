@@ -4,19 +4,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>G21v2 recordings</title>
+  <title>G21v2 manage</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="manifest" href="manifest.json" />
 </head>
 
-<body id="recordings">
+<body id="manage">
   <dialog id="delete-confirm-dialog" align="end">
     <p>Are you sure that you want to delete <span id="file-num"></span> <span id="file-text"></span>?</p>
     <button id="delete-reject" onclick="deleteYesNo(this)">No</button>
     <button id="delete-confirm" onclick="deleteYesNo(this)">Yes</button>
   </dialog>
-  <div id="recordings-navbar">
-    <div id="recordings-navbar-inner">
+  <div id="menu-record-list">
+    <div id="menu-record-list-inner">
       <svg viewBox="0 0 512 512" class="menu-icon" id="delete-selected" onclick="deleteSelected(this)">
         <path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352"/><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
       </svg>
@@ -35,12 +35,17 @@
       </svg>
     </div>
   </div>
-  <div id="recordings-div"></div>
+  <div id="manage-div" style="display: flex">
+    <div id="records-div"></div>
+    <div id="record-details">
+      <h4>Record details</h4>
+    </div>
+  </div>
   <div id="menu"></div>
-  <script src="js/recordings.js" type="module" defer></script>
+  <script src="js/record-list.js" type="module" defer></script>
   <script type="module">
     import { menu } from './js/menu.js'
-    import { downloadSelected, shareSelected, deleteSelected, uncheckAll, checkAll, deleteYesNo } from './js/recordings.js'
+    import { downloadSelected, shareSelected, deleteSelected, uncheckAll, checkAll, deleteYesNo } from './js/record-list.js'
     window.shareSelected = shareSelected
     window.deleteSelected = deleteSelected
     window.downloadSelected = downloadSelected
