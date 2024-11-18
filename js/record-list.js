@@ -7,9 +7,9 @@ let opfsFiles
 const recordingDiv = document.getElementById('records-div')
 const deleteConfirmDialog = document.getElementById('delete-confirm-dialog')
 
-initialiseDisplay()
+initialiseList()
 
-async function initialiseDisplay() {
+async function initialiseList() {
   // Populate with files from origin private file system (root folder)
   recordingDiv.innerHTML = ''
   opfsFiles = await opfsGetFiles()
