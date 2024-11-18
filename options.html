@@ -39,17 +39,25 @@
       <option value="download">Immediate download</option>
       <option value="opfs">Private origin file system</option>
     </select>
+    <div class="opts-category">Record options</div>
+    <hr/>
+    <div class="opts-label"><b>Default recorder:</b> specify the name of the default recorder.</div>
+    <input id="default-recorder" type="text" onchange="defaultRecorder()" />
+    <div class="opts-label"><b>Default determiner:</b> specify the name of the default determiner.</div>
+    <input id="default-determiner" type="text" onchange="defaultDeterminer()" />
   </div>
   <div id="menu"></div>
   <script src="js/options.js" type="module" defer></script>
   <script type="module">
     import { menu } from './js/menu.js'
-    import { filenameFormat, automaticPlayback, playbackVolume, beepVolume, fileHandling } from './js/options.js'
+    import { filenameFormat, automaticPlayback, playbackVolume, beepVolume, fileHandling, defaultRecorder, defaultDeterminer } from './js/options.js'
     window.filenameFormat = filenameFormat
     window.automaticPlayback = automaticPlayback
     window.playbackVolume = playbackVolume
     window.beepVolume = beepVolume
     window.fileHandling = fileHandling
+    window.defaultRecorder = defaultRecorder
+    window.defaultDeterminer = defaultDeterminer
     menu()
 
     fetch('version').then(r => r.json()).then(json => {

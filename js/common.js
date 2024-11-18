@@ -3,7 +3,9 @@ const defaultOpts = {
   'automatic-playback': 'false',
   'playback-volume': '0.5',
   'beep-volume': '0.5',
-  'file-handling': 'opfs'
+  'file-handling': 'opfs',
+  'default-recorder': '',
+  'default-determiner': '',
 }
 
 export function getOpt(id) {

@@ -6,6 +6,8 @@ document.getElementById("automatic-playback").checked = getOpt('automatic-playba
 document.getElementById("playback-volume").value = getOpt('playback-volume')
 document.getElementById("beep-volume").value = getOpt('beep-volume')
 document.getElementById("file-handling").value = getOpt('file-handling')
+document.getElementById("default-recorder").value = getOpt('default-recorder')
+document.getElementById("default-determiner").value = getOpt('default-determiner')
 
 export function filenameFormat() {
   setOpt('filename-format', document.getElementById("filename-format").value)
@@ -25,4 +27,13 @@ export function beepVolume() {
 
 export function fileHandling() {
   setOpt('file-handling', document.getElementById("file-handling").value)
+}
+
+export function defaultRecorder() {
+  console.log('defaultRecorder')
+  setOpt('default-recorder', document.getElementById("default-recorder").value)
+}
+
+export function defaultDeterminer() {
+  setOpt('default-determiner', document.getElementById("default-determiner").value)
 }

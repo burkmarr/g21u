@@ -213,7 +213,7 @@ a.selected .menu-icon circle {
   stroke: rgb(12, 237, 12);
 }
 
-select {
+select, input[type="text"]  {
   border-radius: 4px;
   font-size: inherit;
   padding: 0.5em 3.5em 0.5em 1em;
@@ -222,6 +222,7 @@ select {
   width: 100%;
   appearance: none; /* removes arrow */
 }
+
 
 /* The switch - the box around the slider */
 .switch {
