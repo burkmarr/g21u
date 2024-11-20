@@ -64,20 +64,15 @@
         if (urlParams.get('details')) { 
           document.getElementById('record-list').classList.add('hide')
           document.getElementById('record-details').classList.remove('hide')
-
-          document.getElementById('menu-record-list').classList.add('hide-menu')
           document.getElementById('manage').classList.add('hide-menu')
         } else {
           document.getElementById('record-list').classList.remove('hide')
           document.getElementById('record-details').classList.add('hide')
-
-          document.getElementById('menu-record-list').classList.remove('hide-menu')
           document.getElementById('manage').classList.remove('hide-menu')
         }
       } else {
         document.getElementById('record-list').classList.remove('hide')
         document.getElementById('record-details').classList.remove('hide')
-        document.getElementById('menu-record-list').classList.remove('hide-menu')
         document.getElementById('manage').classList.remove('hide-menu')
       }
     }

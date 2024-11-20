@@ -39,17 +39,35 @@ export async function opfsDeleteFiles(names) {
   }
 }
 
-export async function opfsGetFiles () {
+export async function opfsGetWavFiles () {
   const opfsRoot = await navigator.storage.getDirectory()
   const entries = opfsRoot.values()
   const files = []
   for await (const entry of entries) {
-    const existingFileHandle = await opfsRoot.getFileHandle(entry.name)
-    const file = await existingFileHandle.getFile()
-    files.push({
-      name: entry.name,
-      file: file
-    })
+    if (entry.name.endsWith('.wav')) {
+      const existingFileHandle = await opfsRoot.getFileHandle(entry.name)
+      const file = await existingFileHandle.getFile()
+      files.push({
+        name: entry.name,
+        file: file
+      })
+    } else {
+      console.log(entry.name)
+    }
   }
   return files
+}
+
+export async function opfsGetFile (filename) {
+  const opfsRoot = await navigator.storage.getDirectory()
+
+  const fileHandle = await opfsRoot.getFileHandle(filename, { create: false })
+    .catch( error => {
+      Promise.resolve(null)
+    })
+  if (!fileHandle) {
+    return null
+  }
+  const file = await fileHandle.getFile()
+  return file
 }

@@ -1,25 +1,9 @@
-import { getSv } from './common.js'
+import { getSvJson, getOpt } from './common.js'
+import { opfsGetFile, opfsSaveFile } from './file-handling.js'
 
-initialiseDisplay()
+const container = el('record-details')
+generateRecordFields(el('record-details'))
 populateRecordFields()
-
-function initialiseDisplay () {
-  const container = document.getElementById('record-details')
-  // Generate record fields
-  generateRecordFields(container)
-  // Save/cancel buttons
-  const div = document.createElement('div')
-  div.setAttribute('id', 'record-save-div')
-  container.appendChild(div)
-  const cancel = document.createElement('button')
-  cancel.innerText = 'Cancel'
-  div.appendChild(cancel)
-  const save = document.createElement('button')
-  save.innerText = 'Save'
-  div.appendChild(save)
-  // Populate record fields
-  populateRecordFields()
-}
 
 function createInputLabel(parent, label) {
   const ldiv = document.createElement('div')
@@ -35,12 +19,12 @@ function createInputDiv(parent, id) {
   return div
 }
 
-function generateRecordFields(el) {
+function generateRecordFields(parent) {
 
   let ctrl
 
   // Recorder name
-  ctrl = createInputDiv(el, 'recorder-name')
+  ctrl = createInputDiv(parent, 'recorder-name')
   createInputLabel(ctrl, 'Recorder:')
   const recorderName = document.createElement('input')
   recorderName.setAttribute('id', 'recorder-name-input')
@@ -48,7 +32,7 @@ function generateRecordFields(el) {
   ctrl.appendChild(recorderName)
 
   // Determiner name
-  ctrl = createInputDiv(el, 'determiner-name')
+  ctrl = createInputDiv(parent, 'determiner-name')
   createInputLabel(ctrl, 'Determiner:')
   const determinerName = document.createElement('input')
   determinerName.setAttribute('id', 'determiner-name-input')
@@ -56,7 +40,7 @@ function generateRecordFields(el) {
   ctrl.appendChild(determinerName)
 
   // Date
-  ctrl = createInputDiv(el, 'record-date')
+  ctrl = createInputDiv(parent, 'record-date')
   createInputLabel(ctrl, 'Record date:')
   const recordDate = document.createElement('input')
   recordDate.setAttribute('id', 'record-date-input')
@@ -64,31 +48,104 @@ function generateRecordFields(el) {
   ctrl.appendChild(recordDate)
 
   // Time
-  // TODO a time clear button
-  ctrl = createInputDiv(el, 'record-time')
+  ctrl = createInputDiv(parent, 'record-time')
   createInputLabel(ctrl, 'Record time:')
   const recordTime = document.createElement('input')
   recordTime.setAttribute('id', 'record-time-input')
   recordTime.setAttribute('type', 'time')
   ctrl.appendChild(recordTime)
 
+  // Save/cancel buttons
+  ctrl = createInputDiv(parent, 'record-save-cancel')
+  parent.appendChild(ctrl)
+  const cancel = document.createElement('button')
+  cancel.innerText = 'Cancel'
+  ctrl.appendChild(cancel)
+  const save = document.createElement('button')
+  save.innerText = 'Save'
+  save.addEventListener('click', saveRecord)
+  ctrl.appendChild(save)
 }
 
-export function populateRecordFields() {
-  const sf = JSON.parse(getSv('selectedFile'))
-  console.log('Selected file', sf)
+async function saveRecord() {
+  // Selected soundfile
+  const sf = getSvJson('selectedFile')
+  // Build JSON structure
+  const json = {
+    wav: getSvJson('selectedFile'),
+    recorder: el('recorder-name-input').value,
+    determiner: el('determiner-name-input').value,
+    date: el('record-date-input').value,
+    time: el('record-time-input').value
+  }
+  // Save the file
+  const jsonString = JSON.stringify(json)
+  opfsSaveFile(new Blob([jsonString], { type: "application/json" }),
+    `${sf.filename.substring(0, sf.filename.length-4)}.json`)
+}
+
+export async function populateRecordFields() {
+  // Selected soundfile
+  const sf = getSvJson('selectedFile')
+  // Get corresponding JSON file if it exists
+  let json
   if (sf) {
-    // Recorder
-    // TODO
-    // Determiner
-    // TODO
-    // Date
+    const jsonFile = `${sf.filename.substring(0, sf.filename.length-4)}.json`
+    const blob = await opfsGetFile(jsonFile)
+    if (blob) {
+      json = JSON.parse(await blob.text())
+      console.log('read jsonFile', json)
+    }
+  }
+
+  // Recorder
+  if (json) {
+    el('recorder-name-input').value = json.recorder
+  } else if (sf) {
+    el('recorder-name-input').value = getOpt('default-recorder')
+  } else {
+    el('recorder-name-input').value = ''
+  }
+  
+  // Determiner
+  if (json) {
+    el('determiner-name-input').value = json.determiner
+  } else if (sf) {
+    el('determiner-name-input').value = getOpt('default-determiner')
+  } else {
+    el('determiner-name-input').value = ''
+  }
+
+  // Date
+  if (json) {
+    el('record-date-input').value = json.date
+  } else if (sf) {
     const dte = new Date()
     const day = sf.date.substring(0,2)
     const month = sf.date.substring(3,5)
     const year = sf.date.substring(6)
-    document.getElementById('record-date-input').value = `${year}-${month}-${day}`
-    // Time
-    document.getElementById('record-time-input').value = sf.time.substring(0,5)
+    el('record-date-input').value = `${year}-${month}-${day}`
+  } else {
+    el('record-date-input').value = ''
   }
+
+  // Time
+  if (json) {
+    el('record-time-input').value = json.time
+  } else if (sf) {
+    el('record-time-input').value = sf.time.substring(0,5)
+  } else {
+    el('record-time-input').value = '00:00'
+  }
+
+  // Disable all the input fields if no record selected
+  if (sf) {
+    el('record-details').classList.remove('disable') 
+  } else {
+    el('record-details').classList.add('disable') 
+  }
+}
+
+function el(id) {
+  return document.getElementById(id)
 }

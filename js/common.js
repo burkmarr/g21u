@@ -16,10 +16,10 @@ export function setOpt(id, value) {
   localStorage.setItem(id, value)
 }
 
-export function setSv(id, value) {
-  sessionStorage.setItem(id, value)
+export function setSvJson(id, value) {
+  sessionStorage.setItem(id, JSON.stringify(value))
 }
 
-export function getSv(id) {
-  return sessionStorage.getItem(id)
+export function getSvJson(id) {
+  return sessionStorage.getItem(id) ? JSON.parse(sessionStorage.getItem(id)) : null
 }

@@ -15,6 +15,7 @@ const APP_STATIC_RESOURCES = [
   "js/options.js",
   "js/file-handling.js",
   "js/record-list.js",
+  "js/record-details.js",
   "js/play.js",
   "js/nl.min.js",
   "manifest.json",

@@ -1,6 +1,6 @@
-import { opfsGetFiles, opfsDeleteFiles, downloadBlob } from './file-handling.js'
+import { opfsGetWavFiles, opfsDeleteFiles, downloadBlob } from './file-handling.js'
 import { selectAll, transition, easeLinear } from './nl.min.js'
-import { getOpt, setSv } from './common.js'
+import { getOpt, setSvJson, getSvJson } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 
@@ -13,8 +13,12 @@ initialiseList()
 async function initialiseList() {
   // Populate with files from origin private file system (root folder)
   recordingDiv.innerHTML = ''
-  opfsFiles = await opfsGetFiles()
+  opfsFiles = await opfsGetWavFiles()
 
+  const selectedFilename = getSvJson('selectedFile') ? getSvJson('selectedFile').filename : ''
+  console.log('currentSelected', selectedFilename)
+
+  let matchSf = false
   opfsFiles.forEach((f,i) => {
     // Create div
     const fileDiv = document.createElement('div')
@@ -22,6 +26,12 @@ async function initialiseList() {
     fileDiv.setAttribute('data-file-name', f.name)
     fileDiv.classList.add('opfs-div')
     fileDiv.addEventListener('click', recordSelected)
+
+    if (f.name === selectedFilename) {
+      fileDiv.classList.add('record-selected')
+      matchSf = true
+    }
+
     // Play image
     const playImage = document.createElement('img')
     playImage.setAttribute('src', 'images/playback-green.png')
@@ -66,6 +76,11 @@ async function initialiseList() {
     
     recordingDiv.appendChild(fileDiv)
   })
+  if (!matchSf) {
+    // Currently stored selected file is no longer present
+    // so probably deleted.
+    setSvJson( 'selectedFile', null)
+  }
 }
 
 export async function deleteChecked(el) {
@@ -88,7 +103,8 @@ export async function deleteYesNo(e) {
       }
     })
     await opfsDeleteFiles(names)
-    initialiseList()
+    await initialiseList()
+    populateRecordFields()
   }
 }
 
@@ -151,20 +167,30 @@ function recordChecked(e) {
 
 function recordSelected(e) {
   const currentSelected = document.getElementsByClassName("record-selected")
+  let deselect = false
   if (currentSelected.length) {
+    if(currentSelected[0].getAttribute('data-file-name') === e.target.getAttribute('data-file-name')) {
+      // User has clicked on an already selected record
+      deselect = true
+    }
     currentSelected[0].classList.remove("record-selected")
   }
-  e.target.classList.add("record-selected")
-  // Save the filename of the selected file to a global variable
-  // where it can be used to populate the record details.
-  const sf = {
-    filename: e.target.getAttribute('data-file-name'),
-    date: e.target.getAttribute('data-file-date'),
-    time: e.target.getAttribute('data-file-time'),
-    location: e.target.getAttribute('data-file-location')
+
+  // Select the record
+  if (!deselect) {
+    e.target.classList.add("record-selected")
+    // Save the selected file details to session storage
+    // from where it can be used to populate the record details.
+    const sf = {
+      filename: e.target.getAttribute('data-file-name'),
+      date: e.target.getAttribute('data-file-date'),
+      time: e.target.getAttribute('data-file-time'),
+      location: e.target.getAttribute('data-file-location')
+    }
+    setSvJson( 'selectedFile', sf)
+  } else {
+    setSvJson( 'selectedFile', null)
   }
-  setSv( 'selectedFile', JSON.stringify(sf))
-  console.log('File selected', sf)
   populateRecordFields()
 }
 
