@@ -127,19 +127,10 @@ body#manage {
   padding-top:68px;
 }
 
-#records-div {
+#record-list {
   overflow-y: auto; 
   overflow-x: hidden; 
   height: calc(100vh - 152px);
-}
-
-#record-details {
-  margin-left: 8px;
-}
-/* @media only screen and (max-width: 600px) {
-  #record-details {
-    display: none;
-  }
 }
 
 /* Style the links inside the navigation bar */
@@ -219,16 +210,19 @@ a.selected .menu-icon circle {
   stroke: rgb(12, 237, 12);
 }
 
-select, input[type="text"]  {
+select, input[type="text"], input[type="date"], input[type="time"] {
   border-radius: 4px;
   font-size: inherit;
-  padding: 0.5em 3.5em 0.5em 1em;
+  padding: 0.5em 0.5em 0.5em 1em;
   margin: 0;      
   box-sizing: border-box;
   width: 100%;
   appearance: none; /* removes arrow */
+  border-width: 1px;
 }
-
+input[type="date"], input[type="time"] {
+  font-size: 1.3em
+}
 
 /* The switch - the box around the slider */
 .switch {
@@ -305,7 +299,6 @@ input:checked + .slider:before {
   background-image: linear-gradient(white, rgb(238, 238, 120));
 }
 
-
 .opfs-play-image {
   width: 60px;
 }
@@ -335,3 +328,34 @@ click event not recognised */
   cursor: pointer;
 }
 
+#record-details {
+  margin-left: 1em;
+}
+@media only screen and (max-width: 600px) {
+  #record-list.hide {
+    display: none;
+  }
+  #record-details.hide {
+    display: none;
+  }
+  #record-details {
+    margin-left: 0;
+  }
+  #menu-record-list.hide-menu {
+    display: none;
+  }
+  body#manage.hide-menu {
+    padding-top: 0;
+  }
+} 
+
+#record-save-div {
+  display: flex;
+  justify-content: right;
+  margin-top: 1em;
+}
+
+#record-save-div button {
+  margin-left: 1em;
+  font-size: 1em;;
+}

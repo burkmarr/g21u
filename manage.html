@@ -17,13 +17,13 @@
   </dialog>
   <div id="menu-record-list">
     <div id="menu-record-list-inner">
-      <svg viewBox="0 0 512 512" class="menu-icon" id="delete-selected" onclick="deleteSelected(this)">
+      <svg viewBox="0 0 512 512" class="menu-icon" id="delete-selected" onclick="deleteChecked(this)">
         <path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352"/><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
       </svg>
-      <svg viewBox="0,0,512,512" class="menu-icon" id="download-selected" onclick="downloadSelected(this)">
+      <svg viewBox="0,0,512,512" class="menu-icon" id="download-selected" onclick="downloadChecked(this)">
         <path d="M336 176h40a40 40 0 0140 40v208a40 40 0 01-40 40H136a40 40 0 01-40-40V216a40 40 0 0140-40h40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M176 272l80 80 80-80M256 48v288"/>
       </svg>
-      <svg viewBox="0,0,512,512" class="menu-icon" id="share-selected" onclick="shareSelected(this)">
+      <svg viewBox="0,0,512,512" class="menu-icon" id="share-selected" onclick="shareChecked(this)">
         <circle cx="128" cy="256" r="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><circle cx="384" cy="112" r="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><circle cx="384" cy="400" r="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M169.83 279.53l172.34 96.94M342.17 135.53l-172.34 96.94"/>
       </svg>
       <svg viewBox="0,0,130,130" class="menu-icon" id="select-all" onclick="checkAll(this)">
@@ -36,22 +36,51 @@
     </div>
   </div>
   <div id="manage-div" style="display: flex">
-    <div id="records-div"></div>
-    <div id="record-details-large-screen"></div>
+    <div id="record-list"></div>
+    <div id="record-details"></div>
   </div>
   <div id="menu"></div>
   <script src="js/record-list.js" type="module" defer></script>
   <script src="js/record-details.js" type="module" defer></script>
   <script type="module">
     import { menu } from './js/menu.js'
-    import { downloadSelected, shareSelected, deleteSelected, uncheckAll, checkAll, deleteYesNo } from './js/record-list.js'
-    window.shareSelected = shareSelected
-    window.deleteSelected = deleteSelected
-    window.downloadSelected = downloadSelected
+    import { downloadChecked, shareChecked, deleteChecked, uncheckAll, checkAll, deleteYesNo } from './js/record-list.js'
+    window.shareChecked = shareChecked
+    window.deleteChecked = deleteChecked
+    window.downloadChecked = downloadChecked
     window.uncheckAll = uncheckAll
     window.checkAll = checkAll
     window.deleteYesNo = deleteYesNo
     menu()
+
+    const smallScreen = window.matchMedia("(max-width: 600px)")
+    smallScreen.addEventListener("change", function() {
+      screenLayout()
+    })
+    screenLayout ()
+    function screenLayout () {
+      if (smallScreen.matches) {
+        const urlParams = new URLSearchParams(window.location.search)
+        if (urlParams.get('details')) { 
+          document.getElementById('record-list').classList.add('hide')
+          document.getElementById('record-details').classList.remove('hide')
+
+          document.getElementById('menu-record-list').classList.add('hide-menu')
+          document.getElementById('manage').classList.add('hide-menu')
+        } else {
+          document.getElementById('record-list').classList.remove('hide')
+          document.getElementById('record-details').classList.add('hide')
+
+          document.getElementById('menu-record-list').classList.remove('hide-menu')
+          document.getElementById('manage').classList.remove('hide-menu')
+        }
+      } else {
+        document.getElementById('record-list').classList.remove('hide')
+        document.getElementById('record-details').classList.remove('hide')
+        document.getElementById('menu-record-list').classList.remove('hide-menu')
+        document.getElementById('manage').classList.remove('hide-menu')
+      }
+    }
   </script>
 </body>
 </html>

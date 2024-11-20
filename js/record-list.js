@@ -1,10 +1,11 @@
 import { opfsGetFiles, opfsDeleteFiles, downloadBlob } from './file-handling.js'
 import { selectAll, transition, easeLinear } from './nl.min.js'
-import { getOpt } from './common.js'
+import { getOpt, setSv } from './common.js'
 import { playBlob } from './play.js'
+import { populateRecordFields } from './record-details.js'
 
 let opfsFiles
-const recordingDiv = document.getElementById('records-div')
+const recordingDiv = document.getElementById('record-list')
 const deleteConfirmDialog = document.getElementById('delete-confirm-dialog')
 
 initialiseList()
@@ -18,9 +19,9 @@ async function initialiseList() {
     // Create div
     const fileDiv = document.createElement('div')
     fileDiv.setAttribute('id', `file-div-${i}`)
+    fileDiv.setAttribute('data-file-name', f.name)
     fileDiv.classList.add('opfs-div')
     fileDiv.addEventListener('click', recordSelected)
-
     // Play image
     const playImage = document.createElement('img')
     playImage.setAttribute('src', 'images/playback-green.png')
@@ -50,6 +51,11 @@ async function initialiseList() {
     textDiv.classList.add('opfs-div-text')
     textDiv.innerHTML=`${date} ${time}<br/>${location}`
     fileDiv.appendChild(textDiv)
+    // Set the date, time and location data attributes of the div
+    fileDiv.setAttribute('data-file-date', date)
+    fileDiv.setAttribute('data-file-time', time)
+    fileDiv.setAttribute('data-file-location', location)
+
     // Select checkbox
     const check = document.createElement('input')
     check.setAttribute('type', 'checkbox')
@@ -62,7 +68,7 @@ async function initialiseList() {
   })
 }
 
-export async function deleteSelected(el) {
+export async function deleteChecked(el) {
   flash(el.id)
   const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`opfs-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
@@ -82,11 +88,11 @@ export async function deleteYesNo(e) {
       }
     })
     await opfsDeleteFiles(names)
-    initialiseDisplay()
+    initialiseList()
   }
 }
 
-export async function shareSelected(el) {
+export async function shareChecked(el) {
   flash(el.id)
   const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`opfs-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
@@ -100,7 +106,7 @@ export async function shareSelected(el) {
   }
 }
 
-export async function downloadSelected(el) {
+export async function downloadChecked(el) {
   flash(el.id)
   const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`opfs-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
@@ -149,6 +155,17 @@ function recordSelected(e) {
     currentSelected[0].classList.remove("record-selected")
   }
   e.target.classList.add("record-selected")
+  // Save the filename of the selected file to a global variable
+  // where it can be used to populate the record details.
+  const sf = {
+    filename: e.target.getAttribute('data-file-name'),
+    date: e.target.getAttribute('data-file-date'),
+    time: e.target.getAttribute('data-file-time'),
+    location: e.target.getAttribute('data-file-location')
+  }
+  setSv( 'selectedFile', JSON.stringify(sf))
+  console.log('File selected', sf)
+  populateRecordFields()
 }
 
 async function playRecording(e) {

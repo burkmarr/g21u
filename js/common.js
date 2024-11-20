@@ -15,3 +15,11 @@ export function getOpt(id) {
 export function setOpt(id, value) {
   localStorage.setItem(id, value)
 }
+
+export function setSv(id, value) {
+  sessionStorage.setItem(id, value)
+}
+
+export function getSv(id) {
+  return sessionStorage.getItem(id)
+}
