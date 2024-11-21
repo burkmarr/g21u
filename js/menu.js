@@ -47,6 +47,4 @@ export function menu () {
 
     a.innerHTML = `<svg viewBox="0,0,512,512" class="menu-icon">${l.svgEls}</svg>`
   })
-
-  console.log('href', window.location.href)
 }

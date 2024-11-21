@@ -329,6 +329,14 @@ click event not recognised */
   cursor: pointer;
 }
 
+#record-details input.edited, #record-save-cancel.edited button {
+  background-color: #efe6cd;
+}
+
+#record-details input.saved {
+  background-color: #c8ebcf;
+}
+
 #record-details.disable .record-details-input {
   pointer-events: none;
 	opacity: 0.5;

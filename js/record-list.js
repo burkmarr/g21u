@@ -16,7 +16,7 @@ async function initialiseList() {
   opfsFiles = await opfsGetWavFiles()
 
   const selectedFilename = getSvJson('selectedFile') ? getSvJson('selectedFile').filename : ''
-  console.log('currentSelected', selectedFilename)
+  //console.log('currentSelected', selectedFilename)
 
   let matchSf = false
   opfsFiles.forEach((f,i) => {
@@ -195,7 +195,7 @@ function recordSelected(e) {
 }
 
 async function playRecording(e) {
-  console.log('Playback', e.target.getAttribute('data-index'))
+  //console.log('Playback', e.target.getAttribute('data-index'))
 
   e.stopPropagation()
 

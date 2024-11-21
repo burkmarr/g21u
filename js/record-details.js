@@ -29,6 +29,7 @@ function generateRecordFields(parent) {
   const recorderName = document.createElement('input')
   recorderName.setAttribute('id', 'recorder-name-input')
   recorderName.setAttribute('type', 'text')
+  recorderName.addEventListener('input', highlightFields)
   ctrl.appendChild(recorderName)
 
   // Determiner name
@@ -37,6 +38,7 @@ function generateRecordFields(parent) {
   const determinerName = document.createElement('input')
   determinerName.setAttribute('id', 'determiner-name-input')
   determinerName.setAttribute('type', 'text')
+  determinerName.addEventListener('input', highlightFields)
   ctrl.appendChild(determinerName)
 
   // Date
@@ -45,6 +47,7 @@ function generateRecordFields(parent) {
   const recordDate = document.createElement('input')
   recordDate.setAttribute('id', 'record-date-input')
   recordDate.setAttribute('type', 'date')
+  recordDate.addEventListener('input', highlightFields)
   ctrl.appendChild(recordDate)
 
   // Time
@@ -53,6 +56,7 @@ function generateRecordFields(parent) {
   const recordTime = document.createElement('input')
   recordTime.setAttribute('id', 'record-time-input')
   recordTime.setAttribute('type', 'time')
+  recordTime.addEventListener('input', highlightFields)
   ctrl.appendChild(recordTime)
 
   // Save/cancel buttons
@@ -60,11 +64,16 @@ function generateRecordFields(parent) {
   parent.appendChild(ctrl)
   const cancel = document.createElement('button')
   cancel.innerText = 'Cancel'
+  cancel.addEventListener('click', cancelRecord)
   ctrl.appendChild(cancel)
   const save = document.createElement('button')
   save.innerText = 'Save'
   save.addEventListener('click', saveRecord)
   ctrl.appendChild(save)
+}
+
+async function cancelRecord() {
+  await populateRecordFields()
 }
 
 async function saveRecord() {
@@ -80,23 +89,17 @@ async function saveRecord() {
   }
   // Save the file
   const jsonString = JSON.stringify(json)
-  opfsSaveFile(new Blob([jsonString], { type: "application/json" }),
+  await opfsSaveFile(new Blob([jsonString], { type: "application/json" }),
     `${sf.filename.substring(0, sf.filename.length-4)}.json`)
+
+  highlightFields()
 }
 
 export async function populateRecordFields() {
   // Selected soundfile
   const sf = getSvJson('selectedFile')
   // Get corresponding JSON file if it exists
-  let json
-  if (sf) {
-    const jsonFile = `${sf.filename.substring(0, sf.filename.length-4)}.json`
-    const blob = await opfsGetFile(jsonFile)
-    if (blob) {
-      json = JSON.parse(await blob.text())
-      console.log('read jsonFile', json)
-    }
-  }
+  const json = await getFileJson()
 
   // Recorder
   if (json) {
@@ -120,11 +123,7 @@ export async function populateRecordFields() {
   if (json) {
     el('record-date-input').value = json.date
   } else if (sf) {
-    const dte = new Date()
-    const day = sf.date.substring(0,2)
-    const month = sf.date.substring(3,5)
-    const year = sf.date.substring(6)
-    el('record-date-input').value = `${year}-${month}-${day}`
+    el('record-date-input').value = dateFromSf()
   } else {
     el('record-date-input').value = ''
   }
@@ -144,8 +143,94 @@ export async function populateRecordFields() {
   } else {
     el('record-details').classList.add('disable') 
   }
+
+  highlightFields()
+}
+
+async function highlightFields() {
+
+  const sf = getSvJson('selectedFile')
+  if (!sf) return
+    
+  const flds = [
+    {
+      inputId: 'recorder-name-input',
+      jsonId: 'recorder',
+      default: getOpt('default-recorder')
+    },
+    {
+      inputId: 'determiner-name-input',
+      jsonId: 'determiner',
+      default: getOpt('default-determiner')
+    },
+    {
+      inputId: 'record-date-input',
+      jsonId: 'date',
+      default: dateFromSf()
+    },
+    {
+      inputId: 'record-time-input',
+      jsonId: 'time',
+      default: sf.time.substring(0,5)
+    }
+  ]
+
+  const json = await getFileJson()
+  let edited = false
+  flds.forEach(f => {
+    const fld = el(f.inputId)
+    //console.log(`input: >>${fld.value}<< json: ${json}`)
+    fld.classList.remove('edited')
+    fld.classList.remove('saved')
+    if (json) {
+      if (fld.value === json[f.jsonId]) {
+        fld.classList.add('saved')
+      } else {
+        fld.classList.add('edited')
+        edited = true
+      }
+    } else if (fld.value !== f.default) {
+      fld.classList.add('edited')
+      edited = true
+    }
+  })
+
+  if (edited) {
+    el('record-save-cancel').classList.add('edited')
+  } else {
+    el('record-save-cancel').classList.remove('edited')
+  }
 }
 
 function el(id) {
   return document.getElementById(id)
+}
+
+async function getFileJson() {
+  // Selected soundfile
+  const sf = getSvJson('selectedFile')
+  // Get corresponding JSON file if it exists
+  let json
+  if (sf) {
+    const jsonFile = `${sf.filename.substring(0, sf.filename.length-4)}.json`
+    const blob = await opfsGetFile(jsonFile)
+    if (blob) {
+      json = JSON.parse(await blob.text())
+      //console.log('read jsonFile', json)
+    }
+  }
+  return json
+}
+
+function dateFromSf() {
+  const sf = getSvJson('selectedFile')
+  if (sf) {
+    const dte = new Date()
+    const day = sf.date.substring(0,2)
+    const month = sf.date.substring(3,5)
+    const year = sf.date.substring(6)
+    return `${year}-${month}-${day}`
+  } else {
+    return ''
+  }
 }

@@ -30,7 +30,6 @@ export function fileHandling() {
 }
 
 export function defaultRecorder() {
-  console.log('defaultRecorder')
   setOpt('default-recorder', document.getElementById("default-recorder").value)
 }
 

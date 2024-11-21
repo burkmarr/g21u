@@ -52,7 +52,7 @@ export async function opfsGetWavFiles () {
         file: file
       })
     } else {
-      console.log(entry.name)
+      //console.log(entry.name)
     }
   }
   return files
