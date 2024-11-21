@@ -101,41 +101,17 @@ export async function populateRecordFields() {
   // Get corresponding JSON file if it exists
   const json = await getFileJson()
 
-  // Recorder
-  if (json) {
-    el('recorder-name-input').value = json.recorder
-  } else if (sf) {
-    el('recorder-name-input').value = getOpt('default-recorder')
-  } else {
-    el('recorder-name-input').value = ''
-  }
-  
-  // Determiner
-  if (json) {
-    el('determiner-name-input').value = json.determiner
-  } else if (sf) {
-    el('determiner-name-input').value = getOpt('default-determiner')
-  } else {
-    el('determiner-name-input').value = ''
-  }
+  getFieldDefs().forEach(f => {
+    if (json) {
+      el(f.inputId).value = json[f.jsonId]
+    } else if (sf) {
+      el(f.inputId).value = f.default
+    } else {
+      el(f.inputId).value = f.novalue
+    }
+  })
 
-  // Date
-  if (json) {
-    el('record-date-input').value = json.date
-  } else if (sf) {
-    el('record-date-input').value = dateFromSf()
-  } else {
-    el('record-date-input').value = ''
-  }
-
-  // Time
-  if (json) {
-    el('record-time-input').value = json.time
-  } else if (sf) {
-    el('record-time-input').value = sf.time.substring(0,5)
-  } else {
-    el('record-time-input').value = '00:00'
-  }
+  highlightFields()
 
   // Disable all the input fields if no record selected
   if (sf) {
@@ -143,55 +119,60 @@ export async function populateRecordFields() {
   } else {
     el('record-details').classList.add('disable') 
   }
+}
 
-  highlightFields()
+function getFieldDefs() {
+  const sf = getSvJson('selectedFile')
+
+  return [
+    {
+      inputId: 'recorder-name-input',
+      jsonId: 'recorder',
+      default: getOpt('default-recorder'),
+      novalue: ''
+    },
+    {
+      inputId: 'determiner-name-input',
+      jsonId: 'determiner',
+      default: getOpt('default-determiner'),
+      novalue: ''
+    },
+    {
+      inputId: 'record-date-input',
+      jsonId: 'date',
+      default: dateFromSf(),
+      novalue: ''
+    },
+    {
+      inputId: 'record-time-input',
+      jsonId: 'time',
+      default: sf ? sf.time.substring(0,5) : '00:00',
+      novalue: '00:00'
+    }
+  ]
 }
 
 async function highlightFields() {
 
   const sf = getSvJson('selectedFile')
-  if (!sf) return
-    
-  const flds = [
-    {
-      inputId: 'recorder-name-input',
-      jsonId: 'recorder',
-      default: getOpt('default-recorder')
-    },
-    {
-      inputId: 'determiner-name-input',
-      jsonId: 'determiner',
-      default: getOpt('default-determiner')
-    },
-    {
-      inputId: 'record-date-input',
-      jsonId: 'date',
-      default: dateFromSf()
-    },
-    {
-      inputId: 'record-time-input',
-      jsonId: 'time',
-      default: sf.time.substring(0,5)
-    }
-  ]
-
   const json = await getFileJson()
   let edited = false
-  flds.forEach(f => {
+  getFieldDefs().forEach(f => {
     const fld = el(f.inputId)
-    //console.log(`input: >>${fld.value}<< json: ${json}`)
     fld.classList.remove('edited')
     fld.classList.remove('saved')
-    if (json) {
-      if (fld.value === json[f.jsonId]) {
-        fld.classList.add('saved')
-      } else {
+    if (sf) {
+      if (json) {
+        if (fld.value === json[f.jsonId]) {
+          fld.classList.add('saved')
+        } else {
+          fld.classList.add('edited')
+          edited = true
+        }
+      } else if (fld.value !== f.default) {
         fld.classList.add('edited')
         edited = true
       }
-    } else if (fld.value !== f.default) {
-      fld.classList.add('edited')
-      edited = true
     }
   })
 
