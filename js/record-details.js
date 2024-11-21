@@ -21,46 +21,19 @@ function createInputDiv(parent, id) {
 
 function generateRecordFields(parent) {
 
-  let ctrl
-
-  // Recorder name
-  ctrl = createInputDiv(parent, 'recorder-name')
-  createInputLabel(ctrl, 'Recorder:')
-  const recorderName = document.createElement('input')
-  recorderName.setAttribute('id', 'recorder-name-input')
-  recorderName.setAttribute('type', 'text')
-  recorderName.addEventListener('input', highlightFields)
-  ctrl.appendChild(recorderName)
-
-  // Determiner name
-  ctrl = createInputDiv(parent, 'determiner-name')
-  createInputLabel(ctrl, 'Determiner:')
-  const determinerName = document.createElement('input')
-  determinerName.setAttribute('id', 'determiner-name-input')
-  determinerName.setAttribute('type', 'text')
-  determinerName.addEventListener('input', highlightFields)
-  ctrl.appendChild(determinerName)
-
-  // Date
-  ctrl = createInputDiv(parent, 'record-date')
-  createInputLabel(ctrl, 'Record date:')
-  const recordDate = document.createElement('input')
-  recordDate.setAttribute('id', 'record-date-input')
-  recordDate.setAttribute('type', 'date')
-  recordDate.addEventListener('input', highlightFields)
-  ctrl.appendChild(recordDate)
-
-  // Time
-  ctrl = createInputDiv(parent, 'record-time')
-  createInputLabel(ctrl, 'Record time:')
-  const recordTime = document.createElement('input')
-  recordTime.setAttribute('id', 'record-time-input')
-  recordTime.setAttribute('type', 'time')
-  recordTime.addEventListener('input', highlightFields)
-  ctrl.appendChild(recordTime)
+  // Generate the input fields
+  getFieldDefs().forEach(f => {
+    const ctrl = createInputDiv(parent, f.inputId.substring(0,f.inputId.length-6))
+    createInputLabel(ctrl, `${f.inputLabel}:`)
+    const recorderName = document.createElement('input')
+    recorderName.setAttribute('id', f.inputId)
+    recorderName.setAttribute('type', f.inputType)
+    recorderName.addEventListener('input', highlightFields)
+    ctrl.appendChild(recorderName)
+  })
 
   // Save/cancel buttons
-  ctrl = createInputDiv(parent, 'record-save-cancel')
+  const ctrl = createInputDiv(parent, 'record-save-cancel')
   parent.appendChild(ctrl)
   const cancel = document.createElement('button')
   cancel.innerText = 'Cancel'
@@ -127,24 +100,32 @@ function getFieldDefs() {
   return [
     {
       inputId: 'recorder-name-input',
+      inputType: 'text',
+      inputLabel: 'Recorder',
       jsonId: 'recorder',
       default: getOpt('default-recorder'),
       novalue: ''
     },
     {
       inputId: 'determiner-name-input',
+      inputType: 'text',
+      inputLabel: 'Determiner',
       jsonId: 'determiner',
       default: getOpt('default-determiner'),
       novalue: ''
     },
     {
       inputId: 'record-date-input',
+      inputType: 'date',
+      inputLabel: 'Record date',
       jsonId: 'date',
       default: dateFromSf(),
       novalue: ''
     },
     {
       inputId: 'record-time-input',
+      inputType: 'time',
+      inputLabel: 'Record type',
       jsonId: 'time',
       default: sf ? sf.time.substring(0,5) : '00:00',
       novalue: '00:00'
