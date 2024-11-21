@@ -55,11 +55,16 @@ async function saveRecord() {
   // Build JSON structure
   const json = {
     wav: getSvJson('selectedFile'),
-    recorder: el('recorder-name-input').value,
-    determiner: el('determiner-name-input').value,
-    date: el('record-date-input').value,
-    time: el('record-time-input').value
+    // recorder: el('recorder-name-input').value,
+    // determiner: el('determiner-name-input').value,
+    // date: el('record-date-input').value,
+    // time: el('record-time-input').value
   }
+
+  getFieldDefs().forEach(f => {
+    json[f.jsonId] =  el(f.inputId).value
+  })
+
   // Save the file
   const jsonString = JSON.stringify(json)
   await opfsSaveFile(new Blob([jsonString], { type: "application/json" }),
@@ -129,6 +134,14 @@ function getFieldDefs() {
       jsonId: 'time',
       default: sf ? sf.time.substring(0,5) : '00:00',
       novalue: '00:00'
+    },
+    {
+      inputId: 'taxon-input',
+      inputType: 'text',
+      inputLabel: 'Taxon',
+      jsonId: 'taxon',
+      default: '',
+      novalue: ''
     }
   ]
 }
