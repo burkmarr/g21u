@@ -1,4 +1,5 @@
-import { getSsJson, getFieldDefs } from './common.js'
+import { el, getSsJson, getFieldDefs, keyValuePairTable } from './common.js'
+import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { getJsonFile, opfsSaveFile } from './file-handling.js'
 
 const container = el('record-details')
@@ -25,11 +26,31 @@ function generateRecordFields(parent) {
   getFieldDefs().forEach(f => {
     const ctrl = createInputDiv(parent, f.inputId.substring(0,f.inputId.length-6))
     createInputLabel(ctrl, `${f.inputLabel}:`)
-    const recorderName = document.createElement('input')
-    recorderName.setAttribute('id', f.inputId)
-    recorderName.setAttribute('type', f.inputType)
-    recorderName.addEventListener('input', highlightFields)
-    ctrl.appendChild(recorderName)
+    const input = document.createElement('input')
+    input.setAttribute('id', f.inputId)
+    input.setAttribute('type', f.inputType)
+    input.addEventListener('input', highlightFields)
+    input.addEventListener('focus', fieldFocus)
+    ctrl.appendChild(input)
+
+    // Custom control modifications
+    // Taxon
+    if (f.inputType === 'taxon') {
+      input.setAttribute('type', 'text')
+      input.addEventListener('input', displayTaxonMatches)
+      el('manage').addEventListener('click', hideTaxonMatches)
+      // Only create the taxon matches under the common name control
+      if (f.inputId === 'common-name-input') {
+        const ul =  document.createElement('div')
+        ul.setAttribute('id', 'taxon-suggestions')
+        ctrl.appendChild(ul)
+      }
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          taxonDetails()
+        }
+      })
+    }
   })
 
   // Save/cancel buttons
@@ -43,6 +64,38 @@ function generateRecordFields(parent) {
   save.innerText = 'Save'
   save.addEventListener('click', saveRecord)
   ctrl.appendChild(save)
+}
+
+function fieldFocus(e) {
+  const id = e.target.getAttribute('id')
+  const fieldDef = getFieldDefs().find(fd => fd.inputId === id)
+  if (fieldDef.detailsFn) {
+    fieldDef.detailsFn(id)
+  } else {
+    defaultDetails()
+  }
+}
+
+export function defaultDetails() {
+  // The default information to show for field details
+  // is the original WAV file details.
+  const sf = getSsJson('selectedFile')
+
+  el('field-details').innerHTML = `
+    <h3>Original WAV file details<h3>
+  `
+  if (sf) {
+    const rows = []
+    rows.push({caption: 'Filename', value: sf.filename})
+    rows.push({caption: 'Date', value: sf.date})
+    rows.push({caption: 'Time', value: sf.time})
+    rows.push({caption: 'Loc', value: sf.location})
+    rows.push({caption: 'Accuracy', value: sf.accuracy + ' m'})
+    rows.push({caption: 'Altitude', value: sf.altitude === 'none' ? 'not recorded' : sf.altitude + ' m'})
+    keyValuePairTable(rows, el('field-details'))
+  } else {
+     el('field-details').innerHTML = ``
+  }
 }
 
 async function cancelRecord() {
@@ -64,10 +117,6 @@ async function saveRecord() {
   const jsonString = JSON.stringify(json)
   await opfsSaveFile(new Blob([jsonString], { type: "application/json" }),
     `${sf.filename.substring(0, sf.filename.length-4)}.json`)
-
-  console.log(json)
-  console.log('Save', `${sf.filename.substring(0, sf.filename.length-4)}.json`)
-
   highlightFields()
 }
 
@@ -79,6 +128,9 @@ export async function populateRecordFields() {
   // Get corresponding record JSON if it exists
   const json = await getRecordJson()
   //console.log(json)
+
+  // Initialise the field details panel
+  defaultDetails()
 
   getFieldDefs().forEach(f => {
     if (json) {
@@ -100,7 +152,7 @@ export async function populateRecordFields() {
   }
 }
 
-async function highlightFields() {
+export async function highlightFields() {
 
   const sf = getSsJson('selectedFile')
   const json = await getRecordJson()
@@ -129,10 +181,6 @@ async function highlightFields() {
   } else {
     el('record-save-cancel').classList.remove('edited')
   }
-}
-
-function el(id) {
-  return document.getElementById(id)
 }
 
 async function getRecordJson() {

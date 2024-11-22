@@ -1,5 +1,5 @@
 const VERSION = "v1.0.0"
-const BUILD = 22
+const BUILD = 23
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -8,6 +8,8 @@ const APP_STATIC_RESOURCES = [
   "options.html",
   "manage.html",
   "css/style.css",
+  "css/taxon-select.css",
+  "js/taxonomy.js",
   "js/location.js",
   "js/record.js",
   "js/menu.js",

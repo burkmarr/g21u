@@ -49,13 +49,17 @@ async function initialiseList() {
     const sName = f.name.split('_')
     const date = `${sName[0].substring(8,10)}/${sName[0].substring(5,7)}/${sName[0].substring(0,4)}`
     const time = sName[1].replace(/-/g, ':')
-    let location
+    let location, accuracy, altitude
     if (sName.length === 5) {
       // Name is in GR
       location = sName[2]
+      accuracy = sName[3]
+      altitude = sName[4].substring(0, sName[4].length-4)
     } else {
       // Name is lat/lon format
       location = `${sName[2]}/${sName[3]}`
+      accuracy = sName[4]
+      altitude = sName[5].substring(0, sName[5].length-4)
     }
     const textDiv = document.createElement('div')
     textDiv.classList.add('opfs-div-text')
@@ -65,6 +69,8 @@ async function initialiseList() {
     fileDiv.setAttribute('data-file-date', date)
     fileDiv.setAttribute('data-file-time', time)
     fileDiv.setAttribute('data-file-location', location)
+    fileDiv.setAttribute('data-file-accuracy', accuracy)
+    fileDiv.setAttribute('data-file-altitude', altitude)
 
     // Select checkbox
     const check = document.createElement('input')
@@ -185,7 +191,9 @@ function recordSelected(e) {
       filename: e.target.getAttribute('data-file-name'),
       date: e.target.getAttribute('data-file-date'),
       time: e.target.getAttribute('data-file-time'),
-      location: e.target.getAttribute('data-file-location')
+      location: e.target.getAttribute('data-file-location'),
+      accuracy: e.target.getAttribute('data-file-accuracy'),
+      altitude: e.target.getAttribute('data-file-altitude')
     }
     setSsJson( 'selectedFile', sf)
   } else {

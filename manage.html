@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width">
   <title>G21v2 manage</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/taxon-select.css">
   <link rel="manifest" href="manifest.json" />
 </head>
 
@@ -38,6 +39,7 @@
   <div id="manage-div" style="display: flex">
     <div id="record-list"></div>
     <div id="record-details"></div>
+    <div id="field-details"></div>
   </div>
   <div id="menu"></div>
   <script src="js/record-list.js" type="module" defer></script>
@@ -64,15 +66,18 @@
         if (urlParams.get('details')) { 
           document.getElementById('record-list').classList.add('hide')
           document.getElementById('record-details').classList.remove('hide')
+          document.getElementById('field-details').classList.remove('hide')
           document.getElementById('manage').classList.add('hide-menu')
         } else {
           document.getElementById('record-list').classList.remove('hide')
           document.getElementById('record-details').classList.add('hide')
+          document.getElementById('field-details').classList.add('hide')
           document.getElementById('manage').classList.remove('hide-menu')
         }
       } else {
         document.getElementById('record-list').classList.remove('hide')
         document.getElementById('record-details').classList.remove('hide')
+        document.getElementById('field-details').classList.remove('hide')
         document.getElementById('manage').classList.remove('hide-menu')
       }
     }

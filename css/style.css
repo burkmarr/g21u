@@ -289,7 +289,7 @@ input:checked + .slider:before {
 }
 
 .opfs-div {
-  background-image: linear-gradient(white, lightgray);
+  background-image: linear-gradient(to bottom,  #ffffff 0%,#EFEFEF 100%);
   height: 70px;
   display: flex;
   align-items: center; 
@@ -297,7 +297,7 @@ input:checked + .slider:before {
   min-width: 350px;
 }
 .opfs-div.record-selected {
-  background-image: linear-gradient(white, rgb(238, 238, 120));
+  background-image: linear-gradient(to bottom, white, rgb(238, 238, 120));
 }
 
 .opfs-play-image {
@@ -349,16 +349,23 @@ click event not recognised */
 
 #record-details {
   margin-left: 1em;
-  width: 100%
+  width: 100%;
+  overflow-y: auto; 
+  overflow-x: hidden; 
+  height: calc(100vh - 152px);
 }
+
+#field-details {
+  margin-left: 1em;
+  width: 100%;
+  height: calc(100vh - 152px);
+}
+
 @media only screen and (max-width: 600px) {
-  #record-list.hide {
+  #record-list.hide, #record-details.hide, #field-details.hide {
     display: none;
   }
-  #record-details.hide {
-    display: none;
-  }
-  #record-details {
+  #record-details, #field-details {
     margin-left: 0;
   }
   body#manage.hide-menu #menu-record-list {
@@ -377,5 +384,15 @@ click event not recognised */
 
 #record-save-cancel button {
   margin-left: 1em;
-  font-size: 1em;;
+  font-size: 1em;
+}
+
+#taxon-suggestions {
+  overflow-y: auto; 
+  overflow-x: hidden; 
+  max-height: 250px;
+}
+
+.key-value-pair-table .caption{
+  text-align: right;
 }
