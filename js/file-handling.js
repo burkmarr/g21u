@@ -1,3 +1,5 @@
+import { getFieldDefs } from './common.js'
+
 export function downloadBlob(blob, name) {
   // Convert your blob into a Blob URL (a special url that points to an object in the browser's memory)
   const blobUrl = URL.createObjectURL(blob)
@@ -70,4 +72,34 @@ export async function opfsGetFile (filename) {
   }
   const file = await fileHandle.getFile()
   return file
+}
+
+export async function getJsonFile(filename) {
+
+  let json
+  const blob = await opfsGetFile(filename)
+  if (blob) {
+    json = JSON.parse(await blob.text())
+  }
+  // In case property has been added to definition since this 
+  // file was saved, add the property, and save it before
+  // returning the json.
+  if (json) {
+    let missingProperty = false
+    getFieldDefs().forEach(f => {
+      if (!json.hasOwnProperty(f.jsonId)){
+        json[f.jsonId] = f.novalue
+        missingProperty = true
+      }
+    })
+    if (missingProperty) {
+      const jsonString = JSON.stringify(json)
+      await opfsSaveFile(new Blob([jsonString], { type: "application/json" }), filename)
+      // Need to refetch after saving
+      const blob = await opfsGetFile(filename)
+      json = JSON.parse(await blob.text())
+    }
+  }
+
+  return json
 }

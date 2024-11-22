@@ -1,6 +1,6 @@
 import { opfsGetWavFiles, opfsDeleteFiles, downloadBlob } from './file-handling.js'
 import { selectAll, transition, easeLinear } from './nl.min.js'
-import { getOpt, setSvJson, getSvJson } from './common.js'
+import { getOpt, setSsJson, getSsJson } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 
@@ -15,7 +15,7 @@ async function initialiseList() {
   recordingDiv.innerHTML = ''
   opfsFiles = await opfsGetWavFiles()
 
-  const selectedFilename = getSvJson('selectedFile') ? getSvJson('selectedFile').filename : ''
+  const selectedFilename = getSsJson('selectedFile') ? getSsJson('selectedFile').filename : ''
   //console.log('currentSelected', selectedFilename)
 
   let matchSf = false
@@ -79,7 +79,7 @@ async function initialiseList() {
   if (!matchSf) {
     // Currently stored selected file is no longer present
     // so probably deleted.
-    setSvJson( 'selectedFile', null)
+    setSsJson( 'selectedFile', null)
   }
 }
 
@@ -187,9 +187,9 @@ function recordSelected(e) {
       time: e.target.getAttribute('data-file-time'),
       location: e.target.getAttribute('data-file-location')
     }
-    setSvJson( 'selectedFile', sf)
+    setSsJson( 'selectedFile', sf)
   } else {
-    setSvJson( 'selectedFile', null)
+    setSsJson( 'selectedFile', null)
   }
   populateRecordFields()
 }

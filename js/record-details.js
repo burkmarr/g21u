@@ -1,5 +1,5 @@
-import { getSvJson, getOpt } from './common.js'
-import { opfsGetFile, opfsSaveFile } from './file-handling.js'
+import { getSsJson, getFieldDefs } from './common.js'
+import { getJsonFile, opfsSaveFile } from './file-handling.js'
 
 const container = el('record-details')
 generateRecordFields(el('record-details'))
@@ -51,16 +51,11 @@ async function cancelRecord() {
 
 async function saveRecord() {
   // Selected soundfile
-  const sf = getSvJson('selectedFile')
+  const sf = getSsJson('selectedFile')
   // Build JSON structure
   const json = {
-    wav: getSvJson('selectedFile'),
-    // recorder: el('recorder-name-input').value,
-    // determiner: el('determiner-name-input').value,
-    // date: el('record-date-input').value,
-    // time: el('record-time-input').value
+    wav: getSsJson('selectedFile'),
   }
-
   getFieldDefs().forEach(f => {
     json[f.jsonId] =  el(f.inputId).value
   })
@@ -70,14 +65,20 @@ async function saveRecord() {
   await opfsSaveFile(new Blob([jsonString], { type: "application/json" }),
     `${sf.filename.substring(0, sf.filename.length-4)}.json`)
 
+  console.log(json)
+  console.log('Save', `${sf.filename.substring(0, sf.filename.length-4)}.json`)
+
   highlightFields()
 }
 
 export async function populateRecordFields() {
   // Selected soundfile
-  const sf = getSvJson('selectedFile')
-  // Get corresponding JSON file if it exists
-  const json = await getFileJson()
+  const sf = getSsJson('selectedFile')
+  //console.log(sf)
+
+  // Get corresponding record JSON if it exists
+  const json = await getRecordJson()
+  //console.log(json)
 
   getFieldDefs().forEach(f => {
     if (json) {
@@ -99,57 +100,10 @@ export async function populateRecordFields() {
   }
 }
 
-function getFieldDefs() {
-  const sf = getSvJson('selectedFile')
-
-  return [
-    {
-      inputId: 'recorder-name-input',
-      inputType: 'text',
-      inputLabel: 'Recorder',
-      jsonId: 'recorder',
-      default: getOpt('default-recorder'),
-      novalue: ''
-    },
-    {
-      inputId: 'determiner-name-input',
-      inputType: 'text',
-      inputLabel: 'Determiner',
-      jsonId: 'determiner',
-      default: getOpt('default-determiner'),
-      novalue: ''
-    },
-    {
-      inputId: 'record-date-input',
-      inputType: 'date',
-      inputLabel: 'Record date',
-      jsonId: 'date',
-      default: dateFromSf(),
-      novalue: ''
-    },
-    {
-      inputId: 'record-time-input',
-      inputType: 'time',
-      inputLabel: 'Record type',
-      jsonId: 'time',
-      default: sf ? sf.time.substring(0,5) : '00:00',
-      novalue: '00:00'
-    },
-    {
-      inputId: 'taxon-input',
-      inputType: 'text',
-      inputLabel: 'Taxon',
-      jsonId: 'taxon',
-      default: '',
-      novalue: ''
-    }
-  ]
-}
-
 async function highlightFields() {
 
-  const sf = getSvJson('selectedFile')
-  const json = await getFileJson()
+  const sf = getSsJson('selectedFile')
+  const json = await getRecordJson()
   let edited = false
   getFieldDefs().forEach(f => {
     const fld = el(f.inputId)
@@ -181,31 +135,14 @@ function el(id) {
   return document.getElementById(id)
 }
 
-async function getFileJson() {
+async function getRecordJson() {
   // Selected soundfile
-  const sf = getSvJson('selectedFile')
+  const sf = getSsJson('selectedFile')
   // Get corresponding JSON file if it exists
   let json
   if (sf) {
     const jsonFile = `${sf.filename.substring(0, sf.filename.length-4)}.json`
-    const blob = await opfsGetFile(jsonFile)
-    if (blob) {
-      json = JSON.parse(await blob.text())
-      //console.log('read jsonFile', json)
-    }
+    json = await getJsonFile(jsonFile)
   }
   return json
-}
-
-function dateFromSf() {
-  const sf = getSvJson('selectedFile')
-  if (sf) {
-    const dte = new Date()
-    const day = sf.date.substring(0,2)
-    const month = sf.date.substring(3,5)
-    const year = sf.date.substring(6)
-    return `${year}-${month}-${day}`
-  } else {
-    return ''
-  }
 }
