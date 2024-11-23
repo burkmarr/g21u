@@ -92,7 +92,7 @@ export function defaultDetails() {
     rows.push({caption: 'Loc', value: sf.location})
     rows.push({caption: 'Accuracy', value: sf.accuracy + ' m'})
     rows.push({caption: 'Altitude', value: sf.altitude === 'none' ? 'not recorded' : sf.altitude + ' m'})
-    keyValuePairTable(rows, el('field-details'))
+    keyValuePairTable('wav-details', rows, el('field-details'))
   } else {
      el('field-details').innerHTML = ``
   }

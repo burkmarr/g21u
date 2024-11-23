@@ -118,14 +118,11 @@ export function el(id) {
   return document.getElementById(id)
 }
 
-export function keyValuePairTable(rows, parent, className) {
-  console.log(rows)
-
+export function keyValuePairTable(id, rows, parent) {
+  //console.log(rows)
   const table = document.createElement('table')
+  table.setAttribute('id', id)
   table.classList.add('key-value-pair-table')
-  if (className) {
-    table.classList.add(className)
-  }
   parent.appendChild(table)
   rows.forEach(r => {
     const tr = document.createElement('tr')
@@ -139,5 +136,43 @@ export function keyValuePairTable(rows, parent, className) {
     td2.innerHTML = r.value
     tr.appendChild(td2)
   })
-  return table.innerHTML
+}
+
+export function unorderedList(id, rows, parent) {
+  //console.log(rows)
+  const ul = document.createElement('ul')
+  ul.setAttribute('id', id)
+  ul.classList.add('value-list')
+  parent.appendChild(ul)
+  rows.forEach(r => {
+    const li = document.createElement('li')
+    ul.appendChild(li)
+    li.innerHTML = r
+  })
+}
+
+export function collapsibleDiv(id, caption, parent) {
+  const div = document.createElement('div')
+  div.setAttribute('id', id)
+  div.classList.add('collapsible')
+  parent.appendChild(div)
+  div.innerHTML = `
+    <div class='collapsible-caption'>
+      <b>${caption}</b> <span class='collapsible-toggle'>[show]</span>
+    </div>
+    <div class='collapsible-content hide'></div>
+  `
+  
+  const toggle = document.querySelector(`#${id} .collapsible-toggle`)
+  toggle.addEventListener('click', function(e){
+    if (e.target.innerText === '[show]') {
+      e.target.innerText = '[hide]'
+      document.querySelector(`#${id} .collapsible-content`).classList.remove('hide')
+    } else {
+      e.target.innerText = '[show]'
+      document.querySelector(`#${id} .collapsible-content`).classList.add('hide')
+    }
+  })
+
+  return document.querySelector(`#${id} .collapsible-content`)
 }
