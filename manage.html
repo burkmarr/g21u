@@ -39,9 +39,9 @@
   <div id="manage-div" style="display: flex">
     <div id="record-list"></div>
     <div id="record-field-details">
-      <div id="record-field-tab-buttons" style="display: flex" class="tab">
-        <button class="tablinks" onclick="openTab(event, 'record-details')">Record</button>
-        <button class="tablinks" onclick="openTab(event, 'field-details')">Field</button>
+      <div id="record-field-tab-buttons" class="tab">
+        <button id="tab-button-record-details" class="tablinks" onclick="openTab(event, 'record-details')">Record</button>
+        <button id="tab-button-file-details" class="tablinks" onclick="openTab(event, 'field-details')">Field</button>
         <button class="tabdummy"></button>
       </div>
       <div style="display: flex">
@@ -79,8 +79,10 @@
           document.getElementById('record-list').classList.add('hide')
           document.getElementById('record-field-tab-buttons').classList.remove('hide')
           document.getElementById('manage').classList.add('hide')
-
           document.getElementById('field-details').classList.add('hide')
+
+          document.getElementById('tab-button-record-details').classList.add('active')
+          document.getElementById('tab-button-file-details').classList.remove('active')
         } else {
           document.getElementById('record-field-details').classList.add('hide')
           document.getElementById('record-list').classList.remove('hide')

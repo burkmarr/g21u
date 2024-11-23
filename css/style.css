@@ -131,7 +131,12 @@ body#manage {
   overflow-y: auto; 
   overflow-x: hidden; 
   height: calc(100vh - 152px);
-  width: 100%;
+  width: 50%;
+}
+@media only screen and (max-width: 600px) {
+  #record-list {
+    width: 100%;
+  }
 }
 
 /* Style the links inside the navigation bar */
@@ -434,6 +439,11 @@ click event not recognised */
 
 .tab {
   overflow: hidden;
+  display: flex;
+}
+
+.tab.hide {
+  display: none;
 }
 /* Style the buttons that are used to open the tab content */
 button.tablinks {
@@ -443,6 +453,7 @@ button.tablinks {
   cursor: pointer;
   padding: 14px 16px;
   transition: 0.3s;
+  font-size: 1em;
 }
 button.tabdummy {
   width: 100%;
@@ -450,6 +461,6 @@ button.tabdummy {
   border: none;
   border-bottom: 1px solid #bbb; 
 }
-.tab button.active {
+button.tablinks.active {
   border-bottom: none;
 }
