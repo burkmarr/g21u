@@ -58,13 +58,17 @@ export async function taxonDetails() {
   })
   // Get the details for this guid
   if (guid) {
-
+    console.log(guid)
     const taxonomy = await fetch(`https://species-ws.nbnatlas.org/species/${guid}`).then(data => data.json())
     console.log(taxonomy)
 
     // Taxonomy
     let rows = []
+    rows.push({caption: 'Taxon', value: taxonomy.taxonConcept.nameFormatted})
+    rows.push({caption: 'TVK', value: taxonomy.taxonConcept.guid})
     rows.push({caption: 'NBN group', value: taxonomy.taxonGroup_s})
+    rows.push({caption: 'NBN count', value: taxonomy.occurrenceCounts.occurrenceCount})
+
     rows.push({caption: 'Kingdom', value: taxonomy.classification.kingdom})
     rows.push({caption: 'Phylum', value: taxonomy.classification.phylum})
     rows.push({caption: 'Class', value: taxonomy.classification.class})
@@ -74,14 +78,27 @@ export async function taxonDetails() {
 
     // Common names
     el('field-details').appendChild(document.createElement('br'))
-    const cnDiv = collapsibleDiv('common-names', 'Common names', el('field-details'))
-    rows = taxonomy.commonNames.map(n => n.nameString)
-    unorderedList('common-names-list', rows, cnDiv)
-
+    rows = taxonomy.commonNames ? taxonomy.commonNames.map(n => n.nameString) : []
+    if (rows.length) {
+      const cnDiv = collapsibleDiv('common-names', 'Common names', el('field-details'))
+      unorderedList('common-names-list', rows, cnDiv)
+    } else {
+      const cnDiv = document.createElement('div')
+      cnDiv.innerHTML = '<b>Common names</b> - none'
+      el('field-details').appendChild(cnDiv)
+    }
+    
     // Synonyms
     el('field-details').appendChild(document.createElement('br'))
-    const sDiv = collapsibleDiv('synonyms', 'Synonyms', el('field-details'))
-    unorderedList('synonyms-list', taxonomy.synonymComplete, sDiv)
+    if (taxonomy.synonyms && taxonomy.synonyms.length) {
+      const sDiv = collapsibleDiv('synonyms', 'Synonyms', el('field-details'))
+      unorderedList('synonyms-list', taxonomy.synonyms.map(s => s.nameFormatted), sDiv)
+    } else {
+      const sDiv = document.createElement('div')
+      sDiv.innerHTML = '<b>Synonyms</b> - none'
+      el('field-details').appendChild(sDiv)
+    }
+   
   }
   
 }

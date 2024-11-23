@@ -358,6 +358,8 @@ click event not recognised */
 #field-details {
   margin-left: 1em;
   width: 100%;
+  overflow-y: auto; 
+  overflow-x: hidden; 
   height: calc(100vh - 152px);
 }
 
@@ -407,4 +409,8 @@ click event not recognised */
 
 .collapsible-toggle {
   cursor: pointer;
+}
+
+.scientific-name .name {
+  font-style: italic;
 }
