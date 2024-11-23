@@ -38,8 +38,17 @@
   </div>
   <div id="manage-div" style="display: flex">
     <div id="record-list"></div>
-    <div id="record-details"></div>
-    <div id="field-details"></div>
+    <div id="record-field-details">
+      <div id="record-field-tab-buttons" style="display: flex" class="tab">
+        <button class="tablinks" onclick="openTab(event, 'record-details')">Record</button>
+        <button class="tablinks" onclick="openTab(event, 'field-details')">Field</button>
+        <button class="tabdummy"></button>
+      </div>
+      <div style="display: flex">
+        <div id="record-details" class="tabcontent"></div>
+        <div id="field-details" class="tabcontent"></div>
+      </div>
+    </div>
   </div>
   <div id="menu"></div>
   <script src="js/record-list.js" type="module" defer></script>
@@ -47,12 +56,14 @@
   <script type="module">
     import { menu } from './js/menu.js'
     import { downloadChecked, shareChecked, deleteChecked, uncheckAll, checkAll, deleteYesNo } from './js/record-list.js'
+    import { openTab } from './js/record-details.js'
     window.shareChecked = shareChecked
     window.deleteChecked = deleteChecked
     window.downloadChecked = downloadChecked
     window.uncheckAll = uncheckAll
     window.checkAll = checkAll
     window.deleteYesNo = deleteYesNo
+    window.openTab = openTab
     menu()
 
     const smallScreen = window.matchMedia("(max-width: 600px)")
@@ -64,21 +75,25 @@
       if (smallScreen.matches) {
         const urlParams = new URLSearchParams(window.location.search)
         if (urlParams.get('details')) { 
+          document.getElementById('record-field-details').classList.remove('hide')
           document.getElementById('record-list').classList.add('hide')
-          document.getElementById('record-details').classList.remove('hide')
-          document.getElementById('field-details').classList.remove('hide')
-          document.getElementById('manage').classList.add('hide-menu')
-        } else {
-          document.getElementById('record-list').classList.remove('hide')
-          document.getElementById('record-details').classList.add('hide')
+          document.getElementById('record-field-tab-buttons').classList.remove('hide')
+          document.getElementById('manage').classList.add('hide')
+
           document.getElementById('field-details').classList.add('hide')
-          document.getElementById('manage').classList.remove('hide-menu')
+        } else {
+          document.getElementById('record-field-details').classList.add('hide')
+          document.getElementById('record-list').classList.remove('hide')
+          document.getElementById('record-field-tab-buttons').classList.add('hide')
+          document.getElementById('manage').classList.remove('hide')
         }
       } else {
+        document.getElementById('record-field-details').classList.remove('hide')
         document.getElementById('record-list').classList.remove('hide')
         document.getElementById('record-details').classList.remove('hide')
         document.getElementById('field-details').classList.remove('hide')
-        document.getElementById('manage').classList.remove('hide-menu')
+        document.getElementById('record-field-tab-buttons').classList.add('hide')
+        document.getElementById('manage').classList.remove('hide')
       }
     }
   </script>

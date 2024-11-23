@@ -2,9 +2,12 @@ import { el, getSsJson, getFieldDefs, keyValuePairTable } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { getJsonFile, opfsSaveFile } from './file-handling.js'
 
-const container = el('record-details')
-generateRecordFields(el('record-details'))
-populateRecordFields()
+console.log('record-details', el('record-details'))
+
+if (el('record-details')) {
+  generateRecordFields(el('record-details'))
+  populateRecordFields()
+}
 
 function createInputLabel(parent, label) {
   const ldiv = document.createElement('div')
@@ -193,4 +196,23 @@ async function getRecordJson() {
     json = await getJsonFile(jsonFile)
   }
   return json
+}
+
+export function openTab(e, divId) {
+
+  // Get all elements with class="tabcontent" and hide them
+  const tabcontent = document.getElementsByClassName("tabcontent")
+  for (let i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].classList.add('hide')
+  }
+
+  //Get all elements with class="tablinks" and remove the class "active"
+  const tablinks = document.getElementsByClassName('tablinks')
+  for (let i = 0; i < tablinks.length; i++) {
+    tablinks[i].classList.remove('active')
+  }
+
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(divId).classList.remove('hide')
+  e.currentTarget.classList.add('active')
 }

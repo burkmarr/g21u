@@ -99,9 +99,9 @@ div#home-links a {
   animation-timing-function: ease-in-out;
 }
 
-.hide {
+/* .hide {
   visibility: hidden;
-}
+} */
 
 #navbar, #menu-record-list {
   background-color: #333;
@@ -347,6 +347,11 @@ click event not recognised */
   margin-bottom: 1em;
 }
 
+#record-field-details {
+  width: 100%;
+  height: calc(100vh - 152px);
+}
+
 #record-details {
   margin-left: 1em;
   width: 100%;
@@ -370,10 +375,10 @@ click event not recognised */
   #record-details, #field-details {
     margin-left: 0;
   }
-  body#manage.hide-menu #menu-record-list {
+  body#manage.hide #menu-record-list {
     display: none;
   }
-  body#manage.hide-menu {
+  body#manage.hide {
     padding-top: 0;
   }
 } 
@@ -413,4 +418,38 @@ click event not recognised */
 
 .scientific-name .name {
   font-style: italic;
+}
+
+#record-field-tab-buttons {
+  margin: 0 0 1em 0;
+}
+
+#record-field-tab-buttons.hide {
+  display: none;
+}
+
+#record-field-details.hide {
+  display: none;
+}
+
+.tab {
+  overflow: hidden;
+}
+/* Style the buttons that are used to open the tab content */
+button.tablinks {
+  background-color: white;
+  border: 1px solid #bbb; 
+  width: 100px;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+button.tabdummy {
+  width: 100%;
+  background-color: white;
+  border: none;
+  border-bottom: 1px solid #bbb; 
+}
+.tab button.active {
+  border-bottom: none;
 }
