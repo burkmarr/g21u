@@ -24,7 +24,7 @@ async function initialiseList() {
     const fileDiv = document.createElement('div')
     fileDiv.setAttribute('id', `file-div-${i}`)
     fileDiv.setAttribute('data-file-name', f.name)
-    fileDiv.classList.add('opfs-div')
+    fileDiv.classList.add('record-div')
     fileDiv.addEventListener('click', recordSelected)
 
     if (f.name === selectedFilename) {
@@ -36,14 +36,14 @@ async function initialiseList() {
     const playImage = document.createElement('img')
     playImage.setAttribute('src', 'images/playback-green.png')
     playImage.setAttribute('data-index', i)
-    playImage.setAttribute('id', `opfs-play-image-${i}`)
-    playImage.classList.add('opfs-play-image')
+    playImage.setAttribute('id', `record-play-image-${i}`)
+    playImage.classList.add('record-play-image')
     playImage.addEventListener('click', playRecording)
     fileDiv.appendChild(playImage)
     // Logo
     const logoImage = document.createElement('img')
     logoImage.setAttribute('src', 'images/gilbert.png')
-    logoImage.classList.add('opfs-logo')
+    logoImage.classList.add('record-logo')
     fileDiv.appendChild(logoImage)
     // Text
     const sName = f.name.split('_')
@@ -62,7 +62,7 @@ async function initialiseList() {
       altitude = sName[5].substring(0, sName[5].length-4)
     }
     const textDiv = document.createElement('div')
-    textDiv.classList.add('opfs-div-text')
+    textDiv.classList.add('record-div-text')
     textDiv.innerHTML=`${date} ${time}<br/>${location}`
     fileDiv.appendChild(textDiv)
     // Set the date, time and location data attributes of the div
@@ -75,8 +75,8 @@ async function initialiseList() {
     // Select checkbox
     const check = document.createElement('input')
     check.setAttribute('type', 'checkbox')
-    check.setAttribute('id', `opfs-checkbox-${i}`)
-    check.classList.add('opfs-checkbox')
+    check.setAttribute('id', `record-checkbox-${i}`)
+    check.classList.add('record-checkbox')
     check.addEventListener('click', recordChecked)
     fileDiv.appendChild(check)
     
@@ -91,7 +91,7 @@ async function initialiseList() {
 
 export async function deleteChecked(el) {
   flash(el.id)
-  const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`opfs-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     document.getElementById('file-num').innerText = n
     document.getElementById('file-text').innerText = n === 1 ? 'file' : 'files'
@@ -104,7 +104,7 @@ export async function deleteYesNo(e) {
   if (e.getAttribute('id') === 'delete-confirm') {
     const names = []
     opfsFiles.forEach((f,i) => {
-      if (document.getElementById(`opfs-checkbox-${i}`).checked) {
+      if (document.getElementById(`record-checkbox-${i}`).checked) {
         names.push(f.name)
       }
     })
@@ -116,11 +116,11 @@ export async function deleteYesNo(e) {
 
 export async function shareChecked(el) {
   flash(el.id)
-  const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`opfs-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const files = []
     opfsFiles.forEach((f,i) => {
-      if (document.getElementById(`opfs-checkbox-${i}`).checked) {
+      if (document.getElementById(`record-checkbox-${i}`).checked) {
         files.push(f.file)
       }
     })
@@ -130,11 +130,11 @@ export async function shareChecked(el) {
 
 export async function downloadChecked(el) {
   flash(el.id)
-  const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`opfs-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const files = []
     opfsFiles.forEach((f,i) => {
-      if (document.getElementById(`opfs-checkbox-${i}`).checked) {
+      if (document.getElementById(`record-checkbox-${i}`).checked) {
         downloadBlob(f.file, f.name)
       }
     })
@@ -143,7 +143,7 @@ export async function downloadChecked(el) {
 
 export function uncheckAll(el) {
   flash(el.id)
-  const checkboxes = document.getElementsByClassName('opfs-checkbox')
+  const checkboxes = document.getElementsByClassName('record-checkbox')
   for(let i=0, n=checkboxes.length;i<n;i++) {
     checkboxes[i].checked = false
   }
@@ -151,7 +151,7 @@ export function uncheckAll(el) {
 
 export function checkAll(el) {
   flash(el.id)
-  const checkboxes = document.getElementsByClassName('opfs-checkbox')
+  const checkboxes = document.getElementsByClassName('record-checkbox')
   for(let i=0, n=checkboxes.length;i<n;i++) {
     checkboxes[i].checked = true
   }
@@ -208,7 +208,7 @@ async function playRecording(e) {
   e.stopPropagation()
 
   const i = Number(e.target.getAttribute('data-index'))
-  const playbackImage = document.getElementById(`opfs-play-image-${i}`)
+  const playbackImage = document.getElementById(`record-play-image-${i}`)
 
   playbackImage.removeEventListener('click', playRecording)
   playbackImage.src = "images/playback-red.png"
@@ -229,7 +229,7 @@ function stopPlayback(e) {
   e.stopPropagation()
 
   const i = Number(e.target.getAttribute('data-index'))
-  const playbackImage = document.getElementById(`opfs-play-image-${i}`)
+  const playbackImage = document.getElementById(`record-play-image-${i}`)
 
   opfsFiles[i].playback.pause()
   opfsFiles[i].playback.currentTime = 0
