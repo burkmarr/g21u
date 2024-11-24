@@ -1,6 +1,6 @@
 import { el, getSsJson, getFieldDefs, keyValuePairTable } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
-import { getJsonFile, opfsSaveFile } from './file-handling.js'
+import { getJsonFile, storSaveFile } from './file-handling.js'
 
 console.log('record-details', el('record-details'))
 
@@ -118,7 +118,7 @@ async function saveRecord() {
 
   // Save the file
   const jsonString = JSON.stringify(json)
-  await opfsSaveFile(new Blob([jsonString], { type: "application/json" }),
+  await storSaveFile(new Blob([jsonString], { type: "application/json" }),
     `${sf.filename.substring(0, sf.filename.length-4)}.json`)
   highlightFields()
 }

@@ -1,10 +1,10 @@
-import { opfsGetWavFiles, opfsDeleteFiles, downloadBlob } from './file-handling.js'
+import { storGetWavFiles, storDeleteFiles, downloadBlob } from './file-handling.js'
 import { selectAll, transition, easeLinear } from './nl.min.js'
 import { getOpt, setSsJson, getSsJson } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 
-let opfsFiles
+let storFiles
 const recordingDiv = document.getElementById('record-list')
 const deleteConfirmDialog = document.getElementById('delete-confirm-dialog')
 
@@ -13,13 +13,13 @@ initialiseList()
 async function initialiseList() {
   // Populate with files from origin private file system (root folder)
   recordingDiv.innerHTML = ''
-  opfsFiles = await opfsGetWavFiles()
+  storFiles = await storGetWavFiles()
 
   const selectedFilename = getSsJson('selectedFile') ? getSsJson('selectedFile').filename : ''
   //console.log('currentSelected', selectedFilename)
 
   let matchSf = false
-  opfsFiles.forEach((f,i) => {
+  storFiles.forEach((f,i) => {
     // Create div
     const fileDiv = document.createElement('div')
     fileDiv.setAttribute('id', `file-div-${i}`)
@@ -91,7 +91,7 @@ async function initialiseList() {
 
 export async function deleteChecked(el) {
   flash(el.id)
-  const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  storFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     document.getElementById('file-num').innerText = n
     document.getElementById('file-text').innerText = n === 1 ? 'file' : 'files'
@@ -103,12 +103,12 @@ export async function deleteYesNo(e) {
   deleteConfirmDialog.close()
   if (e.getAttribute('id') === 'delete-confirm') {
     const names = []
-    opfsFiles.forEach((f,i) => {
+    storFiles.forEach((f,i) => {
       if (document.getElementById(`record-checkbox-${i}`).checked) {
         names.push(f.name)
       }
     })
-    await opfsDeleteFiles(names)
+    await storDeleteFiles(names)
     await initialiseList()
     populateRecordFields()
   }
@@ -116,10 +116,10 @@ export async function deleteYesNo(e) {
 
 export async function shareChecked(el) {
   flash(el.id)
-  const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  storFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const files = []
-    opfsFiles.forEach((f,i) => {
+    storFiles.forEach((f,i) => {
       if (document.getElementById(`record-checkbox-${i}`).checked) {
         files.push(f.file)
       }
@@ -130,10 +130,10 @@ export async function shareChecked(el) {
 
 export async function downloadChecked(el) {
   flash(el.id)
-  const n =  opfsFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  storFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const files = []
-    opfsFiles.forEach((f,i) => {
+    storFiles.forEach((f,i) => {
       if (document.getElementById(`record-checkbox-${i}`).checked) {
         downloadBlob(f.file, f.name)
       }
@@ -215,8 +215,8 @@ async function playRecording(e) {
   playbackImage.classList.add("flashing")
   playbackImage.addEventListener('click', stopPlayback)
 
-  opfsFiles[i].playback = new Audio()
-  await playBlob(opfsFiles[i].playback, opfsFiles[i].file, getOpt('playback-volume'))
+  storFiles[i].playback = new Audio()
+  await playBlob(storFiles[i].playback, storFiles[i].file, getOpt('playback-volume'))
 
   playbackImage.removeEventListener('click', stopPlayback)
   playbackImage.src = "images/playback-green.png"
@@ -231,9 +231,9 @@ function stopPlayback(e) {
   const i = Number(e.target.getAttribute('data-index'))
   const playbackImage = document.getElementById(`record-play-image-${i}`)
 
-  opfsFiles[i].playback.pause()
-  opfsFiles[i].playback.currentTime = 0
-  opfsFiles[i].playback = null
+  storFiles[i].playback.pause()
+  storFiles[i].playback.currentTime = 0
+  storFiles[i].playback = null
 
   playbackImage.removeEventListener('click', stopPlayback)
   playbackImage.src = "images/playback-green.png"

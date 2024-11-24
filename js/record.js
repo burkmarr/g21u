@@ -1,7 +1,7 @@
 import { selectAll, transition, easeLinear, wavMediaRecorder, registerWavEncoder, getGr } from './nl.min.js'
 import { beep, doubleBeep, playBlob } from './play.js'
 import { getOpt } from "./common.js"
-import { downloadBlob, opfsSaveFile } from './file-handling.js'
+import { downloadBlob, storSaveFile } from './file-handling.js'
 
 let isGeolocated = false
 let filename
@@ -140,7 +140,7 @@ async function stopRecording() {
     if (mode === 'download') {
       downloadBlob(audioBlob, filename)
     } else if (mode === 'opfs') {
-      opfsSaveFile(audioBlob, filename)
+      storSaveFile(audioBlob, filename)
     }
     if (getOpt('automatic-playback') === "true") {
       playback = new Audio()

@@ -23,9 +23,9 @@ export function downloadBlob(blob, name) {
   document.body.removeChild(link)
 }
 
-export async function opfsSaveFile(blob, name) {
-  const opfsRoot = await navigator.storage.getDirectory()
-  const fileHandle = await opfsRoot.getFileHandle(name, {create: true})
+export async function storSaveFile(blob, name) {
+  const storRoot = await navigator.storage.getDirectory()
+  const fileHandle = await storRoot.getFileHandle(name, {create: true})
   const writable = await fileHandle.createWritable()
   // https://developer.mozilla.org/en-US/docs/Web/API/FileSystemWritableFileStream/write
   // May not work on iOS 
@@ -34,20 +34,20 @@ export async function opfsSaveFile(blob, name) {
   await writable.close()
 }
 
-export async function opfsDeleteFiles(names) {
-  const opfsRoot = await navigator.storage.getDirectory()
+export async function storDeleteFiles(names) {
+  const storRoot = await navigator.storage.getDirectory()
   for (const name of names) {
-    await opfsRoot.removeEntry(name)
+    await storRoot.removeEntry(name)
   }
 }
 
-export async function opfsGetWavFiles () {
-  const opfsRoot = await navigator.storage.getDirectory()
-  const entries = opfsRoot.values()
+export async function storGetWavFiles () {
+  const storRoot = await navigator.storage.getDirectory()
+  const entries = storRoot.values()
   const files = []
   for await (const entry of entries) {
     if (entry.name.endsWith('.wav')) {
-      const existingFileHandle = await opfsRoot.getFileHandle(entry.name)
+      const existingFileHandle = await storRoot.getFileHandle(entry.name)
       const file = await existingFileHandle.getFile()
       files.push({
         name: entry.name,
@@ -60,10 +60,10 @@ export async function opfsGetWavFiles () {
   return files
 }
 
-export async function opfsGetFile (filename) {
-  const opfsRoot = await navigator.storage.getDirectory()
+export async function storGetFile (filename) {
+  const storRoot = await navigator.storage.getDirectory()
 
-  const fileHandle = await opfsRoot.getFileHandle(filename, { create: false })
+  const fileHandle = await storRoot.getFileHandle(filename, { create: false })
     .catch( error => {
       Promise.resolve(null)
     })
@@ -77,7 +77,7 @@ export async function opfsGetFile (filename) {
 export async function getJsonFile(filename) {
 
   let json
-  const blob = await opfsGetFile(filename)
+  const blob = await storGetFile(filename)
   if (blob) {
     json = JSON.parse(await blob.text())
   }
@@ -94,9 +94,9 @@ export async function getJsonFile(filename) {
     })
     if (missingProperty) {
       const jsonString = JSON.stringify(json)
-      await opfsSaveFile(new Blob([jsonString], { type: "application/json" }), filename)
+      await storSaveFile(new Blob([jsonString], { type: "application/json" }), filename)
       // Need to refetch after saving
-      const blob = await opfsGetFile(filename)
+      const blob = await storGetFile(filename)
       json = JSON.parse(await blob.text())
     }
   }
