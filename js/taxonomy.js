@@ -2,11 +2,11 @@ import { el, getSsJson, keyValuePairTable, unorderedList, collapsibleDiv } from 
 import { highlightFields } from './record-details.js'
 
 export async function hideTaxonMatches() {
-  el('taxon-suggestions').classList.add('not-shown')
+  el('taxon-suggestions').classList.add('hide')
 }
 
 export async function displayTaxonMatches() {
-  el('taxon-suggestions').classList.remove('not-shown')
+  el('taxon-suggestions').classList.remove('hide')
 
   const nbnapi = `https://species-ws.nbnatlas.org/search/auto?q=${this.value}&limit=20`
   const data = await fetch(nbnapi).then(data => data.json())

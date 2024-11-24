@@ -5,7 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>G21v2 manage</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/general.css">
+  <link rel="stylesheet" href="css/manage.css">
   <link rel="stylesheet" href="css/taxon-select.css">
   <link rel="manifest" href="manifest.json" />
 </head>
@@ -78,16 +79,15 @@
           document.getElementById('record-field-details').classList.remove('hide')
           document.getElementById('record-list').classList.add('hide')
           document.getElementById('record-field-tab-buttons').classList.remove('hide')
-          document.getElementById('manage').classList.add('hide')
+          document.getElementById('manage').classList.add('hide-menu-record-list')
           document.getElementById('field-details').classList.add('hide')
-
           document.getElementById('tab-button-record-details').classList.add('active')
           document.getElementById('tab-button-file-details').classList.remove('active')
         } else {
           document.getElementById('record-field-details').classList.add('hide')
           document.getElementById('record-list').classList.remove('hide')
           document.getElementById('record-field-tab-buttons').classList.add('hide')
-          document.getElementById('manage').classList.remove('hide')
+          document.getElementById('manage').classList.remove('hide-menu-record-list')
         }
       } else {
         document.getElementById('record-field-details').classList.remove('hide')
@@ -95,7 +95,7 @@
         document.getElementById('record-details').classList.remove('hide')
         document.getElementById('field-details').classList.remove('hide')
         document.getElementById('record-field-tab-buttons').classList.add('hide')
-        document.getElementById('manage').classList.remove('hide')
+        document.getElementById('manage').classList.remove('hide-menu-record-list')
       }
     }
   </script>

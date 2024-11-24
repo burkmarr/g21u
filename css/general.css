@@ -1,0 +1,73 @@
+body {
+  font-family: Arial;
+  padding-bottom:68px; /* Make room for the fixed main navigation menu */
+}
+
+/* General styling for input controls */
+select, input[type="text"], input[type="date"], input[type="time"] {
+  border-radius: 4px;
+  font-size: inherit;
+  padding: 0.5em 0.5em 0.5em 1em;
+  margin: 0;      
+  box-sizing: border-box;
+  width: 100%;
+  border-width: 1px;
+}
+
+/* Main navigation menu bar */
+#navbar {
+  background-color: #333;
+  overflow: hidden;
+  position: fixed;
+  left: 0;
+  height: 68px;
+  width: 100%;
+  bottom: 0;
+}
+#navbar-inner {
+  margin: 0 auto;
+  width: 204px; /* Accommodates three links of width 68px */
+}
+/* Change the width of the navar-inner div
+ * which is centered in the main navbar div
+ * in order to ensure navigation links are
+ * centred correctly because there are a
+ * different number on full screen and
+ * mobile screen
+ */
+ @media only screen and (max-width: 600px) {
+  #navbar-inner {
+    width: 272px; /* Accommodates four links of width 68px */
+  }
+}
+
+/* Links inside the navigation bar */
+#navbar a {
+  float: left;
+  display: block;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+.menu-icon, .menu-icon-2 {
+  width: 36px;
+  cursor: pointer;
+}
+.menu-icon path:not([stroke]) {
+  fill: white;
+}
+.menu-icon path {
+  stroke: white;
+}
+.menu-icon circle {
+  stroke: white;
+}
+a.selected .menu-icon path:not([stroke]) {
+  fill: rgb(12, 237, 12);
+}
+a.selected .menu-icon path {
+  stroke: rgb(12, 237, 12);
+}
+a.selected .menu-icon circle {
+  stroke: rgb(12, 237, 12);
+}

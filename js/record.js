@@ -27,8 +27,8 @@ navigator.geolocation.watchPosition(geolocated, geolocateFailure, {
 function geolocated(position) {
   if (!isGeolocated) {
     // First time in
-    document.getElementById("g21-simp-record").addEventListener('click', startRecording)
-    document.getElementById("g21-simp-record").src = "images/record-green.png"
+    document.getElementById("gps-rec-record").addEventListener('click', startRecording)
+    document.getElementById("gps-rec-record").src = "images/record-green.png"
     isGeolocated = true
   }
   
@@ -72,26 +72,26 @@ function geolocated(position) {
   }
   
   // Update gui GR
-  document.getElementById("g21-simp-prefix").innerHTML = gr10.substring(0,2)
-  document.getElementById("g21-simp-e3").innerHTML = gr10.substring(2,5)
-  document.getElementById("g21-simp-e4").innerHTML = gr10.substring(5,6)
-  document.getElementById("g21-simp-e5").innerHTML = gr10.substring(6,7)
-  document.getElementById("g21-simp-n3").innerHTML = gr10.substring(7,10)
-  document.getElementById("g21-simp-n4").innerHTML = gr10.substring(10,11)
-  document.getElementById("g21-simp-n5").innerHTML = gr10.substring(11,12)
+  document.getElementById("gps-rec-prefix").innerHTML = gr10.substring(0,2)
+  document.getElementById("gps-rec-e3").innerHTML = gr10.substring(2,5)
+  document.getElementById("gps-rec-e4").innerHTML = gr10.substring(5,6)
+  document.getElementById("gps-rec-e5").innerHTML = gr10.substring(6,7)
+  document.getElementById("gps-rec-n3").innerHTML = gr10.substring(7,10)
+  document.getElementById("gps-rec-n4").innerHTML = gr10.substring(10,11)
+  document.getElementById("gps-rec-n5").innerHTML = gr10.substring(11,12)
   // Update gui accuracy
-  document.getElementById("g21-simp-accuracy").innerHTML = `Accuracy: ${accuracy} m`
+  document.getElementById("gps-rec-accuracy").innerHTML = `Accuracy: ${accuracy} m`
   // Update gui altitude
-  document.getElementById("g21-simp-altitude").innerHTML = altitude ? `Altitude: ${altitude} m` : 'Altitude:'
+  document.getElementById("gps-rec-altitude").innerHTML = altitude ? `Altitude: ${altitude} m` : 'Altitude:'
   // Update gui lat/lng
-  document.getElementById("g21-simp-latlon").innerHTML = `${lat} / ${lon}`
+  document.getElementById("gps-rec-latlon").innerHTML = `${lat} / ${lon}`
   // Clear any error msg
-  document.getElementById("g21-simp-msg").innerHTML = ""
+  document.getElementById("gps-rec-msg").innerHTML = ""
 }
 
 function geolocateFailure(err) {
   console.log('Geolocation failure')
-  document.getElementById("g21-simp-msg").innerHTML = err.message
+  document.getElementById("gps-rec-msg").innerHTML = err.message
 }
 
 export async function startRecording() {
@@ -115,7 +115,7 @@ export async function startRecording() {
     audioBlobs.push(event.data)
   })
 
-  const elMicrophone = document.getElementById("g21-simp-record")
+  const elMicrophone = document.getElementById("gps-rec-record")
   elMicrophone.removeEventListener('click', startRecording)
   await beep(600, 0.3) // Await ensures that beep won't be on playback
   mediaRecorder.start()
@@ -123,7 +123,7 @@ export async function startRecording() {
   elMicrophone.classList.add("flashing")
   elMicrophone.addEventListener('click', stopRecording)
 
-  const elBin = document.getElementById("g21-simp-bin")
+  const elBin = document.getElementById("gps-rec-bin")
   elBin.src = "images/bin-orange.png"
   elBin.addEventListener('click', cancelRecording)
 }
@@ -147,7 +147,7 @@ async function stopRecording() {
       await playBlob(playback, audioBlob, getOpt('playback-volume'))
       playback = null
       beep(600, 0.2)
-      const elMicrophone = document.getElementById("g21-simp-record")
+      const elMicrophone = document.getElementById("gps-rec-record")
       elMicrophone.removeEventListener('click', stopPlayback)
       elMicrophone.src = "images/record-green.png"
       elMicrophone.classList.remove("flashing")
@@ -156,10 +156,10 @@ async function stopRecording() {
   })
   mediaRecorder.stop()
   doubleBeep(600, 0.15)
-  const elMicrophone = document.getElementById("g21-simp-record")
+  const elMicrophone = document.getElementById("gps-rec-record")
   elMicrophone.removeEventListener('click', stopRecording)
   elMicrophone.classList.remove("flashing")
-  const elBin = document.getElementById("g21-simp-bin")
+  const elBin = document.getElementById("gps-rec-bin")
   elBin.src = "images/bin-grey.png"
   elBin.removeEventListener('click', cancelRecording)
   if (getOpt('automatic-playback') === "true") {
@@ -180,7 +180,7 @@ function stopPlayback() {
   playback = null
 
   beep(600, 0.2)
-  const elMicrophone = document.getElementById("g21-simp-record")
+  const elMicrophone = document.getElementById("gps-rec-record")
   elMicrophone.removeEventListener('click', stopPlayback)
   elMicrophone.src = "images/record-green.png"
   elMicrophone.classList.remove("flashing")
@@ -190,14 +190,14 @@ function stopPlayback() {
 function cancelRecording() {
   beep(450, 0.4)
   
-  const elMicrophone = document.getElementById("g21-simp-record")
+  const elMicrophone = document.getElementById("gps-rec-record")
   elMicrophone.removeEventListener('click', stopRecording)
   elMicrophone.src = "images/record-green.png"
   elMicrophone.classList.remove("flashing")
   console.log('Add startRecording from cancelRecording')
   elMicrophone.addEventListener('click', startRecording)
 
-  const elBin = document.getElementById("g21-simp-bin")
+  const elBin = document.getElementById("gps-rec-bin")
   elBin.src = "images/bin-grey.png"
   elBin.removeEventListener('click', cancelRecording)
 }
