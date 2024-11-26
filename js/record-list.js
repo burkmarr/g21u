@@ -1,5 +1,5 @@
 import { storGetRecFiles, storDeleteFiles, downloadFile, fileExists, 
-  storGetFile, getFileJson } from './file-handling.js'
+  storGetFile, getFileJson, storSaveFile } from './file-handling.js'
 import { selectAll, transition, easeLinear } from './nl.min.js'
 import { getOpt, setSsJson, getSsJson, getFieldDefs, detailsFromFilename } from './common.js'
 import { playBlob } from './play.js'
@@ -15,7 +15,7 @@ async function initialiseList() {
   // Populate with files from chosen storage 
   recordingDiv.innerHTML = ''
   storFiles = await storGetRecFiles()
-  console.log('storFiles', storFiles)
+  //console.log('storFiles', storFiles)
   const selectedFilename = getSsJson('selectedFile') ? getSsJson('selectedFile').filename : ''
   let matchSf = false
   for (let i=0; i<storFiles.length; i++) {
@@ -56,7 +56,7 @@ async function initialiseList() {
     fileDiv.appendChild(logoImage)
     // Text
     let details
-    console.log('name', name)
+    //console.log('name', name)
     if (getOpt('emulate-v1') === 'true') {
       // Base text on the filename
       details = detailsFromFilename(name)
@@ -64,15 +64,19 @@ async function initialiseList() {
       // Base text on the JSON file values
       let json = {}
       if (await fileExists(`${name}.txt`)) {
+        //console.log(`${name}.txt`, 'exist')
         json = await getFileJson(`${name}.txt`)
         details = json.wav
       } else {
+        //console.log(`${name}.txt`, 'doesnt exist')
         // json file, does not exist - so create it
         details = detailsFromFilename(name)
         json.wav = details
         getFieldDefs(name).forEach(f => {
           json.jsonId = f.default
         })
+        const jsonString = JSON.stringify(json)
+        await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${name}.txt`)
       }
     }
     const textDiv = document.createElement('div')

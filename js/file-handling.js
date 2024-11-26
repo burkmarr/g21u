@@ -76,7 +76,6 @@ export async function storGetRecFiles () {
       const storRoot = await navigator.storage.getDirectory()
       const entries = storRoot.values()
       for await (const entry of entries) {
-        console.log('emtru', entry.name)
         if (entry.name.endsWith('.wav')) {
           wav.push(entry.name.substring(0, entry.name.length - 4))
         } else if (entry.name.endsWith('.txt')) {
@@ -121,7 +120,7 @@ export async function getFileJson(filename) {
 
   let json
   const blob = await storGetFile(filename)
-  console.log(blob)
+  //console.log('blob', blob)
   if (blob) {
     json = JSON.parse(await blob.text())
   }
@@ -160,7 +159,6 @@ export async function getJsonAsTextFile(filename) {
 
 export async function fileExists(filename) {
   let file
-  console.log('fileExists', filename)
   switch(getOpt('file-handling')) {
     case 'opfs':
       const storRoot = await navigator.storage.getDirectory()
