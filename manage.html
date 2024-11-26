@@ -54,10 +54,11 @@
   <div id="menu"></div>
   <script src="js/record-list.js" type="module" defer></script>
   <script src="js/record-details.js" type="module" defer></script>
-  <script type="module">
+  <script type="module" defer>
     import { menu } from './js/menu.js'
     import { downloadChecked, shareChecked, deleteChecked, uncheckAll, checkAll, deleteYesNo } from './js/record-list.js'
     import { openTab } from './js/record-details.js'
+    import { getOpt } from './js/common.js'
     window.shareChecked = shareChecked
     window.deleteChecked = deleteChecked
     window.downloadChecked = downloadChecked
@@ -66,6 +67,12 @@
     window.deleteYesNo = deleteYesNo
     window.openTab = openTab
     menu()
+
+    if (getOpt('emulate-v1') === 'true') {
+      document.body.classList.add('emulate-v1')
+    } else {
+      document.body.classList.add('emulate-v2')
+    }
 
     const smallScreen = window.matchMedia("(max-width: 600px)")
     smallScreen.addEventListener("change", function() {

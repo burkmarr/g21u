@@ -28,6 +28,9 @@ select, input[type="text"], input[type="date"], input[type="time"] {
   margin: 0 auto;
   width: 204px; /* Accommodates three links of width 68px */
 }
+#navbar a#menu-link-edit { /* CSS selector needs to be more specific than below */
+  display: none; /* Edit link is hidden by default */
+}
 /* Change the width of the navar-inner div
  * which is centered in the main navbar div
  * in order to ensure navigation links are
@@ -38,6 +41,9 @@ select, input[type="text"], input[type="date"], input[type="time"] {
  @media only screen and (max-width: 600px) {
   #navbar-inner {
     width: 272px; /* Accommodates four links of width 68px */
+  }
+  #navbar a#menu-link-edit { 
+    display: block;
   }
 }
 
@@ -70,4 +76,8 @@ a.selected .menu-icon path {
 }
 a.selected .menu-icon circle {
   stroke: rgb(12, 237, 12);
+}
+
+.emulate-v1 #menu-link-edit {
+  display: none;
 }

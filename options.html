@@ -13,14 +13,34 @@
 <body>
   <div id="opts-div">
     <div id="version"></div>
-    <div class="opts-category">Output file</div>
+
+    <div class="opts-category">Mode of operation</div>
+    <hr/>
+    <div class="opts-label"><b>V1 emulation:</b> turn on to emulate 
+      version 1 which just produces sound files compatible with the old G21 desktop application.
+      To use version 2 - which replaces both the old G21 Android app <i>and</i> the 
+      old Gilbert 21 desktop application - leave this toggle off. For more information on version 2
+      see <a href="https://github.com/burkmarr/g21u/docs/v2.html" target="blank">v2 documentation</a>.
+    </div>
+    <label class="switch">
+      <input id="emulate-v1" type="checkbox" onchange="useMode()">
+      <span class="slider round"></span>
+    </label>
+
+    <div class="opts-category">File handling</div>
     <hr/>
     <div class="opts-label"><b>Filename format:</b> indicate whether sound files should use OSGR or lat/lon in their names.</div>
     <select id="filename-format" onchange="filenameFormat()">
       <option value="osgr">OSGR</option>
       <option value="latlon">Lat/lon</option>
     </select>
-    <div class="opts-category">Playback</div>
+    <div class="opts-label"><b>Storage:</b> indicate how sound files are to be handled on creation.</div>
+    <select id="file-handling" onchange="fileHandling()">
+      <option value="download">Immediate download</option>
+      <option value="opfs">Private origin file system</option>
+    </select>
+
+    <div class="opts-category">Sound</div>
     <hr/>
     <div class="opts-label"><b>Automatic playback:</b> indicate whether or not to automatically playback at end of recording.</div>
     <label class="switch">
@@ -29,17 +49,9 @@
     </label>
     <div class="opts-label"><b>Playback volume:</b> set volume level for recording playback.</div>
     <input type="range" min="0" max="1" step="0.1" id="playback-volume" onchange="playbackVolume()">
-    <div class="opts-category">Sounds</div>
-    <hr/>
     <div class="opts-label"><b>Sounds signal volume:</b> set volume level for sound signals.</div>
     <input type="range" min="0" max="1" step="0.1" id="beep-volume" onchange="beepVolume()">
-    <div class="opts-category">File handling</div>
-    <hr/>
-    <div class="opts-label"><b>Storage:</b> indicate how sound files are to be handled on creation.</div>
-    <select id="file-handling" onchange="fileHandling()">
-      <option value="download">Immediate download</option>
-      <option value="opfs">Private origin file system</option>
-    </select>
+    
     <div class="opts-category">Record options</div>
     <hr/>
     <div class="opts-label"><b>Default recorder:</b> specify the name of the default recorder.</div>
@@ -48,10 +60,14 @@
     <input id="default-determiner" type="text" onchange="defaultDeterminer()" />
   </div>
   <div id="menu"></div>
-  <script src="js/options.js" type="module" defer></script>
-  <script type="module">
+  <script src="js/options.js" type="module"></script>
+  <script type="module" defer>
+    import { getOpt } from './js/common.js'
     import { menu } from './js/menu.js'
-    import { filenameFormat, automaticPlayback, playbackVolume, beepVolume, fileHandling, defaultRecorder, defaultDeterminer } from './js/options.js'
+    import { filenameFormat, automaticPlayback, playbackVolume, 
+      beepVolume, fileHandling, defaultRecorder, defaultDeterminer,
+      useMode } from './js/options.js'
+    window.useMode = useMode
     window.filenameFormat = filenameFormat
     window.automaticPlayback = automaticPlayback
     window.playbackVolume = playbackVolume
@@ -59,6 +75,13 @@
     window.fileHandling = fileHandling
     window.defaultRecorder = defaultRecorder
     window.defaultDeterminer = defaultDeterminer
+
+    if (getOpt('emulate-v1') === 'true') {
+      document.body.classList.add('emulate-v1')
+    } else {
+      document.body.classList.add('emulate-v2')
+    }
+
     menu()
 
     fetch('version').then(r => r.json()).then(json => {

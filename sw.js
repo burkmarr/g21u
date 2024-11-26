@@ -39,6 +39,7 @@ const APP_STATIC_RESOURCES = [
   "images/playback-red-padded.png",
   "images/playback-red.png",
   "images/playback-green.png",
+  "images/playback-grey.png",
   "images/gilbert.png"
 ]
 

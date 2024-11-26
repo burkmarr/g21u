@@ -1,8 +1,6 @@
 import { el, getSsJson, getFieldDefs, keyValuePairTable } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
-import { getJsonFile, storSaveFile } from './file-handling.js'
-
-console.log('record-details', el('record-details'))
+import { getFileJson, storSaveFile } from './file-handling.js'
 
 if (el('record-details')) {
   generateRecordFields(el('record-details'))
@@ -25,8 +23,12 @@ function createInputDiv(parent, id) {
 
 function generateRecordFields(parent) {
 
+  // Selected file
+  const sf = getSsJson('selectedFile')
+  if (!sf) return null
+
   // Generate the input fields
-  getFieldDefs().forEach(f => {
+  getFieldDefs(sf.name).forEach(f => {
     const ctrl = createInputDiv(parent, f.inputId.substring(0,f.inputId.length-6))
     createInputLabel(ctrl, `${f.inputLabel}:`)
     const input = document.createElement('input')
@@ -70,8 +72,10 @@ function generateRecordFields(parent) {
 }
 
 function fieldFocus(e) {
+  // Selected file
+  const sf = getSsJson('selectedFile')
   const id = e.target.getAttribute('id')
-  const fieldDef = getFieldDefs().find(fd => fd.inputId === id)
+  const fieldDef = getFieldDefs(sf.name).find(fd => fd.inputId === id)
   if (fieldDef.detailsFn) {
     fieldDef.detailsFn(id)
   } else {
@@ -85,7 +89,7 @@ export function defaultDetails() {
   const sf = getSsJson('selectedFile')
 
   el('field-details').innerHTML = `
-    <h3>Original WAV file details<h3>
+    <h3>Original recording details<h3>
   `
   if (sf) {
     const rows = []
@@ -106,42 +110,41 @@ async function cancelRecord() {
 }
 
 async function saveRecord() {
-  // Selected soundfile
+  // Selected file
   const sf = getSsJson('selectedFile')
   // Build JSON structure
   const json = {
     wav: getSsJson('selectedFile'),
   }
-  getFieldDefs().forEach(f => {
+  getFieldDefs(sf.name).forEach(f => {
     json[f.jsonId] =  el(f.inputId).value
   })
 
   // Save the file
   const jsonString = JSON.stringify(json)
-  await storSaveFile(new Blob([jsonString], { type: "application/json" }),
-    `${sf.filename.substring(0, sf.filename.length-4)}.json`)
+  await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${sf.filename}.txt`)
   highlightFields()
 }
 
 export async function populateRecordFields() {
-  // Selected soundfile
+  // Selected file
   const sf = getSsJson('selectedFile')
-  //console.log(sf)
+  console.log('sf', sf)
 
   // Get corresponding record JSON if it exists
   const json = await getRecordJson()
-  //console.log(json)
+  console.log(json)
 
   // Initialise the field details panel
   defaultDetails()
 
-  getFieldDefs().forEach(f => {
+  getFieldDefs(sf.filename).forEach(f => {
     if (json) {
       el(f.inputId).value = json[f.jsonId]
     } else if (sf) {
       el(f.inputId).value = f.default
-    } else {
-      el(f.inputId).value = f.novalue
+    // } else {
+    //   el(f.inputId).value = f.novalue
     }
   })
 
@@ -157,10 +160,11 @@ export async function populateRecordFields() {
 
 export async function highlightFields() {
 
+  // Selected file
   const sf = getSsJson('selectedFile')
   const json = await getRecordJson()
   let edited = false
-  getFieldDefs().forEach(f => {
+  getFieldDefs(sf.name).forEach(f => {
     const fld = el(f.inputId)
     fld.classList.remove('edited')
     fld.classList.remove('saved')
@@ -187,13 +191,13 @@ export async function highlightFields() {
 }
 
 async function getRecordJson() {
-  // Selected soundfile
+  // Selected file
   const sf = getSsJson('selectedFile')
   // Get corresponding JSON file if it exists
   let json
   if (sf) {
-    const jsonFile = `${sf.filename.substring(0, sf.filename.length-4)}.json`
-    json = await getJsonFile(jsonFile)
+    const jsonFile = `${sf.filename}.json`
+    json = await getFileJson(jsonFile)
   }
   return json
 }

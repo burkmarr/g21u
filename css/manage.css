@@ -47,6 +47,9 @@ body#manage {
     width: 100%;
   }
 }
+.emulate-v1 #record-list {
+  width: 100%;
+}
 
 /* Representation of records in record list */
 .record-div {
@@ -64,6 +67,9 @@ body#manage {
   width: 60px;
   /* cursor:pointer required on iOS browsers otherwise click event not recognised */
   cursor: pointer;
+}
+.record-play-image.no-wav {
+  pointer-events: none;
 }
 .record-logo {
   margin-left: 10px;
@@ -104,6 +110,9 @@ body#manage {
 }
 
 /* Record and field details main divs */
+.emulate-v1 #record-field-details {
+  display: none;
+}
 #record-field-details {
   width: 100%;
 }

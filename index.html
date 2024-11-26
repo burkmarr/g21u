@@ -37,10 +37,14 @@
   <script src="js/record.js" type="module" defer></script>
 
   <script type="module">
-    //import { startRecording } from "./js/record.js"
     import { menu } from "./js/menu.js"
+    import { getOpt } from "./js/common.js"
     menu()
-    //window.startRecording = startRecording
+    if (getOpt('emulate-v1') === 'true') {
+      document.body.classList.add('emulate-v1')
+    } else {
+      document.body.classList.add('emulate-v2')
+    }
 
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js")

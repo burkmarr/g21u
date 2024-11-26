@@ -1,19 +1,34 @@
 import { taxonDetails } from './taxonomy.js'
 
-const defaultOpts = {
-  'filename-format': 'osgr',
-  'automatic-playback': 'false',
-  'playback-volume': '0.5',
-  'beep-volume': '0.5',
-  'file-handling': 'opfs',
-  'default-recorder': '',
-  'default-determiner': '',
+export function detailsFromFilename(name) {
+  const sName = name.split('_')
+  const date = `${sName[0].substring(8,10)}/${sName[0].substring(5,7)}/${sName[0].substring(0,4)}`
+  const time = sName[1].replace(/-/g, ':')
+  let location, accuracy, altitude
+  if (sName.length === 5) {
+    // Name is in GR
+    location = sName[2]
+    accuracy = sName[3]
+    altitude = sName[4].substring(0, sName[4].length-4)
+  } else {
+    // Name is lat/lon format
+    location = `${sName[2]}/${sName[3]}`
+    accuracy = sName[4]
+    altitude = sName[5].substring(0, sName[5].length-4)
+  }
+  return {
+    filename: name,
+    date: date,
+    time: time,
+    location: location,
+    accuracy: accuracy,
+    altitude: altitude
+  }
 }
 
-export function getFieldDefs() {
+export function getFieldDefs(filename) {
 
-  const sf = getSsJson('selectedFile')
-  //console.log(sf)
+  const filenameDetails = filename ? detailsFromFilename(filename) : null
 
   return [
     {
@@ -37,7 +52,7 @@ export function getFieldDefs() {
       inputType: 'date',
       inputLabel: 'Record date',
       jsonId: 'date',
-      default: dateFromSf(),
+      default: filenameDetails ? dateFromString(filenameDetails.date) : '',
       novalue: ''
     },
     {
@@ -45,7 +60,7 @@ export function getFieldDefs() {
       inputType: 'time',
       inputLabel: 'Record time',
       jsonId: 'time',
-      default: sf ? sf.time.substring(0,5) : '00:00',
+      default: filenameDetails ? filenameDetails.time.substring(0,5) : '00:00',
       novalue: '00:00'
     },
     {
@@ -71,7 +86,7 @@ export function getFieldDefs() {
       inputType: 'text',
       inputLabel: 'Grid reference',
       jsonId: 'gridref',
-      default: sf ? sf.location : '',
+      default: filenameDetails ? filenameDetails.location : '',
       novalue: ''
     },
     {
@@ -85,20 +100,25 @@ export function getFieldDefs() {
   ]
 }
 
-export function dateFromSf() {
-  const sf = getSsJson('selectedFile')
-  if (sf) {
-    const dte = new Date()
-    const day = sf.date.substring(0,2)
-    const month = sf.date.substring(3,5)
-    const year = sf.date.substring(6)
-    return `${year}-${month}-${day}`
-  } else {
-    return ''
-  }
+export function dateFromString(dateString) {
+  const dte = new Date()
+  const day = dateString.substring(0,2)
+  const month = dateString.substring(3,5)
+  const year = dateString.substring(6)
+  return `${year}-${month}-${day}`
 }
 
 export function getOpt(id) {
+  const defaultOpts = {
+    'emulate-v1': 'false',
+    'filename-format': 'osgr',
+    'automatic-playback': 'false',
+    'playback-volume': '0.5',
+    'beep-volume': '0.5',
+    'file-handling': 'opfs',
+    'default-recorder': '',
+    'default-determiner': '',
+  }
   return localStorage.getItem(id) ? localStorage.getItem(id) : defaultOpts[id]
 }
 
@@ -111,7 +131,13 @@ export function setSsJson(id, value) {
 }
 
 export function getSsJson(id) {
-  return sessionStorage.getItem(id) ? JSON.parse(sessionStorage.getItem(id)) : null
+  const ss = sessionStorage.getItem(id)
+  if ( ss && ss !== 'null') {
+    const ssparse =  JSON.parse(ss)
+    return ssparse.filename ? ssparse : null
+  } else {
+    return null
+  }
 }
 
 export function el(id) {

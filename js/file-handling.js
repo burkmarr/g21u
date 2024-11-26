@@ -1,7 +1,7 @@
-import { getFieldDefs } from './common.js'
+import { getFieldDefs, getOpt } from './common.js'
 
 export function downloadBlob(blob, name) {
-  // Convert your blob into a Blob URL (a special url that points to an object in the browser's memory)
+  // Convert blob into a Blob URL (a special url that points to an object in the browser's memory)
   const blobUrl = URL.createObjectURL(blob)
   // Create a link element
   const link = document.createElement("a")
@@ -23,61 +23,105 @@ export function downloadBlob(blob, name) {
   document.body.removeChild(link)
 }
 
-export async function storSaveFile(blob, name) {
-  const storRoot = await navigator.storage.getDirectory()
-  const fileHandle = await storRoot.getFileHandle(name, {create: true})
-  const writable = await fileHandle.createWritable()
-  // https://developer.mozilla.org/en-US/docs/Web/API/FileSystemWritableFileStream/write
-  // May not work on iOS 
-  // Writes a zero byte file on tested iPhone
-  await writable.write(blob)
-  await writable.close()
+export async function downloadFile(filename) {
+  const blob = await storGetFile (filename)
+  downloadBlob(blob, filename)
 }
 
-export async function storDeleteFiles(names) {
-  const storRoot = await navigator.storage.getDirectory()
-  for (const name of names) {
-    await storRoot.removeEntry(name)
+export async function storSaveFile(blob, name) {
+
+  switch(getOpt('file-handling')) {
+    case 'opfs':
+      const storRoot = await navigator.storage.getDirectory()
+      const fileHandle = await storRoot.getFileHandle(name, {create: true})
+      const writable = await fileHandle.createWritable()
+      // https://developer.mozilla.org/en-US/docs/Web/API/FileSystemWritableFileStream/write
+      // May not work on iOS 
+      // Writes a zero byte file on tested iPhone
+      await writable.write(blob)
+      await writable.close()
+      break
+    default:
+      // No default handler
   }
 }
 
-export async function storGetWavFiles () {
-  const storRoot = await navigator.storage.getDirectory()
-  const entries = storRoot.values()
-  const files = []
-  for await (const entry of entries) {
-    if (entry.name.endsWith('.wav')) {
-      const existingFileHandle = await storRoot.getFileHandle(entry.name)
-      const file = await existingFileHandle.getFile()
-      files.push({
-        name: entry.name,
-        file: file
-      })
-    } else {
-      //console.log(entry.name)
-    }
+export async function storDeleteFiles(files) {
+  switch(getOpt('file-handling')) {
+    case 'opfs':
+      const storRoot = await navigator.storage.getDirectory()
+      for (const file of files) {
+        await storRoot.removeEntry(file).catch(e => console.log(`Could not delete ${file}`))
+      }
+      break
+    default:
+      // No default handler
+  }
+}
+
+export async function storGetRecFiles () {
+  // Returns a list of file names (without extension)
+  // which will be used to build a list of records in
+  // the application. In v1 emulation, just return the
+  // list of wav files. For v2 return a list of all
+  // json files plus names of wavs which don't have a
+  // json file - the record listing code will create
+  // the json if it is missing.
+  let files
+  const wav = []
+  const txt = []
+  const ext = getOpt('emulate-v1') === 'true' ? 'wav' : 'txt'
+  switch(getOpt('file-handling')) {
+    case 'opfs':
+      const storRoot = await navigator.storage.getDirectory()
+      const entries = storRoot.values()
+      for await (const entry of entries) {
+        console.log('emtru', entry.name)
+        if (entry.name.endsWith('.wav')) {
+          wav.push(entry.name.substring(0, entry.name.length - 4))
+        } else if (entry.name.endsWith('.txt')) {
+          txt.push(entry.name.substring(0, entry.name.length - 4))
+        } else {
+          // TODO delete file?
+        }
+      }
+      break
+    default:
+      // No default handler
+  }
+  if (ext === 'wav') {
+    files = wav
+  } else {
+    files = [...new Set([...txt, ...wav])]
   }
   return files
 }
 
 export async function storGetFile (filename) {
-  const storRoot = await navigator.storage.getDirectory()
-
-  const fileHandle = await storRoot.getFileHandle(filename, { create: false })
-    .catch( error => {
-      Promise.resolve(null)
-    })
-  if (!fileHandle) {
-    return null
+  let file
+  switch(getOpt('file-handling')) {
+    case 'opfs':
+      const storRoot = await navigator.storage.getDirectory()
+      const fileHandle = await storRoot.getFileHandle(filename, { create: false })
+        .catch( error => {
+          Promise.resolve(null)
+        })
+      if (!fileHandle) {
+        return null
+      }
+      file = await fileHandle.getFile()
+      break
+    default:
+      // No default handler
   }
-  const file = await fileHandle.getFile()
   return file
 }
 
-export async function getJsonFile(filename) {
+export async function getFileJson(filename) {
 
   let json
   const blob = await storGetFile(filename)
+  console.log(blob)
   if (blob) {
     json = JSON.parse(await blob.text())
   }
@@ -86,20 +130,46 @@ export async function getJsonFile(filename) {
   // returning the json.
   if (json) {
     let missingProperty = false
-    getFieldDefs().forEach(f => {
+    getFieldDefs(filename).forEach(f => {
       if (!json.hasOwnProperty(f.jsonId)){
-        json[f.jsonId] = f.novalue
+        json[f.jsonId] = f.default
         missingProperty = true
       }
     })
     if (missingProperty) {
       const jsonString = JSON.stringify(json)
-      await storSaveFile(new Blob([jsonString], { type: "application/json" }), filename)
+      await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
       // Need to refetch after saving
       const blob = await storGetFile(filename)
       json = JSON.parse(await blob.text())
     }
   }
-
   return json
+}
+
+export async function getJsonAsTextFile(filename) {
+  // navigator.share does not allow json, so share as text instead
+  const blob = await storGetFile(filename)
+  let text = await blob.text()
+  const textBlob = new Blob([text], { type: "text/plain" })
+  const textFile = new File([textBlob], `${filename}.txt`, {
+    type: "text/plain" // Required else navigator.share doesn't work
+  })
+  return textFile
+}
+
+export async function fileExists(filename) {
+  let file
+  console.log('fileExists', filename)
+  switch(getOpt('file-handling')) {
+    case 'opfs':
+      const storRoot = await navigator.storage.getDirectory()
+      const fileHandle = await storRoot.getFileHandle(filename, { create: false })
+        .catch( error => {
+          Promise.resolve(null)
+        })
+      return typeof fileHandle !== 'undefined'
+    default:
+      // No default handler
+  }
 }

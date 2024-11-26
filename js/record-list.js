@@ -1,44 +1,53 @@
-import { storGetWavFiles, storDeleteFiles, downloadBlob } from './file-handling.js'
+import { storGetRecFiles, storDeleteFiles, downloadFile, fileExists, 
+  storGetFile, getFileJson } from './file-handling.js'
 import { selectAll, transition, easeLinear } from './nl.min.js'
-import { getOpt, setSsJson, getSsJson } from './common.js'
+import { getOpt, setSsJson, getSsJson, getFieldDefs, detailsFromFilename } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 
-let storFiles
+let storFiles, audioPlayers = {}
 const recordingDiv = document.getElementById('record-list')
 const deleteConfirmDialog = document.getElementById('delete-confirm-dialog')
 
 initialiseList()
 
 async function initialiseList() {
-  // Populate with files from origin private file system (root folder)
+  // Populate with files from chosen storage 
   recordingDiv.innerHTML = ''
-  storFiles = await storGetWavFiles()
-
+  storFiles = await storGetRecFiles()
+  console.log('storFiles', storFiles)
   const selectedFilename = getSsJson('selectedFile') ? getSsJson('selectedFile').filename : ''
-  //console.log('currentSelected', selectedFilename)
-
   let matchSf = false
-  storFiles.forEach((f,i) => {
+  for (let i=0; i<storFiles.length; i++) {
+    const name = storFiles[i]
     // Create div
     const fileDiv = document.createElement('div')
     fileDiv.setAttribute('id', `file-div-${i}`)
-    fileDiv.setAttribute('data-file-name', f.name)
+    
+    fileDiv.setAttribute('data-file-name', name) 
     fileDiv.classList.add('record-div')
     fileDiv.addEventListener('click', recordSelected)
-
-    if (f.name === selectedFilename) {
+    if (name === selectedFilename) {
       fileDiv.classList.add('record-selected')
       matchSf = true
     }
-
     // Play image
     const playImage = document.createElement('img')
-    playImage.setAttribute('src', 'images/playback-green.png')
+    let img
+    if (await fileExists(`${name}.wav`)) {
+      img = 'images/playback-green.png'
+    } else {
+      img = 'images/playback-grey.png'
+    }
+    playImage.setAttribute('src', img)
     playImage.setAttribute('data-index', i)
     playImage.setAttribute('id', `record-play-image-${i}`)
     playImage.classList.add('record-play-image')
-    playImage.addEventListener('click', playRecording)
+    if (await fileExists(`${name}.wav`)) {
+      playImage.addEventListener('click', playRecording)
+    } else {
+      playImage.classList.add('no-wav')
+    }
     fileDiv.appendChild(playImage)
     // Logo
     const logoImage = document.createElement('img')
@@ -46,31 +55,36 @@ async function initialiseList() {
     logoImage.classList.add('record-logo')
     fileDiv.appendChild(logoImage)
     // Text
-    const sName = f.name.split('_')
-    const date = `${sName[0].substring(8,10)}/${sName[0].substring(5,7)}/${sName[0].substring(0,4)}`
-    const time = sName[1].replace(/-/g, ':')
-    let location, accuracy, altitude
-    if (sName.length === 5) {
-      // Name is in GR
-      location = sName[2]
-      accuracy = sName[3]
-      altitude = sName[4].substring(0, sName[4].length-4)
+    let details
+    console.log('name', name)
+    if (getOpt('emulate-v1') === 'true') {
+      // Base text on the filename
+      details = detailsFromFilename(name)
     } else {
-      // Name is lat/lon format
-      location = `${sName[2]}/${sName[3]}`
-      accuracy = sName[4]
-      altitude = sName[5].substring(0, sName[5].length-4)
+      // Base text on the JSON file values
+      let json = {}
+      if (await fileExists(`${name}.txt`)) {
+        json = await getFileJson(`${name}.txt`)
+        details = json.wav
+      } else {
+        // json file, does not exist - so create it
+        details = detailsFromFilename(name)
+        json.wav = details
+        getFieldDefs(name).forEach(f => {
+          json.jsonId = f.default
+        })
+      }
     }
     const textDiv = document.createElement('div')
     textDiv.classList.add('record-div-text')
-    textDiv.innerHTML=`${date} ${time}<br/>${location}`
+    textDiv.innerHTML=`${details.date} ${details.time}<br/>${details.location}`
     fileDiv.appendChild(textDiv)
     // Set the date, time and location data attributes of the div
-    fileDiv.setAttribute('data-file-date', date)
-    fileDiv.setAttribute('data-file-time', time)
-    fileDiv.setAttribute('data-file-location', location)
-    fileDiv.setAttribute('data-file-accuracy', accuracy)
-    fileDiv.setAttribute('data-file-altitude', altitude)
+    fileDiv.setAttribute('data-file-date', details.date)
+    fileDiv.setAttribute('data-file-time', details.time)
+    fileDiv.setAttribute('data-file-location', details.location)
+    fileDiv.setAttribute('data-file-accuracy', details.accuracy)
+    fileDiv.setAttribute('data-file-altitude', details.altitude)
 
     // Select checkbox
     const check = document.createElement('input')
@@ -81,7 +95,7 @@ async function initialiseList() {
     fileDiv.appendChild(check)
     
     recordingDiv.appendChild(fileDiv)
-  })
+  }
   if (!matchSf) {
     // Currently stored selected file is no longer present
     // so probably deleted.
@@ -102,13 +116,19 @@ export async function deleteChecked(el) {
 export async function deleteYesNo(e) {
   deleteConfirmDialog.close()
   if (e.getAttribute('id') === 'delete-confirm') {
-    const names = []
-    storFiles.forEach((f,i) => {
+    const files = []
+    for (let i=0; i<storFiles.length; i++) {
+      const name = storFiles[i]
       if (document.getElementById(`record-checkbox-${i}`).checked) {
-        names.push(f.name)
+        if (await fileExists(`${name}.wav`)) {
+          files.push(`${name}.wav`)
+        }
+        if (await fileExists(`${name}.txt`)) {
+          files.push(`${name}.txt`)
+        }   
       }
-    })
-    await storDeleteFiles(names)
+    }
+    await storDeleteFiles(files)
     await initialiseList()
     populateRecordFields()
   }
@@ -119,11 +139,20 @@ export async function shareChecked(el) {
   const n =  storFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const files = []
-    storFiles.forEach((f,i) => {
+    for (let i=0; i<storFiles.length; i++) {
+      const name = storFiles[i]
       if (document.getElementById(`record-checkbox-${i}`).checked) {
-        files.push(f.file)
+        if (await fileExists(`${name}.wav`)) {
+          const wav = await storGetFile(`${name}.wav`)
+          files.push(wav)
+        }
+        if (await fileExists(`${name}.txt`)) {
+          const json = await storGetFile(`${name}.txt`)
+          files.push(txt)
+        }   
       }
-    })
+    }
+    console.log('files', files)
     navigator.share({files: files})
   }
 }
@@ -132,12 +161,19 @@ export async function downloadChecked(el) {
   flash(el.id)
   const n =  storFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
-    const files = []
-    storFiles.forEach((f,i) => {
+    for (let i=0; i<storFiles.length; i++) {
+      const name = storFiles[i]
       if (document.getElementById(`record-checkbox-${i}`).checked) {
-        downloadBlob(f.file, f.name)
+        // Download WAV if it exists
+        if (await fileExists(`${name}.wav`)) {
+          downloadFile(`${name}.wav`)
+        }
+        // Download JSON (txt) if it exists and not emulating v1
+        if (getOpt('emulate-v1') === 'false' && await fileExists(`${name}.txt`)) {
+          downloadFile(`${name}.txt`)
+        }
       }
-    })
+    }
   }
 }
 
@@ -215,8 +251,9 @@ async function playRecording(e) {
   playbackImage.classList.add("flashing")
   playbackImage.addEventListener('click', stopPlayback)
 
-  storFiles[i].playback = new Audio()
-  await playBlob(storFiles[i].playback, storFiles[i].file, getOpt('playback-volume'))
+  audioPlayers[i] = new Audio()
+  const audioFile = await storGetFile(`${storFiles[i]}.wav`)
+  await playBlob(audioPlayers[i], audioFile, getOpt('playback-volume'))
 
   playbackImage.removeEventListener('click', stopPlayback)
   playbackImage.src = "images/playback-green.png"
@@ -231,9 +268,9 @@ function stopPlayback(e) {
   const i = Number(e.target.getAttribute('data-index'))
   const playbackImage = document.getElementById(`record-play-image-${i}`)
 
-  storFiles[i].playback.pause()
-  storFiles[i].playback.currentTime = 0
-  storFiles[i].playback = null
+  audioPlayers[i].pause()
+  audioPlayers[i].currentTime = 0
+  audioPlayers[i] = null
 
   playbackImage.removeEventListener('click', stopPlayback)
   playbackImage.src = "images/playback-green.png"

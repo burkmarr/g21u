@@ -36,7 +36,7 @@ export async function taxonDetails() {
   const scientific = el('scientific-name-input').value
   //console.log(sf)
   const fd = el('field-details').innerHTML = `
-    <h3>Taxonomy details (NBN UKSI)</h3>
+    <h3>NBN UKSI details</h3>
     <p>
       Taxonomic details from the 
       UKSI as implemented by the National Biodiversity Network.
