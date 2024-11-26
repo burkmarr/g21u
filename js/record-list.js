@@ -1,7 +1,7 @@
 import { storGetRecFiles, storDeleteFiles, downloadFile, fileExists, 
-  storGetFile, getFileJson, storSaveFile } from './file-handling.js'
+  storGetFile, getRecordJson, storSaveFile } from './file-handling.js'
 import { selectAll, transition, easeLinear } from './nl.min.js'
-import { getOpt, setSsJson, getSsJson, getFieldDefs, detailsFromFilename } from './common.js'
+import { getOpt, getFieldDefs, detailsFromFilename } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 
@@ -12,11 +12,18 @@ const deleteConfirmDialog = document.getElementById('delete-confirm-dialog')
 initialiseList()
 
 async function initialiseList() {
-  // Populate with files from chosen storage 
-  recordingDiv.innerHTML = ''
+
   storFiles = await storGetRecFiles()
-  //console.log('storFiles', storFiles)
-  const selectedFilename = getSsJson('selectedFile') ? getSsJson('selectedFile').filename : ''
+  // If the currently selected file indicated by
+  // session storage is no longer present, then
+  // reset it.
+  if (!storFiles.includes(sessionStorage.getItem('selectedFile'))) {
+    sessionStorage.setItem('selectedFile', '')
+  }
+  console.log('storFiles', storFiles)
+  // Populate with files from storage 
+  recordingDiv.innerHTML = ''
+  const selectedFilename = getOpt('selectedFile') ? getOpt('selectedFile').filename : ''
   let matchSf = false
   for (let i=0; i<storFiles.length; i++) {
     const name = storFiles[i]
@@ -63,32 +70,14 @@ async function initialiseList() {
     } else {
       // Base text on the JSON file values
       let json = {}
-      if (await fileExists(`${name}.txt`)) {
-        //console.log(`${name}.txt`, 'exist')
-        json = await getFileJson(`${name}.txt`)
-        details = json.wav
-      } else {
-        //console.log(`${name}.txt`, 'doesnt exist')
-        // json file, does not exist - so create it
-        details = detailsFromFilename(name)
-        json.wav = details
-        getFieldDefs(name).forEach(f => {
-          json.jsonId = f.default
-        })
-        const jsonString = JSON.stringify(json)
-        await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${name}.txt`)
-      }
+      //console.log(`${name}.txt`, 'exist')
+      json = await getRecordJson(`${name}.txt`)
+      details = detailsFromFilename(name)
     }
     const textDiv = document.createElement('div')
     textDiv.classList.add('record-div-text')
     textDiv.innerHTML=`${details.date} ${details.time}<br/>${details.location}`
     fileDiv.appendChild(textDiv)
-    // Set the date, time and location data attributes of the div
-    fileDiv.setAttribute('data-file-date', details.date)
-    fileDiv.setAttribute('data-file-time', details.time)
-    fileDiv.setAttribute('data-file-location', details.location)
-    fileDiv.setAttribute('data-file-accuracy', details.accuracy)
-    fileDiv.setAttribute('data-file-altitude', details.altitude)
 
     // Select checkbox
     const check = document.createElement('input')
@@ -103,7 +92,7 @@ async function initialiseList() {
   if (!matchSf) {
     // Currently stored selected file is no longer present
     // so probably deleted.
-    setSsJson( 'selectedFile', null)
+    sessionStorage.setItem('selectedFile', '')
   }
 }
 
@@ -225,19 +214,9 @@ function recordSelected(e) {
   // Select the record
   if (!deselect) {
     e.target.classList.add("record-selected")
-    // Save the selected file details to session storage
-    // from where it can be used to populate the record details.
-    const sf = {
-      filename: e.target.getAttribute('data-file-name'),
-      date: e.target.getAttribute('data-file-date'),
-      time: e.target.getAttribute('data-file-time'),
-      location: e.target.getAttribute('data-file-location'),
-      accuracy: e.target.getAttribute('data-file-accuracy'),
-      altitude: e.target.getAttribute('data-file-altitude')
-    }
-    setSsJson( 'selectedFile', sf)
+    sessionStorage.setItem( 'selectedFile', e.target.getAttribute('data-file-name'))
   } else {
-    setSsJson( 'selectedFile', null)
+    sessionStorage.setItem( 'selectedFile', '')
   }
   populateRecordFields()
 }

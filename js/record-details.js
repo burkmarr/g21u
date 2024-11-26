@@ -1,6 +1,6 @@
-import { el, getSsJson, getFieldDefs, keyValuePairTable, detailsFromFilename } from './common.js'
+import { el, getOpt, getFieldDefs, keyValuePairTable, detailsFromFilename } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
-import { getFileJson, storSaveFile } from './file-handling.js'
+import { getRecordJson, storSaveFile } from './file-handling.js'
 
 if (el('record-details')) {
   generateRecordFields(el('record-details'))
@@ -69,9 +69,9 @@ function generateRecordFields(parent) {
 
 function fieldFocus(e) {
   // Selected file
-  const sf = getSsJson('selectedFile')
+  const selectedFile = sessionStorage.getItem('selectedFile')
   const id = e.target.getAttribute('id')
-  const fieldDef = getFieldDefs(sf.filename).find(fd => fd.inputId === id)
+  const fieldDef = getFieldDefs(selectedFile).find(fd => fd.inputId === id)
   if (fieldDef.detailsFn) {
     fieldDef.detailsFn(id)
   } else {
@@ -82,19 +82,20 @@ function fieldFocus(e) {
 export function defaultDetails() {
   // The default information to show for field details
   // is the original WAV file details.
-  const sf = getSsJson('selectedFile')
+  const selectedFile = sessionStorage.getItem('selectedFile')
 
   el('field-details').innerHTML = `
     <h3>Original recording details<h3>
   `
-  if (sf) {
+  if (selectedFile) {
+    const details = detailsFromFilename(selectedFile)
     const rows = []
-    rows.push({caption: 'Filename', value: sf.filename})
-    rows.push({caption: 'Date', value: sf.date})
-    rows.push({caption: 'Time', value: sf.time})
-    rows.push({caption: 'Loc', value: sf.location})
-    rows.push({caption: 'Accuracy', value: sf.accuracy + ' m'})
-    rows.push({caption: 'Altitude', value: sf.altitude === '' ? 'not recorded' : sf.altitude + ' m'})
+    rows.push({caption: 'Filename', value: selectedFile})
+    rows.push({caption: 'Date', value: details.date})
+    rows.push({caption: 'Time', value: details.time})
+    rows.push({caption: 'Loc', value: details.location})
+    rows.push({caption: 'Accuracy', value: details.accuracy + ' m'})
+    rows.push({caption: 'Altitude', value: details.altitude === '' ? 'not recorded' : details.altitude + ' m'})
     keyValuePairTable('wav-details', rows, el('field-details'))
   } else {
      el('field-details').innerHTML = ``
@@ -107,43 +108,43 @@ async function cancelRecord() {
 
 async function saveRecord() {
   // Selected file
-  const sf = getSsJson('selectedFile')
+  const selectedFile = sessionStorage.getItem('selectedFile')
   // Build JSON structure
   // const json = {
-  //   wav: getSsJson('selectedFile'),
+  //   wav: sessionStorage.getItem('selectedFile'),
   // }
 
-  const json = await getFileJson(`${sf.filename}.txt`)
+  const json = await getRecordJson(`${selectedFile}.txt`)
   console.log(json)
 
-  getFieldDefs(sf.filename).forEach(f => {
+  getFieldDefs(selectedFile).forEach(f => {
     json[f.jsonId] =  el(f.inputId).value
   })
 
   //console.log('new json', json)
   // Save the file
   const jsonString = JSON.stringify(json)
-  await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${sf.filename}.txt`)
+  await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${selectedFile}.txt`)
   highlightFields()
 }
 
 export async function populateRecordFields() {
 
   // Selected file
-  const sf = getSsJson('selectedFile')
-  //console.log('sf', sf)
+  const selectedFile = sessionStorage.getItem('selectedFile')
+  console.log('selectedFile', selectedFile)
   let json
-  if (sf) {
-    //console.log(`${sf.filename}.txt`)
+  if (selectedFile) {
+    //console.log(`${selectedFile}.txt`)
     // Get corresponding record JSON if it exists
-    json = await getFileJson(`${sf.filename}.txt`)
+    json = await getRecordJson(`${selectedFile}.txt`)
   }
   //console.log('json', json)
 
-  getFieldDefs(sf ? sf.filename : null).forEach(f => {
+  getFieldDefs(selectedFile ? selectedFile : null).forEach(f => {
     if (json) {
       el(f.inputId).value = json[f.jsonId]
-    // } else if (sf) {
+    // } else if (selectedFile) {
     //   el(f.inputId).value = f.default
     } else {
       el(f.inputId).value = f.novalue
@@ -156,7 +157,7 @@ export async function populateRecordFields() {
   defaultDetails()
 
   // Disable all the input fields if no record selected
-  if (sf) {
+  if (selectedFile) {
     el('record-details').classList.remove('disable') 
   } else {
     el('record-details').classList.add('disable') 
@@ -166,18 +167,18 @@ export async function populateRecordFields() {
 export async function highlightFields() {
 
   // Selected file
-  const sf = getSsJson('selectedFile')
+  const selectedFile = sessionStorage.getItem('selectedFile')
   let json
-  if (sf) {
+  if (selectedFile) {
     // Get corresponding record JSON if it exists
-    json = await getFileJson(`${sf.filename}.txt`)
+    json = await getRecordJson(`${selectedFile}.txt`)
   }
   let edited = false
-  getFieldDefs(sf ? sf.filename : null).forEach(f => {
+  getFieldDefs(selectedFile ? selectedFile : null).forEach(f => {
     const fld = el(f.inputId)
     fld.classList.remove('edited')
     fld.classList.remove('saved')
-    if (sf) {
+    if (selectedFile) {
       if (json) {
         if (fld.value === json[f.jsonId]) {
           fld.classList.add('saved')

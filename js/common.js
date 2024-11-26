@@ -1,6 +1,7 @@
 import { taxonDetails } from './taxonomy.js'
 
 export function detailsFromFilename(name) {
+  if (!name) return ''
   const sName = name.split('_')
   const date = `${sName[0].substring(8,10)}/${sName[0].substring(5,7)}/${sName[0].substring(0,4)}`
   const time = sName[1].replace(/-/g, ':')
@@ -27,7 +28,8 @@ export function detailsFromFilename(name) {
 }
 
 export function getFieldDefs(filename) {
-
+  // Filename can be null - only affects default values
+  // for some fields.
   const filenameDetails = filename ? detailsFromFilename(filename) : null
 
   return [
@@ -124,20 +126,6 @@ export function getOpt(id) {
 
 export function setOpt(id, value) {
   localStorage.setItem(id, value)
-}
-
-export function setSsJson(id, value) {
-  sessionStorage.setItem(id, JSON.stringify(value))
-}
-
-export function getSsJson(id) {
-  const ss = sessionStorage.getItem(id)
-  if ( ss && ss !== 'null') {
-    const ssparse =  JSON.parse(ss)
-    return ssparse.filename ? ssparse : null
-  } else {
-    return null
-  }
 }
 
 export function el(id) {

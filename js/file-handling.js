@@ -1,32 +1,8 @@
 import { getFieldDefs, getOpt } from './common.js'
 
-export function downloadBlob(blob, name) {
-  // Convert blob into a Blob URL (a special url that points to an object in the browser's memory)
-  const blobUrl = URL.createObjectURL(blob)
-  // Create a link element
-  const link = document.createElement("a")
-  // Set link's href to point to the Blob URL
-  link.href = blobUrl
-  link.download = name
-  // Append link to the body
-  document.body.appendChild(link)
-  // Dispatch click event on the link
-  // This is necessary as link.click() does not work on the latest firefox
-  link.dispatchEvent(
-    new MouseEvent('click', { 
-      bubbles: true, 
-      cancelable: true, 
-      view: window 
-    })
-  )
-  // Remove link from body
-  document.body.removeChild(link)
-}
-
-export async function downloadFile(filename) {
-  const blob = await storGetFile (filename)
-  downloadBlob(blob, filename)
-}
+// Function names that start with 'stor' indicate
+// functions that retrieve or write to storage and
+// are all responsive to the type of storage selected.
 
 export async function storSaveFile(blob, name) {
 
@@ -116,31 +92,78 @@ export async function storGetFile (filename) {
   return file
 }
 
-export async function getFileJson(filename) {
-
-  let json
-  const blob = await storGetFile(filename)
-  //console.log('blob', blob)
-  if (blob) {
-    json = JSON.parse(await blob.text())
-  }
-  // In case property has been added to definition since this 
-  // file was saved, add the property, and save it before
-  // returning the json.
-  if (json) {
-    let missingProperty = false
-    getFieldDefs(filename).forEach(f => {
-      if (!json.hasOwnProperty(f.jsonId)){
-        json[f.jsonId] = f.default
-        missingProperty = true
-      }
+export function downloadBlob(blob, name) {
+  // Convert blob into a Blob URL (a special url that points to an object in the browser's memory)
+  const blobUrl = URL.createObjectURL(blob)
+  // Create a link element
+  const link = document.createElement("a")
+  // Set link's href to point to the Blob URL
+  link.href = blobUrl
+  link.download = name
+  // Append link to the body
+  document.body.appendChild(link)
+  // Dispatch click event on the link
+  // This is necessary as link.click() does not work on the latest firefox
+  link.dispatchEvent(
+    new MouseEvent('click', { 
+      bubbles: true, 
+      cancelable: true, 
+      view: window 
     })
-    if (missingProperty) {
-      const jsonString = JSON.stringify(json)
-      await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
-      // Need to refetch after saving
-      const blob = await storGetFile(filename)
-      json = JSON.parse(await blob.text())
+  )
+  // Remove link from body
+  document.body.removeChild(link)
+}
+
+export async function downloadFile(filename) {
+  const blob = await storGetFile (filename)
+  downloadBlob(blob, filename)
+}
+
+export async function getRecordJson(filename) {
+  // This function takes care of getting the record json
+  // from a given record json text file.
+  // It also takes care of *creating* that file if it doesn't
+  // exist. This is the only place these files are created.
+  // This function is called when the application lists 
+  // records - passing the name of any record json text file
+  // or wav files without record json text files.
+  // The function also deals with cases when a new record filed
+  // is added to the apps record field defintions and an existing
+  // record json text file does not have the file by adding that
+  // field in and saving the new json text file. This situation
+  // can arise during development or, conceivably, when a user
+  // updates their app.
+  let json
+  if (!await fileExists(filename)) {
+    // No json text file with this filename, so create one
+    json = {}
+    getFieldDefs(filename).forEach(f => {
+      json.jsonId = f.default
+    })
+    const jsonString = JSON.stringify(json)
+    await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
+  } else {
+    const blob = await storGetFile(filename)
+    json = JSON.parse(await blob.text())
+    // In case property has been added to definition since this 
+    // file was saved, add the property, and save it before
+    // returning the json.
+    if (json) {
+      let missingProperty = false
+      getFieldDefs(filename).forEach(f => {
+        if (!json.hasOwnProperty(f.jsonId)){
+          json[f.jsonId] = f.default
+          missingProperty = true
+        }
+      })
+      if (missingProperty) {
+        const jsonString = JSON.stringify(json)
+        await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
+        // Need to refetch after saving
+        const blob = await storGetFile(filename)
+        json = JSON.parse(await blob.text())
+      }
     }
   }
   return json
