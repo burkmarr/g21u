@@ -1,4 +1,4 @@
-import { el, getSsJson, getFieldDefs, keyValuePairTable } from './common.js'
+import { el, getSsJson, getFieldDefs, keyValuePairTable, detailsFromFilename } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { getFileJson, storSaveFile } from './file-handling.js'
 
@@ -22,10 +22,6 @@ function createInputDiv(parent, id) {
 }
 
 function generateRecordFields(parent) {
-
-  // Selected file
-  //const sf = getSsJson('selectedFile')
-  //console.log('sf', sf)
 
   // Generate the input fields
   getFieldDefs().forEach(f => {
@@ -98,7 +94,7 @@ export function defaultDetails() {
     rows.push({caption: 'Time', value: sf.time})
     rows.push({caption: 'Loc', value: sf.location})
     rows.push({caption: 'Accuracy', value: sf.accuracy + ' m'})
-    rows.push({caption: 'Altitude', value: sf.altitude === 'none' ? 'not recorded' : sf.altitude + ' m'})
+    rows.push({caption: 'Altitude', value: sf.altitude === '' ? 'not recorded' : sf.altitude + ' m'})
     keyValuePairTable('wav-details', rows, el('field-details'))
   } else {
      el('field-details').innerHTML = ``

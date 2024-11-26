@@ -1,4 +1,4 @@
-import { el, getSsJson, keyValuePairTable, unorderedList, collapsibleDiv } from './common.js'
+import { el, keyValuePairTable, unorderedList, collapsibleDiv } from './common.js'
 import { highlightFields } from './record-details.js'
 
 export async function hideTaxonMatches() {
@@ -32,9 +32,9 @@ export async function displayTaxonMatches() {
 }
 
 export async function taxonDetails() {
-  const sf = getSsJson('selectedFile')
+
   const scientific = el('scientific-name-input').value
-  //console.log(sf)
+
   const fd = el('field-details').innerHTML = `
     <h3>NBN UKSI details</h3>
     <p>
