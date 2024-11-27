@@ -21,7 +21,7 @@ export function detailsFromFilename(name) {
     filename: name,
     date: date,
     time: time,
-    location: location,
+    gridref: location,
     accuracy: accuracy,
     altitude: altitude
   }

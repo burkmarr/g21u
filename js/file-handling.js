@@ -56,8 +56,6 @@ export async function storGetRecFiles () {
           wav.push(entry.name.substring(0, entry.name.length - 4))
         } else if (entry.name.endsWith('.txt')) {
           txt.push(entry.name.substring(0, entry.name.length - 4))
-        } else {
-          // TODO delete file?
         }
       }
       break
@@ -70,6 +68,41 @@ export async function storGetRecFiles () {
     files = [...new Set([...txt, ...wav])]
   }
   return files
+}
+
+export async function storGetRecs () {
+  let recs = []
+  const v1 = getOpt('emulate-v1') === 'true'
+  switch(getOpt('file-handling')) {
+    case 'opfs':
+      const storRoot = await navigator.storage.getDirectory()
+      const entries = storRoot.values()
+      for await (const entry of entries) {
+        const ext = entry.name.substring(entry.name.length - 4)
+        const name = entry.name.substring(0, entry.name.length - 4)
+        if (ext === '.wav') {
+          if (v1) {
+            recs.push({filename: name})
+          } else { //v2
+            const json = await getRecordJson(`${name}.txt`)
+            json.filename = name
+            recs.push(json)
+          }
+        } else if (!v1 && ext === '.txt') {
+          // Add only if there is no corresponding wav file
+          // those with wav files are added above
+          if (!await fileExists(`${name}.wav`)) {
+            const json = await getRecordJson(`${name}.txt`)
+            json.filename = name
+            recs.push(json)
+          }
+        }
+      }
+      break
+    default:
+      // No default handler
+  }
+  return recs
 }
 
 export async function storGetFile (filename) {

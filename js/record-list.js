@@ -1,11 +1,11 @@
-import { storGetRecFiles, storDeleteFiles, downloadFile, fileExists, 
-  storGetFile, getRecordJson, storSaveFile } from './file-handling.js'
+import { storGetRecs, storDeleteFiles, downloadFile, fileExists, 
+  storGetFile, getRecordJson } from './file-handling.js'
 import { selectAll, transition, easeLinear } from './nl.min.js'
-import { getOpt, getFieldDefs, detailsFromFilename } from './common.js'
+import { getOpt, detailsFromFilename } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 
-let storFiles, audioPlayers = {}
+let storRecs, audioPlayers = {}
 const recordingDiv = document.getElementById('record-list')
 const deleteConfirmDialog = document.getElementById('delete-confirm-dialog')
 
@@ -13,20 +13,37 @@ initialiseList()
 
 async function initialiseList() {
 
-  storFiles = await storGetRecFiles()
+  storRecs = await storGetRecs()
+  storRecs = storRecs.sort((a,b) => {
+    // Sort on date first and then time
+    let comparison = 0
+    if (a.date > b.date) {
+      comparison = -1
+    } else if (a.date < b.date) {
+      comparison = 1
+    }
+    if (comparison === 0) {
+      if (a.time > b.time) {
+        comparison = -1
+      } else if (a.time < b.time) {
+        comparison = 1
+      } 
+    }
+    return comparison
+  })
+  console.log('storRecs', storRecs)
+
   // If the currently selected file indicated by
   // session storage is no longer present, then
   // reset it.
-  if (!storFiles.includes(sessionStorage.getItem('selectedFile'))) {
+  if (!storRecs.find(r => r.filename === sessionStorage.getItem('selectedFile'))) {
     sessionStorage.setItem('selectedFile', '')
   }
-  console.log('storFiles', storFiles)
   // Populate with files from storage 
   recordingDiv.innerHTML = ''
-  const selectedFilename = getOpt('selectedFile') ? getOpt('selectedFile').filename : ''
-  let matchSf = false
-  for (let i=0; i<storFiles.length; i++) {
-    const name = storFiles[i]
+
+  for (let i=0; i<storRecs.length; i++) {
+    const name = storRecs[i].filename
     // Create div
     const fileDiv = document.createElement('div')
     fileDiv.setAttribute('id', `file-div-${i}`)
@@ -34,9 +51,8 @@ async function initialiseList() {
     fileDiv.setAttribute('data-file-name', name) 
     fileDiv.classList.add('record-div')
     fileDiv.addEventListener('click', recordSelected)
-    if (name === selectedFilename) {
+    if (name === sessionStorage.getItem('selectedFile')) {
       fileDiv.classList.add('record-selected')
-      matchSf = true
     }
     // Play image
     const playImage = document.createElement('img')
@@ -62,23 +78,11 @@ async function initialiseList() {
     logoImage.classList.add('record-logo')
     fileDiv.appendChild(logoImage)
     // Text
-    let details
-    //console.log('name', name)
-    if (getOpt('emulate-v1') === 'true') {
-      // Base text on the filename
-      details = detailsFromFilename(name)
-    } else {
-      // Base text on the JSON file values
-      let json = {}
-      //console.log(`${name}.txt`, 'exist')
-      json = await getRecordJson(`${name}.txt`)
-      details = detailsFromFilename(name)
-    }
     const textDiv = document.createElement('div')
+    textDiv.setAttribute('id', `rec-text-${name}`)
     textDiv.classList.add('record-div-text')
-    textDiv.innerHTML=`${details.date} ${details.time}<br/>${details.location}`
     fileDiv.appendChild(textDiv)
-
+    
     // Select checkbox
     const check = document.createElement('input')
     check.setAttribute('type', 'checkbox')
@@ -88,17 +92,44 @@ async function initialiseList() {
     fileDiv.appendChild(check)
     
     recordingDiv.appendChild(fileDiv)
+
+    // If I set the text immediately after fileDiv.appendChild(textDiv)
+    // it fails (for v1) because element appears not yet created,
+    // so doing it here at end which seems to work.
+    setRecordText(name)
   }
-  if (!matchSf) {
-    // Currently stored selected file is no longer present
-    // so probably deleted.
-    sessionStorage.setItem('selectedFile', '')
+}
+
+export async function setRecordText(filename) {
+  let details
+  if (getOpt('emulate-v1') === 'true') {
+    // Base text on the filename
+    details = detailsFromFilename(filename)
+  } else {
+    // Base text on the JSON file values
+    details = await getRecordJson(`${filename}.txt`)
+  }
+  let html = details.date
+  html = buildText(html, details.time.substring(0, 5), ' ')
+  html = buildText(html, details.gridref, '<br/>')
+  html = buildText(html, details['scientific-name'], '<br/>')
+
+  document.getElementById(`rec-text-${filename}`).innerHTML = html
+
+  function buildText(txt1, txt2, sep) {
+    if (txt1 && txt2) {
+      return `${txt1}${sep}${txt2}`
+    } else if (txt1) {
+      return txt1
+    } else {
+      return txt2
+    }
   }
 }
 
 export async function deleteChecked(el) {
   flash(el.id)
-  const n =  storFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     document.getElementById('file-num').innerText = n
     document.getElementById('file-text').innerText = n === 1 ? 'file' : 'files'
@@ -110,8 +141,8 @@ export async function deleteYesNo(e) {
   deleteConfirmDialog.close()
   if (e.getAttribute('id') === 'delete-confirm') {
     const files = []
-    for (let i=0; i<storFiles.length; i++) {
-      const name = storFiles[i]
+    for (let i=0; i<storRecs.length; i++) {
+      const name = storRecs[i].filename
       if (document.getElementById(`record-checkbox-${i}`).checked) {
         if (await fileExists(`${name}.wav`)) {
           files.push(`${name}.wav`)
@@ -129,11 +160,11 @@ export async function deleteYesNo(e) {
 
 export async function shareChecked(el) {
   flash(el.id)
-  const n =  storFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const files = []
-    for (let i=0; i<storFiles.length; i++) {
-      const name = storFiles[i]
+    for (let i=0; i<storRecs.length; i++) {
+      const name = storRecs[i].filename
       if (document.getElementById(`record-checkbox-${i}`).checked) {
         if (await fileExists(`${name}.wav`)) {
           const wav = await storGetFile(`${name}.wav`)
@@ -152,10 +183,10 @@ export async function shareChecked(el) {
 
 export async function downloadChecked(el) {
   flash(el.id)
-  const n =  storFiles.reduce((a,f,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
-    for (let i=0; i<storFiles.length; i++) {
-      const name = storFiles[i]
+    for (let i=0; i<storRecs.length; i++) {
+      const name = storRecs[i].filename
       if (document.getElementById(`record-checkbox-${i}`).checked) {
         // Download WAV if it exists
         if (await fileExists(`${name}.wav`)) {
@@ -235,7 +266,7 @@ async function playRecording(e) {
   playbackImage.addEventListener('click', stopPlayback)
 
   audioPlayers[i] = new Audio()
-  const audioFile = await storGetFile(`${storFiles[i]}.wav`)
+  const audioFile = await storGetFile(`${storRec[i].filename}.wav`)
   await playBlob(audioPlayers[i], audioFile, getOpt('playback-volume'))
 
   playbackImage.removeEventListener('click', stopPlayback)

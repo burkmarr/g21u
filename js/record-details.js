@@ -1,5 +1,6 @@
 import { el, getOpt, getFieldDefs, keyValuePairTable, detailsFromFilename } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
+import { setRecordText } from './record-list.js'
 import { getRecordJson, storSaveFile } from './file-handling.js'
 
 if (el('record-details')) {
@@ -93,7 +94,7 @@ export function defaultDetails() {
     rows.push({caption: 'Filename', value: selectedFile})
     rows.push({caption: 'Date', value: details.date})
     rows.push({caption: 'Time', value: details.time})
-    rows.push({caption: 'Loc', value: details.location})
+    rows.push({caption: 'Loc', value: details.gridref})
     rows.push({caption: 'Accuracy', value: details.accuracy + ' m'})
     rows.push({caption: 'Altitude', value: details.altitude === '' ? 'not recorded' : details.altitude + ' m'})
     keyValuePairTable('wav-details', rows, el('field-details'))
@@ -126,6 +127,8 @@ async function saveRecord() {
   const jsonString = JSON.stringify(json)
   await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${selectedFile}.txt`)
   highlightFields()
+
+  setRecordText(selectedFile)
 }
 
 export async function populateRecordFields() {
