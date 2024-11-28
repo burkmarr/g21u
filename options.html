@@ -60,13 +60,13 @@
     <input id="default-determiner" type="text" onchange="defaultDeterminer()" />
   </div>
   <div id="menu"></div>
-  <script src="js/options.js" type="module"></script>
+  <!-- <script src="js/options.js" type="module"></script> -->
   <script type="module" defer>
     import { getOpt } from './js/common.js'
     import { menu } from './js/menu.js'
     import { filenameFormat, automaticPlayback, playbackVolume, 
       beepVolume, fileHandling, defaultRecorder, defaultDeterminer,
-      useMode } from './js/options.js'
+      useMode,initialiseGui } from './js/options.js'
     window.useMode = useMode
     window.filenameFormat = filenameFormat
     window.automaticPlayback = automaticPlayback
@@ -82,8 +82,8 @@
       document.body.classList.add('emulate-v2')
     }
 
+    initialiseGui()
     menu()
-
     fetch('version').then(r => r.json()).then(json => {
       document.getElementById('version').innerText = json.version
     })

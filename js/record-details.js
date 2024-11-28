@@ -1,12 +1,7 @@
-import { el, getOpt, getFieldDefs, keyValuePairTable, detailsFromFilename } from './common.js'
+import { el, getFieldDefs, keyValuePairTable, detailsFromFilename } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { setRecordText } from './record-list.js'
 import { getRecordJson, storSaveFile } from './file-handling.js'
-
-if (el('record-details')) {
-  generateRecordFields(el('record-details'))
-  populateRecordFields()
-}
 
 function createInputLabel(parent, label) {
   const ldiv = document.createElement('div')
@@ -22,7 +17,9 @@ function createInputDiv(parent, id) {
   return div
 }
 
-function generateRecordFields(parent) {
+export function generateRecordFields() {
+
+  const parent = el('record-details')
 
   // Generate the input fields
   getFieldDefs().forEach(f => {
@@ -203,7 +200,8 @@ export async function highlightFields() {
   }
 }
 
-export function openTab(e, divId) {
+export function openTab(e) {
+  const divId = e.target.id.substring(11)
 
   // Get all elements with class="tabcontent" and hide them
   const tabcontent = document.getElementsByClassName("tabcontent")

@@ -61,12 +61,15 @@ select, input[type="text"], input[type="date"], input[type="time"] {
 }
 .menu-icon path:not([stroke]) {
   fill: white;
+  pointer-events: none;
 }
 .menu-icon path {
   stroke: white;
+  pointer-events: none;
 }
 .menu-icon circle {
   stroke: white;
+  pointer-events: none;
 }
 a.selected .menu-icon path:not([stroke]) {
   fill: rgb(12, 237, 12);

@@ -9,9 +9,7 @@ let storRecs, audioPlayers = {}
 const recordingDiv = document.getElementById('record-list')
 const deleteConfirmDialog = document.getElementById('delete-confirm-dialog')
 
-initialiseList()
-
-async function initialiseList() {
+export async function initialiseList() {
 
   storRecs = await storGetRecs()
   storRecs = storRecs.sort((a,b) => {
@@ -39,7 +37,7 @@ async function initialiseList() {
   if (!storRecs.find(r => r.filename === sessionStorage.getItem('selectedFile'))) {
     sessionStorage.setItem('selectedFile', '')
   }
-  // Populate with files from storage 
+  // Populate with files from storage (large devices)
   recordingDiv.innerHTML = ''
 
   for (let i=0; i<storRecs.length; i++) {
@@ -127,8 +125,8 @@ export async function setRecordText(filename) {
   }
 }
 
-export async function deleteChecked(el) {
-  flash(el.id)
+export async function deleteChecked(e) {
+  flash(e.target.id)
   const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     document.getElementById('file-num').innerText = n
@@ -139,7 +137,7 @@ export async function deleteChecked(el) {
 
 export async function deleteYesNo(e) {
   deleteConfirmDialog.close()
-  if (e.getAttribute('id') === 'delete-confirm') {
+  if (e.target.getAttribute('id') === 'delete-confirm') {
     const files = []
     for (let i=0; i<storRecs.length; i++) {
       const name = storRecs[i].filename
@@ -158,8 +156,8 @@ export async function deleteYesNo(e) {
   }
 }
 
-export async function shareChecked(el) {
-  flash(el.id)
+export async function shareChecked(e) {
+  flash(e.target.id)
   const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const files = []
@@ -181,8 +179,9 @@ export async function shareChecked(el) {
   }
 }
 
-export async function downloadChecked(el) {
-  flash(el.id)
+export async function downloadChecked(e) {
+  console.log('e', e)
+  flash(e.target.id)
   const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     for (let i=0; i<storRecs.length; i++) {
@@ -201,16 +200,16 @@ export async function downloadChecked(el) {
   }
 }
 
-export function uncheckAll(el) {
-  flash(el.id)
+export function uncheckAll(e) {
+  flash(e.target.id)
   const checkboxes = document.getElementsByClassName('record-checkbox')
   for(let i=0, n=checkboxes.length;i<n;i++) {
     checkboxes[i].checked = false
   }
 }
 
-export function checkAll(el) {
-  flash(el.id)
+export function checkAll(e) {
+  flash(e.target.id)
   const checkboxes = document.getElementsByClassName('record-checkbox')
   for(let i=0, n=checkboxes.length;i<n;i++) {
     checkboxes[i].checked = true
@@ -218,6 +217,7 @@ export function checkAll(el) {
 }
 
 function flash(id) {
+  console.log('id', id)
   const t = transition().duration(300).ease(easeLinear)
   selectAll(`#${id}.menu-icon path, #${id}.menu-icon circle`)
     .transition(t).style("stroke", "#00FF21")

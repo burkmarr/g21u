@@ -88,7 +88,7 @@ export function getFieldDefs(filename) {
       inputType: 'text',
       inputLabel: 'Grid reference',
       jsonId: 'gridref',
-      default: filenameDetails ? filenameDetails.location : '',
+      default: filenameDetails ? filenameDetails.gridref : '',
       novalue: ''
     },
     {
