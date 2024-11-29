@@ -23,19 +23,19 @@
       see <a href="https://github.com/burkmarr/g21u/docs/v2.html" target="blank">v2 documentation</a>.
     </div>
     <label class="switch">
-      <input id="emulate-v1" type="checkbox" onchange="useMode()">
+      <input id="emulate-v1" type="checkbox">
       <span class="slider round"></span>
     </label>
 
     <div class="opts-category">File handling</div>
     <hr/>
     <div class="opts-label"><b>Filename format:</b> indicate whether sound files should use OSGR or lat/lon in their names.</div>
-    <select id="filename-format" onchange="filenameFormat()">
+    <select id="filename-format">
       <option value="osgr">OSGR</option>
       <option value="latlon">Lat/lon</option>
     </select>
     <div class="opts-label"><b>Storage:</b> indicate how sound files are to be handled on creation.</div>
-    <select id="file-handling" onchange="fileHandling()">
+    <select id="file-handling">
       <option value="download">Immediate download</option>
       <option value="opfs">Private origin file system</option>
     </select>
@@ -44,48 +44,57 @@
     <hr/>
     <div class="opts-label"><b>Automatic playback:</b> indicate whether or not to automatically playback at end of recording.</div>
     <label class="switch">
-      <input id="automatic-playback" type="checkbox" onchange="automaticPlayback()">
+      <input id="automatic-playback" type="checkbox">
       <span class="slider round"></span>
     </label>
     <div class="opts-label"><b>Playback volume:</b> set volume level for recording playback.</div>
-    <input type="range" min="0" max="1" step="0.1" id="playback-volume" onchange="playbackVolume()">
+    <input type="range" min="0" max="1" step="0.1" id="playback-volume">
     <div class="opts-label"><b>Sounds signal volume:</b> set volume level for sound signals.</div>
-    <input type="range" min="0" max="1" step="0.1" id="beep-volume" onchange="beepVolume()">
+    <input type="range" min="0" max="1" step="0.1" id="beep-volume">
     
     <div class="opts-category">Record options</div>
     <hr/>
     <div class="opts-label"><b>Default recorder:</b> specify the name of the default recorder.</div>
-    <input id="default-recorder" type="text" onchange="defaultRecorder()" />
+    <input id="default-recorder" type="text" />
     <div class="opts-label"><b>Default determiner:</b> specify the name of the default determiner.</div>
-    <input id="default-determiner" type="text" onchange="defaultDeterminer()" />
+    <input id="default-determiner" type="text" />
   </div>
   <div id="menu"></div>
-  <!-- <script src="js/options.js" type="module"></script> -->
+
   <script type="module" defer>
     import { getOpt } from './js/common.js'
     import { menu } from './js/menu.js'
-    import { filenameFormat, automaticPlayback, playbackVolume, 
-      beepVolume, fileHandling, defaultRecorder, defaultDeterminer,
-      useMode,initialiseGui } from './js/options.js'
-    window.useMode = useMode
-    window.filenameFormat = filenameFormat
-    window.automaticPlayback = automaticPlayback
-    window.playbackVolume = playbackVolume
-    window.beepVolume = beepVolume
-    window.fileHandling = fileHandling
-    window.defaultRecorder = defaultRecorder
-    window.defaultDeterminer = defaultDeterminer
+    import { filenameFormat, automaticPlayback, playbackVolume, beepVolume, 
+      fileHandling, defaultRecorder, defaultDeterminer, useMode, initialiseGui 
+    } from './js/options.js'
 
+    // Add class to body if emulating v1
     if (getOpt('emulate-v1') === 'true') {
       document.body.classList.add('emulate-v1')
-    } else {
-      document.body.classList.add('emulate-v2')
     }
 
+    // Add event handlers
+    document.getElementById('emulate-v1').addEventListener('change', useMode)
+    document.getElementById('filename-format').addEventListener('change', filenameFormat)
+    document.getElementById('automatic-playback').addEventListener('change', automaticPlayback)
+    document.getElementById('playback-volume').addEventListener('change', playbackVolume)
+    document.getElementById('beep-volume').addEventListener('change', beepVolume)
+    document.getElementById('file-handling').addEventListener('change', fileHandling)
+    document.getElementById('default-recorder').addEventListener('change', defaultRecorder)
+    document.getElementById('default-determiner').addEventListener('change', defaultDeterminer)
+
+    // Initialise the gui
     initialiseGui()
+
+    // Main navigation (bottom) menu
     menu()
+
+    // Display the version number (from the service worker)
     fetch('version').then(r => r.json()).then(json => {
       document.getElementById('version').innerText = json.version
+    }).catch(e => {
+      // Will fail if service worker is being bypassed, e.g. 
+      // by a hard refresh. So just display nothing in that case.
     })
 
   </script>

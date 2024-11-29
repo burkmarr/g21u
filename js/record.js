@@ -3,6 +3,9 @@ import { beep, doubleBeep, playBlob } from './play.js'
 import { getOpt } from "./common.js"
 import { downloadBlob, storSaveFile } from './file-handling.js'
 
+// No exports from this module
+// so safe to have module level functionlity
+// - review if exports added.
 let isGeolocated = false
 let filename
 
@@ -94,7 +97,7 @@ function geolocateFailure(err) {
   document.getElementById("gps-rec-msg").innerHTML = err.message
 }
 
-export async function startRecording() {
+async function startRecording() {
 
   console.log('start recording')
 

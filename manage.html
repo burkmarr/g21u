@@ -55,7 +55,9 @@
 
   <script type="module" defer>
     import { menu } from './js/menu.js'
-    import { downloadChecked, shareChecked, deleteChecked, uncheckAll, checkAll, deleteYesNo, initialiseList } from './js/record-list.js'
+    import { downloadChecked, shareChecked, deleteChecked, uncheckAll, 
+      checkAll, deleteYesNo, initialiseList
+    } from './js/record-list.js'
     import { openTab, generateRecordFields, populateRecordFields } from './js/record-details.js'
     import { getOpt } from './js/common.js'
 
@@ -77,10 +79,12 @@
 
     // Record list
     await initialiseList()
+
     // Record fields
     generateRecordFields()
     await populateRecordFields()
-    // Menu
+
+    // Main navigation (bottom) menu
     menu()
 
     // Manage screen layout depending on:

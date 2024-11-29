@@ -6,8 +6,6 @@ import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 
 let storRecs, audioPlayers = {}
-const recordingDiv = document.getElementById('record-list')
-const deleteConfirmDialog = document.getElementById('delete-confirm-dialog')
 
 export async function initialiseList() {
 
@@ -38,7 +36,7 @@ export async function initialiseList() {
     sessionStorage.setItem('selectedFile', '')
   }
   // Populate with files from storage (large devices)
-  recordingDiv.innerHTML = ''
+  document.getElementById('record-list').innerHTML = ''
 
   for (let i=0; i<storRecs.length; i++) {
     const name = storRecs[i].filename
@@ -89,7 +87,7 @@ export async function initialiseList() {
     check.addEventListener('click', recordChecked)
     fileDiv.appendChild(check)
     
-    recordingDiv.appendChild(fileDiv)
+    document.getElementById('record-list').appendChild(fileDiv)
 
     // If I set the text immediately after fileDiv.appendChild(textDiv)
     // it fails (for v1) because element appears not yet created,
@@ -131,12 +129,12 @@ export async function deleteChecked(e) {
   if (n) {
     document.getElementById('file-num').innerText = n
     document.getElementById('file-text').innerText = n === 1 ? 'file' : 'files'
-    deleteConfirmDialog.showModal()
+    document.getElementById('delete-confirm-dialog').showModal()
   }
 }
 
 export async function deleteYesNo(e) {
-  deleteConfirmDialog.close()
+  document.getElementById('delete-confirm-dialog').close()
   if (e.target.getAttribute('id') === 'delete-confirm') {
     const files = []
     for (let i=0; i<storRecs.length; i++) {
