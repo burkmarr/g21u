@@ -15,7 +15,6 @@ export async function displayTaxonMatches(e) {
 
   const nbnapi = `https://species-ws.nbnatlas.org/search/auto?q=${this.value}&limit=20`
   const ret = await fetch(nbnapi).then(data => data.json())
-  //console.log(ret)
   const data = ret.autoCompleteList.filter(t => {
     if (scientific) {
       return t.scientificNameMatches.length > 0
@@ -23,7 +22,6 @@ export async function displayTaxonMatches(e) {
       return t.commonNameMatches.length > 0
     }
   })
-  console.log(data)
   const html = data.map(taxon => {
     const scientificName = taxon.name
     const commonName = taxon.commonName ? taxon.commonName : ''

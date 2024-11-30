@@ -1,5 +1,5 @@
 const VERSION = "v1.0.0"
-const BUILD = 28
+const BUILD = 29
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -100,6 +100,8 @@ self.addEventListener("fetch", (event) => {
         if (cachedResponse) {
           // Return the cached response if it's available.
           return cachedResponse
+        } else if (event.request.url.includes('species-ws.nbnatlas.org')) {
+          return fetch(event.request)
         } else {
           // This is where we would implement a request to network
           // for resource in a cache first then network strategy

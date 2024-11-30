@@ -4,7 +4,6 @@
     - list of when the file was shared (or share attempted)
     - will need an explanation of 'attempt' if that is necessary
     - amount of storage available
-- Different taxon searches should operate for common and scientific names. I don't think there's a way to limit search to either via the API so I would need to filter the api output.
 - Add a comment field.
 - NBN API searches need to bypass cache - otherwise nothing is returned when service worker is used.
 - Sharing - keep button but test if browser permits (Firefox doesn't) and if user tries it on one of these browsers present a modal which explains that it won't work and suggest a browser that does!
