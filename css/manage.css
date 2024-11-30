@@ -16,7 +16,7 @@ h3 {
 .small-edit #record-list {
   display: none;
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 1024px) {
   #record-list {
     width: 100%;
   }
@@ -90,7 +90,7 @@ h3 {
 .emulate-v1 #record-field-details {
   display: none;
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 1024px) {
   body:not(.small-edit) #record-field-details { 
     display: none;
   }
@@ -118,7 +118,7 @@ h3 {
 body:not(.small-edit) #record-details {
   display: block;
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 1024px) {
   #record-list.hide {
     display: none;
   }

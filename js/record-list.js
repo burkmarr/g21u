@@ -10,6 +10,14 @@ let storRecs, audioPlayers = {}
 export async function initialiseList() {
 
   storRecs = await storGetRecs()
+
+  console.log(storRecs.length)
+
+  if (!storRecs.length) {
+    document.getElementById('record-list').innerHTML = `<h3>No records to display</h3><p>Make some!</p>`
+    return
+  }
+
   storRecs = storRecs.sort((a,b) => {
     // Sort on date first and then time
     let comparison = 0
@@ -43,7 +51,6 @@ export async function initialiseList() {
     // Create div
     const fileDiv = document.createElement('div')
     fileDiv.setAttribute('id', `file-div-${i}`)
-    
     fileDiv.setAttribute('data-file-name', name) 
     fileDiv.classList.add('record-div')
     fileDiv.addEventListener('click', recordSelected)

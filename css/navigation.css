@@ -1,4 +1,4 @@
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 1024px) {
   /* Hide the record list navbot */
   body#manage.hide-navtop {
     padding-top: 0;
@@ -35,7 +35,7 @@
 #navtop svg#edit-record {
   display: none;
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 1024px) {
   #navtop-inner-right {
     width: 204px; /* Accommodates three links of width 68px */
     margin: 0 auto;
@@ -87,7 +87,7 @@
  * different number on full screen and
  * mobile screen
  */
- @media only screen and (max-width: 600px) {
+ @media only screen and (max-width: 1024px) {
   #navbot-inner {
     width: 272px; /* Accommodates four links of width 68px */
   }

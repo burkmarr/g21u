@@ -1,14 +1,14 @@
-#taxon-suggestions {
+.taxon-suggestions {
   overflow-y: auto; 
   overflow-x: hidden; 
   max-height: 250px;
 }
 
-#taxon-suggestions.hide {
+.taxon-suggestions.hide {
   display: none;
 }
 
-#taxon-suggestions {
+.taxon-suggestions {
   li {
     list-style: none;
     border-bottom: 1px solid #D8D8D8;

@@ -1,18 +1,16 @@
 # TODO
-- Add mapping details
 - Metadata should consist of following:
     - list of when the file was downloaded (or download attempted)
     - list of when the file was shared (or share attempted)
     - will need an explanation of 'attempt' if that is necessary
     - amount of storage available
 - Different taxon searches should operate for common and scientific names. I don't think there's a way to limit search to either via the API so I would need to filter the api output.
-- Prevent taxonDetails from making call if TVK hasn't changed (otherwise it makes too many unecessary calls)
+- Add a comment field.
 - NBN API searches need to bypass cache - otherwise nothing is returned when service worker is used.
 - Sharing - keep button but test if browser permits (Firefox doesn't) and if user tries it on one of these browsers present a modal which explains that it won't work and suggest a browser that does!
-- Recorder panel needs some text that indicates when no record selected
-- Record list needs some text that indicates when no records to list
 - Record download, share & CSV inclusion attempts in metadata in record json (txt)
 - json (txt) file should be created upon wav creation, but full record fields only added for v2 - v1 compat should only be used to record metadata
 - If metadata shows that a file is downloaded, shared or exported to a CSV, indicate in the record list with icons
 - Will need something to clear this metadata (by type) for all checked records - in case where there is a failure that the software cannot detect.
 - Need to request persisitent storage
+- Add mapping details

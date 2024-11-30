@@ -1,4 +1,4 @@
-import { el, getFieldDefs, keyValuePairTable, detailsFromFilename } from './common.js'
+import { el, getFieldDefs, keyValuePairTable, detailsFromFilename, collapsibleDiv } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { setRecordText } from './record-list.js'
 import { getRecordJson, storSaveFile } from './file-handling.js'
@@ -21,8 +21,7 @@ function createInputDiv(parent, id) {
 export function generateRecordFields() {
 
   const parent = el('record-details')
-
-  parent.innerHTML = '<h3>Details of selected record</h3>'
+  parent.innerHTML = '<h3 id="record-details-title"></h3>'
 
   // Generate the input fields
   getFieldDefs().forEach(f => {
@@ -41,17 +40,19 @@ export function generateRecordFields() {
       input.setAttribute('type', 'text')
       input.addEventListener('input', displayTaxonMatches)
       el('manage').addEventListener('click', hideTaxonMatches)
-      // Only create the taxon matches under the common name control
-      if (f.inputId === 'common-name-input') {
-        const ul =  document.createElement('div')
-        ul.setAttribute('id', 'taxon-suggestions')
-        ctrl.appendChild(ul)
+  
+      const ul =  document.createElement('div')
+      ul.setAttribute('id', `${f.inputId}-suggestions`)
+      ul.classList.add('taxon-suggestions')
+      ctrl.appendChild(ul)
+
+      if (f.inputId === 'scientific-name-input') {
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            taxonDetails()
+          }
+        })
       }
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          taxonDetails()
-        }
-      })
     }
   })
 
@@ -75,9 +76,10 @@ export function defaultDetails() {
   const selectedFile = sessionStorage.getItem('selectedFile')
 
   el('metadata-details').innerHTML = `
-    <h3>Original recording details<h3>
+    <h3>Metadata for selected record<h3>
   `
   if (selectedFile) {
+    const ordDiv = collapsibleDiv('original-recording-details', 'Original recording details', el('metadata-details'))
     const details = detailsFromFilename(selectedFile)
     const rows = []
     rows.push({caption: 'Filename', value: selectedFile})
@@ -86,9 +88,10 @@ export function defaultDetails() {
     rows.push({caption: 'Loc', value: details.gridref})
     rows.push({caption: 'Accuracy', value: details.accuracy + ' m'})
     rows.push({caption: 'Altitude', value: details.altitude === '' ? 'not recorded' : details.altitude + ' m'})
-    keyValuePairTable('wav-details', rows, el('metadata-details'))
+    //keyValuePairTable('wav-details', rows, el('metadata-details'))
+    keyValuePairTable('wav-details', rows, ordDiv)
   } else {
-     el('metadata-details').innerHTML = `<h3>No file selected details</h3>`
+    el('metadata-details').innerHTML = `<h3>No record selected</h3>`
   }
 }
 
@@ -117,7 +120,11 @@ async function saveRecord() {
   await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${selectedFile}.txt`)
   highlightFields()
 
+  // Update the record text in case details changed
   setRecordText(selectedFile)
+
+  // Get taxon details in case taxon changes
+  taxonDetails()
 }
 
 export async function populateRecordFields() {
@@ -125,6 +132,13 @@ export async function populateRecordFields() {
   // Selected file
   const selectedFile = sessionStorage.getItem('selectedFile')
   console.log('selectedFile', selectedFile)
+
+  if (!selectedFile) {
+    document.getElementById('record-details-title').innerHTML = 'No record selected'
+  } else {
+    document.getElementById('record-details-title').innerHTML = 'Details of selected record'
+  }
+
   let json
   if (selectedFile) {
     //console.log(`${selectedFile}.txt`)
