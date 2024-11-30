@@ -72,7 +72,6 @@ export function getFieldDefs(filename) {
       jsonId: 'scientific-name',
       default: '',
       novalue: '',
-      detailsFn: taxonDetails
     },
     {
       inputId: 'common-name-input',
@@ -81,7 +80,7 @@ export function getFieldDefs(filename) {
       jsonId: 'common-name',
       default: '',
       novalue: '',
-      detailsFn: taxonDetails
+
     },
     {
       inputId: 'gridref-input',

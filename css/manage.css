@@ -1,38 +1,9 @@
 body#manage {
-  padding-top:68px; /* Makes room the record list menu */
+  padding-top:68px; /* Makes room the record list navbot */
+  margin: 1em
 }
-@media only screen and (max-width: 600px) {
-  /* Hide the record list menu */
-  body#manage.hide-menu-record-list {
-    padding-top: 0;
-  }
-  body#manage.hide-menu-record-list #menu-record-list {
-    display: none;
-  }
-}
-
-/* Record list toolbar - fixed to top of page */
-#menu-record-list {
-  background-color: #333;
-  overflow: hidden;
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 68px;
-  width: 100%;
-  z-index: 100;
-}
-#menu-record-list-inner {
-  width: 340px; /* Accommodates five links of width 68px */
-  margin: 0 auto;
-}
-/* Style the links inside the record list toolbar */
-#menu-record-list svg {
-  float: left;
-  display: block;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
+h3 {
+  margin-top: 0;
 }
 
 /* Records list div */
@@ -41,6 +12,9 @@ body#manage {
   overflow-x: hidden; 
   height: calc(100vh - 152px);
   width: 50%;
+}
+.small-edit #record-list {
+  display: none;
 }
 @media only screen and (max-width: 600px) {
   #record-list {
@@ -110,31 +84,45 @@ body#manage {
 }
 
 /* Record and field details main divs */
+#record-field-details {
+  display: flex;
+}
 .emulate-v1 #record-field-details {
   display: none;
+}
+@media only screen and (max-width: 600px) {
+  body:not(.small-edit) #record-field-details { 
+    display: none;
+  }
 }
 #record-field-details {
   width: 100%;
 }
-#record-details {
+
+.details-div {
   margin-left: 1em;
   width: 100%;
   overflow-y: auto; 
   overflow-x: hidden; 
-  height: calc(100vh - 152px); /* Accommodates the menu & toolbar/tab buttons */
+  height: calc(100vh - 152px); /* Accommodates the navbot & toolbar/tab buttons */
 }
-#field-details {
-  margin-left: 1em;
+
+.details-div {
   width: 100%;
-  overflow-y: auto; 
-  overflow-x: hidden; 
-  height: calc(100vh - 152px); /* Accommodates the menu & toolbar/tab buttons */
+}
+
+/* Details div visibility in response to button selections */
+.details-div.hide {
+  display: none;
+}
+body:not(.small-edit) #record-details {
+  display: block;
 }
 @media only screen and (max-width: 600px) {
-  #record-list.hide, #record-details.hide, #field-details.hide {
+  #record-list.hide {
     display: none;
   }
-  #record-details, #field-details {
+  .details-div {
     margin-left: 0;
   }
 } 
@@ -183,7 +171,7 @@ body#manage {
 /* Tab control for switching between 
  * Record and Field details
  */
-#record-field-tab-buttons {
+/* #record-field-tab-buttons {
   margin: 0 0 1em 0;
 }
 #record-field-tab-buttons.hide {
@@ -216,4 +204,4 @@ button.tabdummy {
 }
 button.tablinks.active {
   border-bottom: none;
-}
+} */

@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width">
   <title>G21v2 options</title>
   <link rel="stylesheet" href="css/general.css">
+  <link rel="stylesheet" href="css/navigation.css">
   <link rel="stylesheet" href="css/options.css">
   <link rel="manifest" href="manifest.json" />
 </head>
@@ -59,11 +60,11 @@
     <div class="opts-label"><b>Default determiner:</b> specify the name of the default determiner.</div>
     <input id="default-determiner" type="text" />
   </div>
-  <div id="menu"></div>
+  <div id="navbot"></div>
 
   <script type="module" defer>
     import { getOpt } from './js/common.js'
-    import { menu } from './js/menu.js'
+    import { navbot } from './js/navbot.js'
     import { filenameFormat, automaticPlayback, playbackVolume, beepVolume, 
       fileHandling, defaultRecorder, defaultDeterminer, useMode, initialiseGui 
     } from './js/options.js'
@@ -86,8 +87,8 @@
     // Initialise the gui
     initialiseGui()
 
-    // Main navigation (bottom) menu
-    menu()
+    // Main navigation (bottom) navbot
+    navbot()
 
     // Display the version number (from the service worker)
     fetch('version').then(r => r.json()).then(json => {

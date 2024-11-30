@@ -1,17 +1,13 @@
 # TODO
-
-- Extend record list menu bar to work for 'field' info on main screen with separated menu items
-  - mapping
-  - taxonomy
-  - metadata
-    - original wavfile details (as now)
+- Add mapping details
+- Metadata should consist of following:
     - list of when the file was downloaded (or download attempted)
     - list of when the file was shared (or share attempted)
     - will need an explanation of 'attempt' if that is necessary
     - amount of storage available
-  - These should behave like tabs
-  - On mobile, the record details should be added to this menu so all appear together.
 - Different taxon searches should operate for common and scientific names. I don't think there's a way to limit search to either via the API so I would need to filter the api output.
+- Prevent taxonDetails from making call if TVK hasn't changed (otherwise it makes too many unecessary calls)
+- NBN API searches need to bypass cache - otherwise nothing is returned when service worker is used.
 - Sharing - keep button but test if browser permits (Firefox doesn't) and if user tries it on one of these browsers present a modal which explains that it won't work and suggest a browser that does!
 - Recorder panel needs some text that indicates when no record selected
 - Record list needs some text that indicates when no records to list

@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width">
   <title>G21v2 record</title>
   <link rel="stylesheet" href="css/general.css">
+  <link rel="stylesheet" href="css/navigation.css">
   <link rel="stylesheet" href="css/record.css">
   <link rel="manifest" href="manifest.json" />
 </head>
@@ -27,12 +28,12 @@
   <div id="gps-rec-latlon" class="gps-rec-centre">lat/lon</div>
   <div id="gps-rec-msg" class="gps-rec-centre"></div>
 
-  <div id="menu"></div>
+  <div id="navbot"></div>
 
   <script src="js/record.js" type="module" defer></script>
 
   <script type="module">
-    import { menu } from "./js/menu.js"
+    import { navbot } from "./js/navbot.js"
     import { getOpt } from "./js/common.js"
 
     // Add class to body if emulating v1
@@ -40,8 +41,8 @@
       document.body.classList.add('emulate-v1')
     }
 
-    // Main navigation (bottom) menu
-    menu()
+    // Main navigation (bottom) navbot
+    navbot()
 
     // Register service worker
     if ("serviceWorker" in navigator) {

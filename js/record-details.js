@@ -3,6 +3,7 @@ import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.
 import { setRecordText } from './record-list.js'
 import { getRecordJson, storSaveFile } from './file-handling.js'
 
+
 function createInputLabel(parent, label) {
   const ldiv = document.createElement('div')
   ldiv.innerHTML = label
@@ -21,6 +22,8 @@ export function generateRecordFields() {
 
   const parent = el('record-details')
 
+  parent.innerHTML = '<h3>Details of selected record</h3>'
+
   // Generate the input fields
   getFieldDefs().forEach(f => {
     const ctrl = createInputDiv(parent, f.inputId.substring(0,f.inputId.length-6))
@@ -29,7 +32,7 @@ export function generateRecordFields() {
     input.setAttribute('id', f.inputId)
     input.setAttribute('type', f.inputType)
     input.addEventListener('input', highlightFields)
-    input.addEventListener('focus', fieldFocus)
+    //input.addEventListener('focus', fieldFocus)
     ctrl.appendChild(input)
 
     // Custom control modifications
@@ -65,24 +68,13 @@ export function generateRecordFields() {
   ctrl.appendChild(save)
 }
 
-function fieldFocus(e) {
-  // Selected file
-  const selectedFile = sessionStorage.getItem('selectedFile')
-  const id = e.target.getAttribute('id')
-  const fieldDef = getFieldDefs(selectedFile).find(fd => fd.inputId === id)
-  if (fieldDef.detailsFn) {
-    fieldDef.detailsFn(id)
-  } else {
-    defaultDetails()
-  }
-}
-
 export function defaultDetails() {
+
   // The default information to show for field details
   // is the original WAV file details.
   const selectedFile = sessionStorage.getItem('selectedFile')
 
-  el('field-details').innerHTML = `
+  el('metadata-details').innerHTML = `
     <h3>Original recording details<h3>
   `
   if (selectedFile) {
@@ -94,9 +86,9 @@ export function defaultDetails() {
     rows.push({caption: 'Loc', value: details.gridref})
     rows.push({caption: 'Accuracy', value: details.accuracy + ' m'})
     rows.push({caption: 'Altitude', value: details.altitude === '' ? 'not recorded' : details.altitude + ' m'})
-    keyValuePairTable('wav-details', rows, el('field-details'))
+    keyValuePairTable('wav-details', rows, el('metadata-details'))
   } else {
-     el('field-details').innerHTML = ``
+     el('metadata-details').innerHTML = `<h3>No file selected details</h3>`
   }
 }
 
@@ -156,6 +148,9 @@ export async function populateRecordFields() {
   // Initialise the field details panel
   defaultDetails()
 
+  // Initialise the taxon details panel
+  taxonDetails()
+
   // Disable all the input fields if no record selected
   if (selectedFile) {
     el('record-details').classList.remove('disable') 
@@ -200,22 +195,14 @@ export async function highlightFields() {
   }
 }
 
-export function openTab(e) {
-  const divId = e.target.id.substring(11)
+export function editNavigation(e) {
+  const divId = `${sessionStorage.getItem('topNav').substring(5)}-details`
 
-  // Get all elements with class="tabcontent" and hide them
-  const tabcontent = document.getElementsByClassName("tabcontent")
-  for (let i = 0; i < tabcontent.length; i++) {
-    tabcontent[i].classList.add('hide')
+  // Get all elements with class="details-div" and hide them
+  const detailsDiv = document.getElementsByClassName("details-div")
+  for (let i = 0; i < detailsDiv.length; i++) {
+    detailsDiv[i].classList.add('hide')
   }
-
-  //Get all elements with class="tablinks" and remove the class "active"
-  const tablinks = document.getElementsByClassName('tablinks')
-  for (let i = 0; i < tablinks.length; i++) {
-    tablinks[i].classList.remove('active')
-  }
-
-  // Show the current tab, and add an "active" class to the button that opened the tab
+  // Show the current contents div
   document.getElementById(divId).classList.remove('hide')
-  e.currentTarget.classList.add('active')
 }

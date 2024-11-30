@@ -35,7 +35,7 @@ export async function taxonDetails() {
 
   const scientific = el('scientific-name-input').value
 
-  const fd = el('field-details').innerHTML = `
+  const fd = el('taxa-details').innerHTML = `
     <h3>NBN UKSI details</h3>
     <p>
       Taxonomic details from the 
@@ -58,9 +58,9 @@ export async function taxonDetails() {
   })
   // Get the details for this guid
   if (guid) {
-    console.log(guid)
+    //console.log(guid)
     const taxonomy = await fetch(`https://species-ws.nbnatlas.org/species/${guid}`).then(data => data.json())
-    console.log(taxonomy)
+    //console.log(taxonomy)
 
     // Taxonomy
     let rows = []
@@ -74,29 +74,29 @@ export async function taxonDetails() {
     rows.push({caption: 'Class', value: taxonomy.classification.class})
     rows.push({caption: 'Order', value: taxonomy.classification.order})
     rows.push({caption: 'Family', value: taxonomy.classification.family})
-    keyValuePairTable('nbn-taxonomy', rows, el('field-details'))
+    keyValuePairTable('nbn-taxonomy', rows, el('taxa-details'))
 
     // Common names
-    el('field-details').appendChild(document.createElement('br'))
+    el('taxa-details').appendChild(document.createElement('br'))
     rows = taxonomy.commonNames ? taxonomy.commonNames.map(n => n.nameString) : []
     if (rows.length) {
-      const cnDiv = collapsibleDiv('common-names', 'Common names', el('field-details'))
+      const cnDiv = collapsibleDiv('common-names', 'Common names', el('taxa-details'))
       unorderedList('common-names-list', rows, cnDiv)
     } else {
       const cnDiv = document.createElement('div')
       cnDiv.innerHTML = '<b>Common names</b> - none'
-      el('field-details').appendChild(cnDiv)
+      el('taxa-details').appendChild(cnDiv)
     }
     
     // Synonyms
-    el('field-details').appendChild(document.createElement('br'))
+    el('taxa-details').appendChild(document.createElement('br'))
     if (taxonomy.synonyms && taxonomy.synonyms.length) {
-      const sDiv = collapsibleDiv('synonyms', 'Synonyms', el('field-details'))
+      const sDiv = collapsibleDiv('synonyms', 'Synonyms', el('taxa-details'))
       unorderedList('synonyms-list', taxonomy.synonyms.map(s => s.nameFormatted), sDiv)
     } else {
       const sDiv = document.createElement('div')
       sDiv.innerHTML = '<b>Synonyms</b> - none'
-      el('field-details').appendChild(sDiv)
+      el('taxa-details').appendChild(sDiv)
     }
    
   }

@@ -167,7 +167,7 @@ export async function shareChecked(e) {
           files.push(wav)
         }
         if (await fileExists(`${name}.txt`)) {
-          const json = await storGetFile(`${name}.txt`)
+          const txt = await storGetFile(`${name}.txt`)
           files.push(txt)
         }   
       }
@@ -217,10 +217,10 @@ export function checkAll(e) {
 function flash(id) {
   console.log('id', id)
   const t = transition().duration(300).ease(easeLinear)
-  selectAll(`#${id}.menu-icon path, #${id}.menu-icon circle`)
+  selectAll(`#${id}.nabvar-icon path, #${id}.nabvar-icon circle`)
     .transition(t).style("stroke", "#00FF21")
     .transition(t).style("stroke", "white")
-  selectAll(`#${id}.menu-icon-2 path`)
+  selectAll(`#${id}.nabvar-icon-2 path`)
     .transition(t).style("fill", "#00FF21")
     .transition(t).style("fill", "white")
 }
@@ -264,7 +264,7 @@ async function playRecording(e) {
   playbackImage.addEventListener('click', stopPlayback)
 
   audioPlayers[i] = new Audio()
-  const audioFile = await storGetFile(`${storRec[i].filename}.wav`)
+  const audioFile = await storGetFile(`${storRecs[i].filename}.wav`)
   await playBlob(audioPlayers[i], audioFile, getOpt('playback-volume'))
 
   playbackImage.removeEventListener('click', stopPlayback)

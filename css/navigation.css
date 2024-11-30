@@ -1,0 +1,138 @@
+@media only screen and (max-width: 600px) {
+  /* Hide the record list navbot */
+  body#manage.hide-navtop {
+    padding-top: 0;
+  }
+  body#manage.hide-navtop #navtop {
+    display: none;
+  }
+}
+
+/* Record list toolbar - fixed to top of page */
+#navtop {
+  background-color: #333;
+  overflow: hidden;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 68px;
+  width: 100%;
+  z-index: 100;
+}
+
+/* Top navigation buttons/bars position and visibility */
+.navtop-inner-container {
+  width: 100%
+}
+#navtop-inner-left {
+  width: 340px; /* Accommodates five links of width 68px */
+  margin: 0 auto;
+}
+#navtop-inner-right {
+  width: 136px; /* Accommodates two links of width 68px */
+  margin: 0 auto;
+}
+#navtop svg#edit-record {
+  display: none;
+}
+@media only screen and (max-width: 600px) {
+  #navtop-inner-right {
+    width: 204px; /* Accommodates three links of width 68px */
+    margin: 0 auto;
+  }
+  #navtop svg#edit-record {
+    display: block;
+  }
+  .navtop-inner-container.middle {
+    display: none;
+  }
+  .small-edit .navtop-inner-container.left {
+    display: none;
+  }
+  body:not(.small-edit) .navtop-inner-container.right {
+    display: none;
+  }
+}
+
+/* Style the links inside the record list toolbar */
+#navtop svg {
+  float: left;
+  display: block;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+/* Main navigation bar */
+#navbot {
+  background-color: #333;
+  overflow: hidden;
+  position: fixed;
+  left: 0;
+  height: 68px;
+  width: 100%;
+  bottom: 0;
+}
+#navbot-inner {
+  margin: 0 auto;
+  width: 204px; /* Accommodates three links of width 68px */
+}
+#navbot a#navbot-link-edit { /* CSS selector needs to be more specific than below */
+  display: none; /* Edit link is hidden by default */
+}
+/* Change the width of the navar-inner div
+ * which is centered in the main navbot div
+ * in order to ensure navigation links are
+ * centred correctly because there are a
+ * different number on full screen and
+ * mobile screen
+ */
+ @media only screen and (max-width: 600px) {
+  #navbot-inner {
+    width: 272px; /* Accommodates four links of width 68px */
+  }
+  #navbot a#navbot-link-edit { 
+    display: block;
+  }
+}
+
+/* Links inside the navigation bar */
+#navbot a {
+  float: left;
+  display: block;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+#navbot svg {
+  pointer-events: none;
+}
+.nabvar-icon, .nabvar-icon-2 {
+  width: 36px;
+  cursor: pointer;
+}
+.nabvar-icon path:not([stroke]) {
+  fill: white;
+  pointer-events: none;
+}
+.nabvar-icon path {
+  stroke: white;
+  pointer-events: none;
+}
+.nabvar-icon circle {
+  stroke: white;
+  pointer-events: none;
+}
+.selected-nav .nabvar-icon path:not([stroke]) {
+  fill: rgb(12, 237, 12);
+}
+.selected-nav .nabvar-icon path {
+  stroke: rgb(12, 237, 12);
+}
+.selected-nav .nabvar-icon circle {
+  stroke: rgb(12, 237, 12);
+}
+
+.emulate-v1 #navbot-link-edit {
+  display: none;
+}
