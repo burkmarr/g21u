@@ -27,3 +27,17 @@ textarea {
  input[type="date"], input[type="time"] {
   font-size: 16px;
 }
+
+
+.key-value-pair-table .caption{
+  text-align: right;
+}
+.value-list {
+  margin: 0.3em 0 !important;
+}
+.collapsible-content.hide {
+  display: none;
+}
+.collapsible-toggle {
+  cursor: pointer;
+}

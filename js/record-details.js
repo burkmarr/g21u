@@ -74,7 +74,7 @@ export function generateRecordFields() {
   ctrl.appendChild(save)
 }
 
-export function defaultDetails() {
+export async function getMetadata() {
 
   // The default information to show for field details
   // is the original WAV file details.
@@ -103,6 +103,11 @@ export function defaultDetails() {
     //keyValuePairTable('wav-details', rows, el('metadata-details'))
     keyValuePairTable('wav-details', rows, ordDiv)
   }
+
+  const {quota, usage, usageDetails} = await navigator.storage.estimate()
+  console.log('quota', quota)
+  console.log('usage', usage)
+  console.log('usageDetails', usageDetails)
 }
 
 async function cancelRecord() {
@@ -170,7 +175,7 @@ export async function populateRecordFields() {
   highlightFields()
 
   // Initialise the field details panel
-  defaultDetails()
+  getMetadata()
 
   // Initialise the taxon details panel
   taxonDetails()

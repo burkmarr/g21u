@@ -87,6 +87,11 @@
     }
 
     editNavigation()
+
+    // Request persistent storage
+    // Some diagnostics on options page indicate 
+    // whether or not has been granted.
+    const persist = await navigator.storage.persist()
   </script>
 </body>
 </html>

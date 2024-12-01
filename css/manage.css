@@ -144,20 +144,6 @@ body:not(.small-edit) #record-details {
   padding: 8px;
 }
 
-/* For displaying info on taxonomic field details */
-.key-value-pair-table .caption{
-  text-align: right;
-}
-.value-list {
-  margin: 0.3em 0 !important;
-}
-.collapsible-content.hide {
-  display: none;
-}
-.collapsible-toggle {
-  cursor: pointer;
-}
-
 /* Formatting of names provided by NBN API */
 .scientific-name .name {
   font-style: italic;

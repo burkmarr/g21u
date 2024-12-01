@@ -1,4 +1,4 @@
-import { getOpt, setOpt } from "./common.js"
+import { getOpt, setOpt, keyValuePairTable } from "./common.js"
 
 export function initialiseGui() {
   // Initialise GUI option values
@@ -10,6 +10,8 @@ export function initialiseGui() {
   document.getElementById("file-handling").value = getOpt('file-handling')
   document.getElementById("default-recorder").value = getOpt('default-recorder')
   document.getElementById("default-determiner").value = getOpt('default-determiner')
+
+  storageMetrics()
 }
 
 export function useMode() {
@@ -41,4 +43,57 @@ export function defaultRecorder() {
 
 export function defaultDeterminer() {
   setOpt('default-determiner', document.getElementById("default-determiner").value)
+}
+
+async function storageMetrics() {
+
+  const per = navigator.storage && navigator.storage.persist ? true : false
+  const {quota, usage, usageDetails} = await navigator.storage.estimate()
+
+  const rows = [
+    {
+      caption: 'Persistent storage available',
+      value: per ? 'Yes' : 'No'
+    },
+    {
+      caption: 'Persistent storage granted',
+      value: await navigator.storage.persisted() ? 'Yes' : 'No'
+    },
+    {
+      caption: 'Total storage quota',
+      value: formatBytes(quota)
+    },
+    {
+      caption: 'Total app storage usage',
+      value: formatBytes(usage)
+    },
+    {
+      caption: 'App cache use',
+      value: formatBytes(usageDetails.caches)
+    },
+    {
+      caption: 'App file system use',
+      value: formatBytes(usageDetails.fileSystem)
+    },
+    {
+      caption: 'App service worker use',
+      value: formatBytes(usageDetails.serviceWorkerRegistrations)
+    }
+  ]
+
+  console.log('usageDetails', usageDetails)
+  
+  keyValuePairTable('storage-metrics-table', rows, document.getElementById('storage-metrics'))
+}
+
+function formatBytes(bytes, decimals = 2) {
+  if (!+bytes) return '0 Bytes'
+
+  const k = 1024
+  const dm = decimals < 0 ? 0 : decimals
+  const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
