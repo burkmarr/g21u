@@ -53,6 +53,13 @@
     display: none;
   }
 }
+body.emulate-v1 .navtop-inner-container.middle {
+  display: none;
+}
+body.emulate-v1 .navtop-inner-container.right {
+  display: none;
+}
+
 
 /* Style the links inside the record list toolbar */
 #navtop svg {
@@ -87,7 +94,13 @@
  * different number on full screen and
  * mobile screen
  */
- @media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 1024px) {
+  body.emulate-v1 #navbot a#navbot-link-edit {
+    display: none;
+  }
+  body.emulate-v1 #navbot-inner {
+    width: 204px; /* Accommodates four links of width 68px */
+  }
   #navbot-inner {
     width: 272px; /* Accommodates four links of width 68px */
   }
@@ -131,8 +144,4 @@
 }
 .selected-nav .nabvar-icon circle {
   stroke: rgb(12, 237, 12);
-}
-
-.emulate-v1 #navbot-link-edit {
-  display: none;
 }
