@@ -47,17 +47,19 @@ export function defaultDeterminer() {
 
 async function storageMetrics() {
 
-  const per = navigator.storage && navigator.storage.persist ? true : false
+  const perSupported = navigator.storage && navigator.storage.persist ? true : false
+  const perGranted = perSupported && await navigator.storage.persisted()
   const {quota, usage, usageDetails} = await navigator.storage.estimate()
+  //const detailsSupported = navigator.storage.estimate ? true : false 
 
   const rows = [
     {
       caption: 'Persistent storage available',
-      value: per ? 'Yes' : 'No'
+      value: perSupported ? 'Yes' : 'No'
     },
     {
       caption: 'Persistent storage granted',
-      value: await navigator.storage.persisted() ? 'Yes' : 'No'
+      value: perGranted ? 'Yes' : 'No'
     },
     {
       caption: 'Total storage quota',
@@ -69,20 +71,17 @@ async function storageMetrics() {
     },
     {
       caption: 'App cache use',
-      value: formatBytes(usageDetails.caches)
+      value: usageDetails ? formatBytes(usageDetails.caches) : 'Info not supported by this browser'
     },
     {
       caption: 'App file system use',
-      value: formatBytes(usageDetails.fileSystem)
+      value: usageDetails ? formatBytes(usageDetails.fileSystem) : 'Info not supported by this browser'
     },
     {
       caption: 'App service worker use',
-      value: formatBytes(usageDetails.serviceWorkerRegistrations)
+      value: usageDetails ? formatBytes(usageDetails.serviceWorkerRegistrations) : 'Info not supported by this browser'
     }
   ]
-
-  console.log('usageDetails', usageDetails)
-  
   keyValuePairTable('storage-metrics-table', rows, document.getElementById('storage-metrics'))
 }
 

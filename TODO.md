@@ -1,7 +1,4 @@
 # TODO
-- Need to request persisitent storage
-- Add storage statistics to metdata?
-- json (txt) file should be created upon wav creation, but full record fields only added for v2 - v1 compat should only be used to record metadata
 - Metadata should consist of following:
     - list of when the file was downloaded (or download attempted)
     - list of when the file was shared (or share attempted)

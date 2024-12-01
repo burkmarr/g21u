@@ -68,6 +68,15 @@ h3 {
   width: 100px;
   height: 40px;
 }
+/* Share not supported dialog */
+#share-not-supported {
+  max-width: 300px;
+}
+#share-not-supported button {
+  width: 100px;
+  height: 40px;
+  float: right;
+}
 
 /*General styling for record details input fields */
 .record-details-input {

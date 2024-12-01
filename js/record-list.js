@@ -164,6 +164,12 @@ export async function deleteYesNo(e) {
 
 export async function shareChecked(e) {
   flash(e.target.id)
+
+  if (!navigator.share) {
+    document.querySelector('#share-not-supported #agent').innerHTML = navigator.userAgent
+    document.getElementById('share-not-supported').showModal()
+    return
+  }
   const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const files = []

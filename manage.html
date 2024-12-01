@@ -13,11 +13,21 @@
 </head>
 
 <body id="manage">
+
   <dialog id="delete-confirm-dialog" align="end">
     <p>Are you sure that you want to delete <span id="file-num"></span> <span id="file-text"></span>?</p>
     <button id="delete-reject">No</button>
     <button id="delete-confirm">Yes</button>
   </dialog>
+
+  <dialog id="share-not-supported" >
+    <p>
+      This broweser - <span id='agent'></span> - does not support the web share API. Consider 
+      using a browser that does, e.g. Chrome.
+    </p>
+    <form method="dialog"><button>OK</button></form>
+  </dialog>
+
   <div id="navtop" style="display: flex"></div>
   </div>
   <div id="manage-div" style="display: flex">
