@@ -1,4 +1,4 @@
-import { getFieldDefs, getOpt } from './common.js'
+import { getFieldDefs, getOpt, getDateTime } from './common.js'
 
 // Function names that start with 'stor' indicate
 // functions that retrieve or write to storage and
@@ -149,11 +149,21 @@ export function downloadBlob(blob, name) {
 }
 
 export async function downloadFile(filename) {
+  // Download the file
   const blob = await storGetFile (filename)
   downloadBlob(blob, filename)
+  // Update record's metadata if this is a json text file
+  if (filename.endsWith('.txt')) {
+    const json = await getRecordJson(filename)
+    json.metadata.downloads.push(getDateTime())
+    // Write the file
+    const jsonString = JSON.stringify(json)
+    await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
+  }
 }
 
 export async function getRecordJson(filename) {
+  console.log('getRecordJson', filename)
   // This function takes care of getting the record json
   // from a given record json text file.
   // It also takes care of *creating* that file if it doesn't
@@ -167,22 +177,32 @@ export async function getRecordJson(filename) {
   // field in and saving the new json text file. This situation
   // can arise during development or, conceivably, when a user
   // updates their app.
+  const metadata = {
+    downloads: [],
+    shares: [],
+    csvs: []
+  }
   let json
   if (!await fileExists(filename)) {
     // No json text file with this filename, so create one
     json = {}
+    // Add record fields
     getFieldDefs(filename).forEach(f => {
       json.jsonId = f.default
     })
+    // Add metadata
+    json.metadata = metadata
+    // Write the file
     const jsonString = JSON.stringify(json)
     await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
   } else {
     const blob = await storGetFile(filename)
     json = JSON.parse(await blob.text())
-    // In case property has been added to definition since this 
-    // file was saved, add the property, and save it before
+    // In case property or metadata has been added to definition since this 
+    // file was saved, add the property/metadata, and save it before
     // returning the json.
     if (json) {
+      // Fields
       let missingProperty = false
       getFieldDefs(filename).forEach(f => {
         if (!json.hasOwnProperty(f.jsonId)){
@@ -190,6 +210,19 @@ export async function getRecordJson(filename) {
           missingProperty = true
         }
       })
+      // Metadata
+      if (!json.metadata) {
+        json.metadata = metadata
+        missingProperty = true
+      } else {
+        Object.keys(metadata).forEach(k => {
+          if (!json.metadata[k]) {
+            json.metadata[k] = metadata[k]
+            missingProperty = true
+          }
+        })
+      }
+      // Write file if necessary
       if (missingProperty) {
         const jsonString = JSON.stringify(json)
         await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
@@ -199,18 +232,8 @@ export async function getRecordJson(filename) {
       }
     }
   }
+  console.log('file json', json)
   return json
-}
-
-export async function getJsonAsTextFile(filename) {
-  // navigator.share does not allow json, so share as text instead
-  const blob = await storGetFile(filename)
-  let text = await blob.text()
-  const textBlob = new Blob([text], { type: "text/plain" })
-  const textFile = new File([textBlob], `${filename}.txt`, {
-    type: "text/plain" // Required else navigator.share doesn't work
-  })
-  return textFile
 }
 
 export async function fileExists(filename) {

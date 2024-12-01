@@ -117,6 +117,23 @@ export function dateFromString(dateString) {
   return `${year}-${month}-${day}`
 }
 
+export function getDateTime() {
+  const dte = new Date()
+  const year = dte.getFullYear()
+  let month = String(dte.getMonth() + 1)
+  let day = String(dte.getDate())
+  let hour = String(dte.getHours())
+  let minute = String(dte.getMinutes())
+  let second = String(dte.getSeconds())
+  month = month.length === 2 ? month : `0${month}`
+  day = day.length === 2 ? day : `0${day}`
+  hour = hour.length === 2 ? hour : `0${hour}`
+  minute = minute.length === 2 ? minute : `0${minute}`
+  second = second.length === 2 ? second : `0${second}`
+  const dateTime = `${year}-${month}-${day}_${hour}-${minute}-${second}`
+  return dateTime
+}
+
 export function getOpt(id) {
   const defaultOpts = {
     'emulate-v1': 'false',

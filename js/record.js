@@ -1,6 +1,6 @@
 import { selectAll, transition, easeLinear, wavMediaRecorder, registerWavEncoder, getGr } from './nl.min.js'
 import { beep, doubleBeep, playBlob } from './play.js'
-import { getOpt } from "./common.js"
+import { getOpt, getDateTime } from "./common.js"
 import { downloadBlob, storSaveFile } from './file-handling.js'
 
 // No exports from this module
@@ -52,20 +52,7 @@ function geolocated(position) {
   const gr = getGr(lon, lat, 'wg', 'gb', [1,10])
   const gr10 = gr.p1
   const gr8 = gr.p10
-  const dte = new Date()
-  const year = dte.getFullYear()
-  let month = String(dte.getMonth() + 1)
-  let day = String(dte.getDate())
-  let hour = String(dte.getHours())
-  let minute = String(dte.getMinutes())
-  let second = String(dte.getSeconds())
-  month = month.length === 2 ? month : `0${month}`
-  day = day.length === 2 ? day : `0${day}`
-  hour = hour.length === 2 ? hour : `0${hour}`
-  minute = minute.length === 2 ? minute : `0${minute}`
-  second = second.length === 2 ? second : `0${second}`
-  const dateTime = `${year}-${month}-${day}_${hour}-${minute}-${second}`
-
+  const dateTime = getDateTime()
   if (getOpt('filename-format') === 'osgr') {
     //2015-02-14_20-54-29_SD65821128_18_0.wav
     filename = `${dateTime}_${gr8}_${accuracy}_${altitude ? altitude : 'none'}.wav`
