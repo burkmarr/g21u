@@ -1,5 +1,6 @@
 import { downloadChecked, shareChecked, deleteChecked, uncheckAll, checkAll } from './record-list.js'
 import { editNavigation } from './record-details.js'
+import { getSs, setSs } from './common.js'
 
 export function navtop () {
   const listNavs = [
@@ -96,7 +97,7 @@ export function navtop () {
   editNavs.forEach(n => {
     const div = document.createElement('div')
     div.classList.add('edit-nav')
-    if(n.id === sessionStorage.getItem('topNav')) {
+    if(n.id === getSs('topNav')) {
       div.classList.add('selected-nav')
     }
     navtopInnerRight.appendChild(div)
@@ -105,7 +106,7 @@ export function navtop () {
 
     // Handle highlighting of clicked div
     div.addEventListener('click', function(e){
-      sessionStorage.setItem('topNav', e.target.id)
+      setSs('topNav', e.target.id)
       // Take selected class off all divs
       const navs = document.getElementsByClassName("edit-nav")
       for (let i = 0; i < navs.length; i++) {

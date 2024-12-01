@@ -37,14 +37,14 @@
       checkAll, deleteYesNo, initialiseList
     } from './js/record-list.js'
     import { generateRecordFields, populateRecordFields, editNavigation } from './js/record-details.js'
-    import { getOpt } from './js/common.js'
+    import { getOpt, getSs, setSs } from './js/common.js'
 
     // Add class to body if emulating v1
     if (getOpt('emulate-v1') === 'true') {
       document.body.classList.add('emulate-v1')
     }
     // Add class to body if small screen edit page
-    if (sessionStorage.getItem('mainNav') === 'navbot-link-edit') { 
+    if (getSs('mainNav') === 'navbot-link-edit') { 
       document.body.classList.add('small-edit')
     }
  
@@ -74,10 +74,12 @@
     })
     function screenLayout () {
       // On screen size change
-      if (sessionStorage.getItem('mainNav') === 'navbot-link-edit' && !smallScreen.matches) {
-        if (sessionStorage.getItem('topNav') === 'edit-record') {
-          // If topnav edit was selected on small screen reset session storage to metadata
-          sessionStorage.setItem('topNav', 'edit-metadata')
+      if (getSs('mainNav') === 'navbot-link-edit' && !smallScreen.matches) {
+        if (getSs('topNav') === 'edit-record') {
+          // If topnav edit was previously selected on small screen 
+          // reset to nothing so that the appriate default is selected
+          // for large screen.
+          setSs('topNav', '')
         }
         // If edit was selected on small screen, select manage on large
         document.getElementById('navbot-link-manage').click()

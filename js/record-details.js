@@ -1,4 +1,4 @@
-import { el, getFieldDefs, keyValuePairTable, detailsFromFilename, collapsibleDiv } from './common.js'
+import { el, getFieldDefs, keyValuePairTable, detailsFromFilename, collapsibleDiv, getSs } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { setRecordText } from './record-list.js'
 import { getRecordJson, storSaveFile } from './file-handling.js'
@@ -27,9 +27,14 @@ export function generateRecordFields() {
   getFieldDefs().forEach(f => {
     const ctrl = createInputDiv(parent, f.inputId.substring(0,f.inputId.length-6))
     createInputLabel(ctrl, `${f.inputLabel}:`)
-    const input = document.createElement('input')
+    let input
+    if (f.inputType === 'textarea') {
+      input = document.createElement('textarea')
+    } else {
+      input = document.createElement('input')
+      input.setAttribute('type', f.inputType)
+    }
     input.setAttribute('id', f.inputId)
-    input.setAttribute('type', f.inputType)
     input.addEventListener('input', highlightFields)
     //input.addEventListener('focus', fieldFocus)
     ctrl.appendChild(input)
@@ -73,11 +78,18 @@ export function defaultDetails() {
 
   // The default information to show for field details
   // is the original WAV file details.
-  const selectedFile = sessionStorage.getItem('selectedFile')
+  const selectedFile = getSs('selectedFile')
 
-  el('metadata-details').innerHTML = `
-    <h3>Metadata for selected record<h3>
-  `
+  if (selectedFile) {
+    el('metadata-details').innerHTML = `<h3>Metadata <span class="header-note">(for selected record)</span></h3>`
+  } else {
+    el('metadata-details').innerHTML = `<h3>Metadata <span class="header-note">(no record selected)</span></h3>`
+  }
+
+  const para = document.createElement('p')
+  para.innerHTML = `<i>For information only - these data are not explicitly stored with the record.</i>`
+  el('metadata-details').appendChild(para)
+
   if (selectedFile) {
     const ordDiv = collapsibleDiv('original-recording-details', 'Original recording details', el('metadata-details'))
     const details = detailsFromFilename(selectedFile)
@@ -90,8 +102,6 @@ export function defaultDetails() {
     rows.push({caption: 'Altitude', value: details.altitude === '' ? 'not recorded' : details.altitude + ' m'})
     //keyValuePairTable('wav-details', rows, el('metadata-details'))
     keyValuePairTable('wav-details', rows, ordDiv)
-  } else {
-    el('metadata-details').innerHTML = `<h3>No record selected</h3>`
   }
 }
 
@@ -101,10 +111,10 @@ async function cancelRecord() {
 
 async function saveRecord() {
   // Selected file
-  const selectedFile = sessionStorage.getItem('selectedFile')
+  const selectedFile = getSs('selectedFile')
   // Build JSON structure
   // const json = {
-  //   wav: sessionStorage.getItem('selectedFile'),
+  //   wav: getSs('selectedFile'),
   // }
 
   const json = await getRecordJson(`${selectedFile}.txt`)
@@ -130,13 +140,13 @@ async function saveRecord() {
 export async function populateRecordFields() {
 
   // Selected file
-  const selectedFile = sessionStorage.getItem('selectedFile')
+  const selectedFile = getSs('selectedFile')
   console.log('selectedFile', selectedFile)
 
   if (!selectedFile) {
-    document.getElementById('record-details-title').innerHTML = 'No record selected'
+    document.getElementById('record-details-title').innerHTML = 'Record details <span class="header-note">(no record selected)</span>'
   } else {
-    document.getElementById('record-details-title').innerHTML = 'Details of selected record'
+    document.getElementById('record-details-title').innerHTML = 'Record details <span class="header-note">(for selected record)</span>'
   }
 
   let json
@@ -176,7 +186,7 @@ export async function populateRecordFields() {
 export async function highlightFields() {
 
   // Selected file
-  const selectedFile = sessionStorage.getItem('selectedFile')
+  const selectedFile = getSs('selectedFile')
   let json
   if (selectedFile) {
     // Get corresponding record JSON if it exists
@@ -210,7 +220,7 @@ export async function highlightFields() {
 }
 
 export function editNavigation(e) {
-  const divId = `${sessionStorage.getItem('topNav').substring(5)}-details`
+  const divId = `${getSs('topNav').substring(5)}-details`
 
   // Get all elements with class="details-div" and hide them
   const detailsDiv = document.getElementsByClassName("details-div")

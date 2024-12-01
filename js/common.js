@@ -98,6 +98,14 @@ export function getFieldDefs(filename) {
       default: '',
       novalue: ''
     },
+    {
+      inputId: 'comment-input',
+      inputType: 'textarea',
+      inputLabel: 'Comment',
+      jsonId: 'comment',
+      default: '',
+      novalue: ''
+    },
   ]
 }
 
@@ -125,6 +133,31 @@ export function getOpt(id) {
 
 export function setOpt(id, value) {
   localStorage.setItem(id, value)
+}
+
+export function setSs(id, value) {
+  return sessionStorage.setItem(id, value)
+}
+
+export function getSs(id) {
+  const defaults = {
+    mainNav: 'navbot-link-record',
+    topNav: () => {
+      if (window.matchMedia("(max-width: 1024px)").matches) {
+        return 'edit-record'
+      } else {
+        return 'edit-taxa'
+      }
+    }
+  }
+
+  if (sessionStorage.getItem(id)) {
+    return sessionStorage.getItem(id)
+  } else if (typeof defaults[id] === 'function') {
+    return defaults[id]()
+  } else {
+    return defaults[id]
+  }
 }
 
 export function el(id) {

@@ -1,7 +1,8 @@
-import { storGetRecs, storDeleteFiles, downloadFile, fileExists, 
-  storGetFile, getRecordJson } from './file-handling.js'
+import { storGetRecs, storDeleteFiles, downloadFile, 
+  fileExists, storGetFile, getRecordJson 
+} from './file-handling.js'
 import { selectAll, transition, easeLinear } from './nl.min.js'
-import { getOpt, detailsFromFilename } from './common.js'
+import { getOpt, detailsFromFilename, getSs, setSs } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 
@@ -40,8 +41,8 @@ export async function initialiseList() {
   // If the currently selected file indicated by
   // session storage is no longer present, then
   // reset it.
-  if (!storRecs.find(r => r.filename === sessionStorage.getItem('selectedFile'))) {
-    sessionStorage.setItem('selectedFile', '')
+  if (!storRecs.find(r => r.filename === getSs('selectedFile'))) {
+    setSs('selectedFile', '')
   }
   // Populate with files from storage (large devices)
   document.getElementById('record-list').innerHTML = ''
@@ -54,7 +55,7 @@ export async function initialiseList() {
     fileDiv.setAttribute('data-file-name', name) 
     fileDiv.classList.add('record-div')
     fileDiv.addEventListener('click', recordSelected)
-    if (name === sessionStorage.getItem('selectedFile')) {
+    if (name === getSs('selectedFile')) {
       fileDiv.classList.add('record-selected')
     }
     // Play image
@@ -250,9 +251,9 @@ function recordSelected(e) {
   // Select the record
   if (!deselect) {
     e.target.classList.add("record-selected")
-    sessionStorage.setItem( 'selectedFile', e.target.getAttribute('data-file-name'))
+    setSs( 'selectedFile', e.target.getAttribute('data-file-name'))
   } else {
-    sessionStorage.setItem( 'selectedFile', '')
+    setSs( 'selectedFile', '')
   }
   populateRecordFields()
 }

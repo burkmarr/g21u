@@ -4,7 +4,7 @@ body {
 }
 
 /* General styling for input controls */
-select, input[type="text"], input[type="date"], input[type="time"] {
+select, input[type="text"], input[type="date"], input[type="time"], textarea {
   border-radius: 4px;
   font-size: inherit;
   padding: 0.5em 0.5em 0.5em 1em;
@@ -12,4 +12,18 @@ select, input[type="text"], input[type="date"], input[type="time"] {
   box-sizing: border-box;
   width: 100%;
   border-width: 1px;
+}
+
+textarea { 
+  resize: vertical;
+  font-family: Arial;
+  font-size: 16px;
+}
+
+/* Font size for date and time inputs
+ * to make them look more like the other
+ * input controls
+ */
+ input[type="date"], input[type="time"] {
+  font-size: 16px;
 }

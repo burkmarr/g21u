@@ -1,4 +1,4 @@
-import { el, keyValuePairTable, unorderedList, collapsibleDiv } from './common.js'
+import { el, keyValuePairTable, unorderedList, collapsibleDiv, getSs } from './common.js'
 import { highlightFields } from './record-details.js'
 
 export async function hideTaxonMatches() {
@@ -46,23 +46,43 @@ export async function taxonDetails() {
 
   console.log('fetch taxonDetails')
 
+  const selectedFile = getSs('selectedFile')
   const scientific = el('scientific-name-input').value
+  let noDataText
+  if (!selectedFile) {
+    noDataText = '(no record selected)'
+  } else {
+    noDataText = '(no scientific name set)'
+  }
 
-  el('taxa-details').innerHTML = `<h3>NBN UKSI details</h3><p>
-      Taxonomic details from the 
+  if (scientific) {
+    el('taxa-details').innerHTML = `<h3>NBN UKSI details <span class="header-note">(for selected record)</span></h3>`
+  } else {
+    el('taxa-details').innerHTML = `<h3>NBN UKSI details <span class="header-note">${noDataText}</span></h3>`
+  }
+
+  let para
+
+  para = document.createElement('p')
+  para.innerHTML = `<i>For information only - these data are not explicitly stored with the record.</i>`
+  el('taxa-details').appendChild(para)
+
+  para = document.createElement('p')
+  para.innerHTML = `Taxonomic details from the 
       UKSI as implemented by the National Biodiversity Network.
       These details are retrieved when you select a record
       from the record list, select a taxon from an NBN taxon list
       or when you hit enter with your cursor in the scientific name field.
-    </p>`
-
+  `
+  el('taxa-details').appendChild(para)
+  
   if (scientific) {
-    el('taxa-details').innerHTML = `${el('taxa-details').innerHTML}<p>
+    para = document.createElement('p')
+    para.innerHTML= `
       NBN taxonomy searched on the
       scientific name: <b><i>${scientific}</i></b>.
-    </p>`
-  } else {
-   return
+    `
+    el('taxa-details').appendChild(para)
   }
 
   // Get the guid for the scientific name

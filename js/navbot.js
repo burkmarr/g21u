@@ -1,3 +1,5 @@
+import { getSs, setSs } from './common.js'
+
 export function navbot () {
 
   const links = [
@@ -33,14 +35,14 @@ export function navbot () {
     a.setAttribute('id', l.id)
     a.setAttribute('href', l.href)
     navbotInner.appendChild(a)
-    if(l.id === sessionStorage.getItem('mainNav')) {
+    if(l.id === getSs('mainNav')) {
       a.setAttribute('class', 'selected-nav')
     }
     a.addEventListener('click', function(e){
       // Intercept navigation link and update a session variable with link id
       // allows us to distinguish between click on navbot-link-manage and
       // navbot-link-edit in code
-      sessionStorage.setItem('mainNav', e.target.id)
+      setSs('mainNav', e.target.id)
     })
 
     // The dynamic creation of svg below doesn't give desired results
