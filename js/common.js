@@ -1,5 +1,3 @@
-import { taxonDetails } from './taxonomy.js'
-
 export function detailsFromFilename(name) {
   if (!name) return ''
   const sName = name.split('_')
@@ -225,21 +223,25 @@ export function collapsibleDiv(id, caption, parent) {
   div.setAttribute('id', id)
   div.classList.add('collapsible')
   parent.appendChild(div)
+
+  const toggleText = getSs(id) ? getSs(id) : 'show'
+ 
   div.innerHTML = `
     <div class='collapsible-caption'>
-      <b>${caption}</b> <span class='collapsible-toggle'>[show]</span>
+      <b>${caption}</b> <span class='collapsible-toggle'>[${toggleText}]</span>
     </div>
-    <div class='collapsible-content hide'></div>
+    <div class='collapsible-content ${toggleText === 'show' ? 'hide' : ''}'></div>
   `
-  
   const toggle = document.querySelector(`#${id} .collapsible-toggle`)
   toggle.addEventListener('click', function(e){
     if (e.target.innerText === '[show]') {
       e.target.innerText = '[hide]'
       document.querySelector(`#${id} .collapsible-content`).classList.remove('hide')
+      setSs(id, 'hide')
     } else {
       e.target.innerText = '[show]'
       document.querySelector(`#${id} .collapsible-content`).classList.add('hide')
+      setSs(id, 'show')
     }
   })
 

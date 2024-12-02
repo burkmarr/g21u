@@ -1,4 +1,4 @@
-import { el, getFieldDefs, keyValuePairTable, detailsFromFilename, collapsibleDiv, getSs } from './common.js'
+import { el, getFieldDefs, keyValuePairTable, detailsFromFilename, collapsibleDiv, unorderedList, getSs } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { setRecordText } from './record-list.js'
 import { getRecordJson, storSaveFile } from './file-handling.js'
@@ -109,13 +109,7 @@ export async function getMetadata() {
     // Downloads
     const downDiv = collapsibleDiv('download-details', 'Downloaded on...', el('metadata-details'))
     if (json.metadata.downloads.length) {
-      const ul = document.createElement('ul')
-      downDiv.appendChild(ul)
-      json.metadata.downloads.forEach(d => {
-        const li = document.createElement('li')
-        li.innerText = d
-        ul.appendChild(li)
-      })
+      unorderedList('download-details-list', json.metadata.downloads, downDiv)
     } else {
       downDiv.innerHTML = "No downloads are recorded for this record."
     }
@@ -123,13 +117,7 @@ export async function getMetadata() {
     // Shares
     const shareDiv = collapsibleDiv('share-details', 'Shared on...', el('metadata-details'))
     if (json.metadata.shares.length) {
-      const ul = document.createElement('ul')
-      shareDiv.appendChild(ul)
-      json.metadata.shares.forEach(d => {
-        const li = document.createElement('li')
-        li.innerText = d
-        ul.appendChild(li)
-      })
+      unorderedList('share-details-list', json.metadata.shares, shareDiv)
     } else {
       shareDiv.innerHTML = "No shares are recorded for this record."
     }
