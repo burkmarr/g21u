@@ -30,35 +30,6 @@ export function navbot () {
   navbotInner.setAttribute('id', 'navbot-inner')
   navbot.appendChild(navbotInner)
 
-  links.forEach(l => {
-    return
-    const a = document.createElement('a')
-    a.setAttribute('id', l.id)
-    a.setAttribute('href', l.href)
-    navbotInner.appendChild(a)
-    if(l.id === getSs('mainNav')) {
-      a.setAttribute('class', 'selected-nav')
-    }
-    a.addEventListener('click', function(e){
-      // Intercept navigation link and update a session variable with link id
-      // allows us to distinguish between click on navbot-link-manage and
-      // navbot-link-edit in code
-      setSs('mainNav', e.target.id)
-    })
-
-    // The dynamic creation of svg below doesn't give desired results
-    // The path elements appear to be there but do not render.
-    // setAttribute seems to convert viewBox to viewbox and I wonder if
-    // that is the problem.
-    // const svg = document.createElement('svg')
-    // svg.setAttribute('viewBox', '0,0,512,512')
-    // svg.setAttribute('class', 'nabvar-icon')
-    // svg.innerHTML = l.svgEls
-    // a.appendChild(svg)
-
-    a.innerHTML = `<svg viewBox="0,0,512,512" class="nabvar-icon">${l.svgEls}</svg>`
-  })
-
   links.forEach(n => {
     const div = document.createElement('div')
     div.classList.add('main-nav')

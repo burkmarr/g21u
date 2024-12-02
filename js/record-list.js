@@ -213,6 +213,11 @@ export async function downloadChecked(e) {
   }
 }
 
+export async function csvChecked(e) {
+  console.log('Make CSV')
+  flash(e.target.id)
+}
+
 export function uncheckAll(e) {
   flash(e.target.id)
   const checkboxes = document.getElementsByClassName('record-checkbox')
@@ -230,12 +235,11 @@ export function checkAll(e) {
 }
 
 function flash(id) {
-  console.log('id', id)
   const t = transition().duration(300).ease(easeLinear)
-  selectAll(`#${id}.nabvar-icon path, #${id}.nabvar-icon circle`)
+  selectAll(`#${id}.ionic path, #${id}.nabvar-icon circle`)
     .transition(t).style("stroke", "#00FF21")
     .transition(t).style("stroke", "white")
-  selectAll(`#${id}.nabvar-icon-2 path`)
+  selectAll(`#${id}.fill path`)
     .transition(t).style("fill", "#00FF21")
     .transition(t).style("fill", "white")
 }
