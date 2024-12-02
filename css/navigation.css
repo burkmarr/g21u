@@ -85,7 +85,7 @@ body.emulate-v1 .navtop-inner-container.right {
  * mobile screen
  */
 @media only screen and (max-width: 1024px) {
-  body.emulate-v1 #navbot a#navbot-link-edit {
+  body.emulate-v1 #navbot svg#navbot-link-edit {
     display: none;
   }
   body.emulate-v1 #navbot-inner {
@@ -94,7 +94,7 @@ body.emulate-v1 .navtop-inner-container.right {
   #navbot-inner {
     width: calc(var(--but-size) * 4);
   }
-  #navbot a#navbot-link-edit { 
+  #navbot svg#navbot-link-edit { 
     display: block;
   }
 }

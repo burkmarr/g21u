@@ -49,3 +49,7 @@ textarea {
 .collapsible-toggle {
   cursor: pointer;
 }
+
+.collapsible-caption {
+  margin: 1em 0 0.5em 0;
+}

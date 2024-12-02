@@ -117,7 +117,10 @@ export function dateFromString(dateString) {
   return `${year}-${month}-${day}`
 }
 
-export function getDateTime() {
+export function getDateTime(formatted) {
+  // If formatted not set to true, returns date of format
+  // yyy-mm-dd_hh-mm-ss - which is required for filenames.
+  // If set to true, returns a nicely formatted date & time.
   const dte = new Date()
   const year = dte.getFullYear()
   let month = String(dte.getMonth() + 1)
@@ -130,8 +133,11 @@ export function getDateTime() {
   hour = hour.length === 2 ? hour : `0${hour}`
   minute = minute.length === 2 ? minute : `0${minute}`
   second = second.length === 2 ? second : `0${second}`
-  const dateTime = `${year}-${month}-${day}_${hour}-${minute}-${second}`
-  return dateTime
+  if (formatted) {
+    return `${day}/${month}/${year} ${hour}:${minute}:${second}`
+  } else {
+    return `${year}-${month}-${day}_${hour}-${minute}-${second}`
+  }
 }
 
 export function getOpt(id) {

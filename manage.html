@@ -92,7 +92,15 @@
           setSs('topNav', '')
         }
         // If edit was selected on small screen, select manage on large
-        document.getElementById('navbot-link-manage').click()
+        // Dispatch click event on the link
+        // This is necessary as click() method may not on div element on some browsers
+        document.getElementById('navbot-link-manage').dispatchEvent(
+          new MouseEvent('click', { 
+            bubbles: true, 
+            cancelable: true, 
+            view: window 
+          })
+        )
       }
     }
 

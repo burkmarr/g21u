@@ -136,7 +136,7 @@ export function downloadBlob(blob, name) {
   // Append link to the body
   document.body.appendChild(link)
   // Dispatch click event on the link
-  // This is necessary as link.click() does not work on the latest firefox
+  // This is necessary as click() method may not on a element on some browsers
   link.dispatchEvent(
     new MouseEvent('click', { 
       bubbles: true, 
@@ -155,15 +155,29 @@ export async function downloadFile(filename) {
   // Update record's metadata if this is a json text file
   if (filename.endsWith('.txt')) {
     const json = await getRecordJson(filename)
-    json.metadata.downloads.push(getDateTime())
+    json.metadata.downloads.push(getDateTime(true))
     // Write the file
     const jsonString = JSON.stringify(json)
     await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
   }
 }
 
+export async function shareFiles(files) {
+  // For json text record files, add record
+  // of share into metadata.
+  const txtFiles = files.filter(f => f.name.endsWith('.txt'))
+  for (let i=0; i<txtFiles.length; i++) {
+    const filename = txtFiles[i].name
+    const json = await getRecordJson(filename)
+    json.metadata.shares.push(getDateTime(true))
+    // Write the file
+    const jsonString = JSON.stringify(json)
+    await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
+  }
+  navigator.share({files: files})
+}
+
 export async function getRecordJson(filename) {
-  console.log('getRecordJson', filename)
   // This function takes care of getting the record json
   // from a given record json text file.
   // It also takes care of *creating* that file if it doesn't
@@ -232,7 +246,6 @@ export async function getRecordJson(filename) {
       }
     }
   }
-  console.log('file json', json)
   return json
 }
 

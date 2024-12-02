@@ -1,23 +1,19 @@
 # TODO
-- Metadata should consist of following:
-    - list of when the file was downloaded (or download attempted)
-    - list of when the file was shared (or share attempted)
-    - will need an explanation of 'attempt' if that is necessary
 - Record download, share & CSV inclusion attempts in metadata in record json (txt)
 - If metadata shows that a file is downloaded, shared or exported to a CSV, indicate in the record list with icons
-- Will need something to clear this metadata (by type) for all checked records - in case where there is a failure that the software cannot detect.
-- Adding custom taxa.
-- indexDB.
-- file system storage.
+- Will need something to clear this metadata (by type) for all checked records - in case where there is a failure that the software cannot detect
+- Create CSV from selected records
+- Adding custom taxa
+- indexDB
+- OS File system storage
 - Dealing with lat/lon
 - Add mapping details
+- Adding custom locations
+- Adding custom fields (iRecord extra fields)
 - New page for dealing with CSVs
-  - delete CSV.
-  - create CSV.
-  - add records to CSV.
-  - delete CSV.
-  - archive CSV.
-  - download CSV.
-  - share CSV.
-  - combine CSVs.
+  - delete CSV
+  - archive CSV (only where OS file system support)
+  - download CSV
+  - share CSV
+  - combine CSVs
 

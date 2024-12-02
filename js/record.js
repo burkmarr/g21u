@@ -7,7 +7,7 @@ import { downloadBlob, storSaveFile } from './file-handling.js'
 // so safe to have module level functionlity
 // - review if exports added.
 let isGeolocated = false
-let filename
+let filenameLoc
 
 let mediaRecorder = null
 let audioBlobs = []
@@ -52,13 +52,12 @@ function geolocated(position) {
   const gr = getGr(lon, lat, 'wg', 'gb', [1,10])
   const gr10 = gr.p1
   const gr8 = gr.p10
-  const dateTime = getDateTime()
   if (getOpt('filename-format') === 'osgr') {
     //2015-02-14_20-54-29_SD65821128_18_0.wav
-    filename = `${dateTime}_${gr8}_${accuracy}_${altitude ? altitude : 'none'}.wav`
+    filenameLoc = `${gr8}_${accuracy}_${altitude ? altitude : 'none'}`
   } else {
-     //2015-02-14_20-54-45_53.59675_-2.51646_15_0.wav
-    filename = `${dateTime}_${lat}_${lon}_${accuracy}_${altitude ? altitude : 'none'}.wav`
+    //2015-02-14_20-54-45_53.59675_-2.51646_15_0.wav
+    filenameLoc = `${lat}_${lon}_${accuracy}_${altitude ? altitude : 'none'}`
   }
   
   // Update gui GR
@@ -127,10 +126,11 @@ async function stopRecording() {
       capturedStream.getTracks().forEach(track => track.stop())
     }
     const mode = getOpt('file-handling')
+    const dateTime = getDateTime()
     if (mode === 'download') {
-      downloadBlob(audioBlob, filename)
+      downloadBlob(audioBlob, `${dateTime}_${filenameLoc}.wav`)
     } else if (mode === 'opfs') {
-      storSaveFile(audioBlob, filename)
+      storSaveFile(audioBlob, `${dateTime}_${filenameLoc}.wav`)
     }
     if (getOpt('automatic-playback') === "true") {
       playback = new Audio()

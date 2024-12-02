@@ -1,5 +1,5 @@
 import { storGetRecs, storDeleteFiles, downloadFile, 
-  fileExists, storGetFile, getRecordJson 
+  fileExists, storGetFile, getRecordJson, shareFiles
 } from './file-handling.js'
 import { selectAll, transition, easeLinear } from './nl.min.js'
 import { getOpt, detailsFromFilename, getSs, setSs } from './common.js'
@@ -12,7 +12,12 @@ export async function initialiseList() {
 
   storRecs = await storGetRecs()
 
-  console.log(storRecs.length)
+  // If the currently selected file indicated by
+  // session storage is no longer present, then
+  // reset it.
+  if (!storRecs.find(r => r.filename === getSs('selectedFile'))) {
+    setSs('selectedFile', '')
+  }
 
   if (!storRecs.length) {
     document.getElementById('record-list').innerHTML = `<h3>No records to display</h3><p>Make some!</p>`
@@ -36,14 +41,7 @@ export async function initialiseList() {
     }
     return comparison
   })
-  console.log('storRecs', storRecs)
 
-  // If the currently selected file indicated by
-  // session storage is no longer present, then
-  // reset it.
-  if (!storRecs.find(r => r.filename === getSs('selectedFile'))) {
-    setSs('selectedFile', '')
-  }
   // Populate with files from storage (large devices)
   document.getElementById('record-list').innerHTML = ''
 
@@ -186,8 +184,8 @@ export async function shareChecked(e) {
         }   
       }
     }
-    console.log('files', files)
-    navigator.share({files: files})
+    await shareFiles(files)
+    populateRecordFields()
   }
 }
 
@@ -196,19 +194,22 @@ export async function downloadChecked(e) {
   flash(e.target.id)
   const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
+    const promises = []
     for (let i=0; i<storRecs.length; i++) {
       const name = storRecs[i].filename
       if (document.getElementById(`record-checkbox-${i}`).checked) {
         // Download WAV if it exists
         if (await fileExists(`${name}.wav`)) {
-          downloadFile(`${name}.wav`)
+          promises.push(downloadFile(`${name}.wav`))
         }
         // Download JSON (txt) if it exists and not emulating v1
         if (getOpt('emulate-v1') === 'false' && await fileExists(`${name}.txt`)) {
-          downloadFile(`${name}.txt`)
+          promises.push(downloadFile(`${name}.txt`))
         }
       }
     }
+    await Promise.all(promises)
+    populateRecordFields()
   }
 }
 

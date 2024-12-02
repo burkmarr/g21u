@@ -81,9 +81,9 @@ export async function getMetadata() {
   const selectedFile = getSs('selectedFile')
 
   if (selectedFile) {
-    el('metadata-details').innerHTML = `<h3>Metadata <span class="header-note">(for selected record)</span></h3>`
+    el('metadata-details').innerHTML = `<h3>Metadata <span class="header-note">for selected record</span></h3>`
   } else {
-    el('metadata-details').innerHTML = `<h3>Metadata <span class="header-note">(no record selected)</span></h3>`
+    el('metadata-details').innerHTML = `<h3>Metadata <span class="header-note">- no record selected</span></h3>`
   }
 
   const para = document.createElement('p')
@@ -91,23 +91,57 @@ export async function getMetadata() {
   el('metadata-details').appendChild(para)
 
   if (selectedFile) {
+    const json = await getRecordJson(`${selectedFile}.txt`)
+    //console.log(json)
+
+    // Original recording details
     const ordDiv = collapsibleDiv('original-recording-details', 'Original recording details', el('metadata-details'))
     const details = detailsFromFilename(selectedFile)
-    const rows = []
-    rows.push({caption: 'Filename', value: selectedFile})
-    rows.push({caption: 'Date', value: details.date})
-    rows.push({caption: 'Time', value: details.time})
-    rows.push({caption: 'Loc', value: details.gridref})
-    rows.push({caption: 'Accuracy', value: details.accuracy + ' m'})
-    rows.push({caption: 'Altitude', value: details.altitude === '' ? 'not recorded' : details.altitude + ' m'})
-    //keyValuePairTable('wav-details', rows, el('metadata-details'))
-    keyValuePairTable('wav-details', rows, ordDiv)
+    const ordRows = []
+    ordRows.push({caption: 'Filename', value: selectedFile})
+    ordRows.push({caption: 'Date', value: details.date})
+    ordRows.push({caption: 'Time', value: details.time})
+    ordRows.push({caption: 'Loc', value: details.gridref})
+    ordRows.push({caption: 'Accuracy', value: details.accuracy + ' m'})
+    ordRows.push({caption: 'Altitude', value: details.altitude === '' ? 'not recorded' : details.altitude + ' m'})
+    keyValuePairTable('wav-details', ordRows, ordDiv)
+
+    // Downloads
+    const downDiv = collapsibleDiv('download-details', 'Downloaded on...', el('metadata-details'))
+    if (json.metadata.downloads.length) {
+      const ul = document.createElement('ul')
+      downDiv.appendChild(ul)
+      json.metadata.downloads.forEach(d => {
+        const li = document.createElement('li')
+        li.innerText = d
+        ul.appendChild(li)
+      })
+    } else {
+      downDiv.innerHTML = "No downloads are recorded for this record."
+    }
+
+    // Shares
+    const shareDiv = collapsibleDiv('share-details', 'Shared on...', el('metadata-details'))
+    if (json.metadata.shares.length) {
+      const ul = document.createElement('ul')
+      shareDiv.appendChild(ul)
+      json.metadata.shares.forEach(d => {
+        const li = document.createElement('li')
+        li.innerText = d
+        ul.appendChild(li)
+      })
+    } else {
+      shareDiv.innerHTML = "No shares are recorded for this record."
+    }
+    
+    // CSVs
+   
   }
 
   const {quota, usage, usageDetails} = await navigator.storage.estimate()
-  console.log('quota', quota)
-  console.log('usage', usage)
-  console.log('usageDetails', usageDetails)
+  // console.log('quota', quota)
+  // console.log('usage', usage)
+  // console.log('usageDetails', usageDetails)
 }
 
 async function cancelRecord() {
@@ -142,12 +176,12 @@ export async function populateRecordFields() {
 
   // Selected file
   const selectedFile = getSs('selectedFile')
-  console.log('selectedFile', selectedFile)
+  //console.log('selectedFile', selectedFile)
 
   if (!selectedFile) {
-    document.getElementById('record-details-title').innerHTML = 'Record details <span class="header-note">(no record selected)</span>'
+    document.getElementById('record-details-title').innerHTML = 'Record details <span class="header-note">- no record selected</span>'
   } else {
-    document.getElementById('record-details-title').innerHTML = 'Record details <span class="header-note">(for selected record)</span>'
+    document.getElementById('record-details-title').innerHTML = 'Record details <span class="header-note">for selected record</span>'
   }
 
   let json
@@ -156,7 +190,7 @@ export async function populateRecordFields() {
     // Get corresponding record JSON if it exists
     json = await getRecordJson(`${selectedFile}.txt`)
   }
-  //console.log('json', json)
+  console.log('record', json)
 
   getFieldDefs(selectedFile ? selectedFile : null).forEach(f => {
     if (json) {

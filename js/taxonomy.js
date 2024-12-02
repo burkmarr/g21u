@@ -44,19 +44,17 @@ export async function displayTaxonMatches(e) {
 
 export async function taxonDetails() {
 
-  console.log('fetch taxonDetails')
-
   const selectedFile = getSs('selectedFile')
   const scientific = el('scientific-name-input').value
   let noDataText
   if (!selectedFile) {
-    noDataText = '(no record selected)'
+    noDataText = '- no record selected'
   } else {
-    noDataText = '(no scientific name set)'
+    noDataText = '- no scientific name set'
   }
 
   if (scientific) {
-    el('taxa-details').innerHTML = `<h3>NBN UKSI details <span class="header-note">(for selected record)</span></h3>`
+    el('taxa-details').innerHTML = `<h3>NBN UKSI details <span class="header-note">for selected record</span></h3>`
   } else {
     el('taxa-details').innerHTML = `<h3>NBN UKSI details <span class="header-note">${noDataText}</span></h3>`
   }
