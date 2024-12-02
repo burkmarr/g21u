@@ -1,7 +1,7 @@
 body#manage {
-  padding-top:68px; /* Makes room the record list navbot */
-  margin: 1em
+  padding-top: var(--but-size); 
 }
+
 h3 {
   margin-top: 0;
 }
@@ -13,7 +13,7 @@ h3 {
 #record-list {
   overflow-y: auto; 
   overflow-x: hidden; 
-  height: calc(100vh - 152px);
+  height: calc(100vh - 2 * var(--but-size) - 2 * var(--body-margin));
   width: 50%;
 }
 .small-edit #record-list {
@@ -116,7 +116,7 @@ h3 {
   width: 100%;
   overflow-y: auto; 
   overflow-x: hidden; 
-  height: calc(100vh - 152px); /* Accommodates the navbot & toolbar/tab buttons */
+  height: calc(100vh - 2 * var(--but-size) - 2 * var(--body-margin));
 }
 
 .details-div {

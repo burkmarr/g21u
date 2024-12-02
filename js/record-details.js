@@ -115,15 +115,11 @@ async function cancelRecord() {
 }
 
 async function saveRecord() {
-  // Selected file
+
   const selectedFile = getSs('selectedFile')
-  // Build JSON structure
-  // const json = {
-  //   wav: getSs('selectedFile'),
-  // }
 
   const json = await getRecordJson(`${selectedFile}.txt`)
-  console.log(json)
+  //console.log(json)
 
   getFieldDefs(selectedFile).forEach(f => {
     json[f.jsonId] =  el(f.inputId).value

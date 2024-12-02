@@ -15,7 +15,7 @@
     margin:0;
     padding:10px;
     &:nth-child(even) {
-      background: linear-gradient(to bottom,  #ffffff 0%,#FFFFFF 100%);
+      background: linear-gradient(to bottom,  #ffffff 0%,#EFEFEF 100%);
     }
     &:nth-child(odd) {
       background: linear-gradient(to bottom,  #ffffff 0%,#EFEFEF 100%);

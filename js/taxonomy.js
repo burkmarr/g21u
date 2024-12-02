@@ -146,6 +146,7 @@ function taxonSelected(e) {
   const common = e.target.children[2].innerText
   el('scientific-name-input').value = scientific
   el('common-name-input').value = common
+  hideTaxonMatches()
   highlightFields()
   taxonDetails()
 }

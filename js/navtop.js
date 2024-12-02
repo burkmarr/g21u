@@ -117,7 +117,5 @@ export function navtop () {
 
       editNavigation()
     })
-    // Handle displaying the correct content div
-    //div.addEventListener('click', editNavigation)
   })
 }

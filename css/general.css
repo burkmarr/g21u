@@ -1,6 +1,14 @@
+:root {
+  --but-padding: 10px;
+  --but-width: 30px;
+  --but-size: calc(var(--but-width) + 2 * var(--but-padding));
+  --body-margin: 6px;
+}
+
 body {
   font-family: Arial;
-  padding-bottom:68px; /* Make room for the fixed main navigation navbot */
+  padding-bottom: var(--but-size);
+  margin: var(--body-margin);
 }
 
 /* General styling for input controls */

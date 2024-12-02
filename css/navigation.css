@@ -15,7 +15,7 @@
   position: fixed;
   left: 0;
   top: 0;
-  height: 68px;
+  height: var(--but-size);
   width: 100%;
   z-index: 100;
 }
@@ -25,11 +25,11 @@
   width: 100%
 }
 #navtop-inner-left {
-  width: 340px; /* Accommodates five links of width 68px */
+  width: calc(var(--but-size) * 5);
   margin: 0 auto;
 }
 #navtop-inner-right {
-  width: 136px; /* Accommodates two links of width 68px */
+  width: calc(var(--but-size) * 2);
   margin: 0 auto;
 }
 #navtop svg#edit-record {
@@ -37,7 +37,7 @@
 }
 @media only screen and (max-width: 1024px) {
   #navtop-inner-right {
-    width: 204px; /* Accommodates three links of width 68px */
+    width: calc(var(--but-size) * 3);
     margin: 0 auto;
   }
   #navtop svg#edit-record {
@@ -60,31 +60,21 @@ body.emulate-v1 .navtop-inner-container.right {
   display: none;
 }
 
-
-/* Style the links inside the record list toolbar */
-#navtop svg {
-  float: left;
-  display: block;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-}
-
 /* Main navigation bar */
 #navbot {
   background-color: #333;
   overflow: hidden;
   position: fixed;
   left: 0;
-  height: 68px;
+  height: var(--but-size);
   width: 100%;
   bottom: 0;
 }
 #navbot-inner {
   margin: 0 auto;
-  width: 204px; /* Accommodates three links of width 68px */
+  width: calc(var(--but-size) * 3);
 }
-#navbot a#navbot-link-edit { /* CSS selector needs to be more specific than below */
+#navbot svg#navbot-link-edit { /* CSS selector needs to be more specific than below */
   display: none; /* Edit link is hidden by default */
 }
 /* Change the width of the navar-inner div
@@ -99,30 +89,25 @@ body.emulate-v1 .navtop-inner-container.right {
     display: none;
   }
   body.emulate-v1 #navbot-inner {
-    width: 204px; /* Accommodates four links of width 68px */
+    width: calc(var(--but-size) * 3);
   }
   #navbot-inner {
-    width: 272px; /* Accommodates four links of width 68px */
+    width: calc(var(--but-size) * 4);
   }
   #navbot a#navbot-link-edit { 
     display: block;
   }
 }
 
-/* Links inside the navigation bar */
-#navbot a {
+.nabvar-icon, .nabvar-icon-2 {
+
+  width: var(--but-width);
+  cursor: pointer;
   float: left;
   display: block;
   text-align: center;
-  padding: 14px 16px;
+  padding: var(--but-padding);
   text-decoration: none;
-}
-#navbot svg {
-  pointer-events: none;
-}
-.nabvar-icon, .nabvar-icon-2 {
-  width: 36px;
-  cursor: pointer;
 }
 .nabvar-icon path:not([stroke]) {
   fill: white;
