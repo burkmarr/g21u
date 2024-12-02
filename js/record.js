@@ -4,7 +4,7 @@ import { getOpt } from "./common.js"
 import { downloadBlob, opfsSaveFile } from './file-handling.js'
 
 let isGeolocated = false
-let filename
+let filenameLoc
 
 let mediaRecorder = null
 let audioBlobs = []
@@ -49,26 +49,13 @@ function geolocated(position) {
   const gr = getGr(lon, lat, 'wg', 'gb', [1,10])
   const gr10 = gr.p1
   const gr8 = gr.p10
-  const dte = new Date()
-  const year = dte.getFullYear()
-  let month = String(dte.getMonth() + 1)
-  let day = String(dte.getDate())
-  let hour = String(dte.getHours())
-  let minute = String(dte.getMinutes())
-  let second = String(dte.getSeconds())
-  month = month.length === 2 ? month : `0${month}`
-  day = day.length === 2 ? day : `0${day}`
-  hour = hour.length === 2 ? hour : `0${hour}`
-  minute = minute.length === 2 ? minute : `0${minute}`
-  second = second.length === 2 ? second : `0${second}`
-  const dateTime = `${year}-${month}-${day}_${hour}-${minute}-${second}`
-
+  
   if (getOpt('filename-format') === 'osgr') {
     //2015-02-14_20-54-29_SD65821128_18_0.wav
-    filename = `${dateTime}_${gr8}_${accuracy}_${altitude ? altitude : 'none'}.wav`
+    filenameLoc = `${gr8}_${accuracy}_${altitude ? altitude : 'none'}`
   } else {
      //2015-02-14_20-54-45_53.59675_-2.51646_15_0.wav
-    filename = `${dateTime}_${lat}_${lon}_${accuracy}_${altitude ? altitude : 'none'}.wav`
+    filenameLoc = `${lat}_${lon}_${accuracy}_${altitude ? altitude : 'none'}`
   }
   
   // Update gui GR
@@ -131,6 +118,20 @@ export async function startRecording() {
 async function stopRecording() {
 
   mediaRecorder.addEventListener('stop', async () => {
+    const dte = new Date()
+    const year = dte.getFullYear()
+    let month = String(dte.getMonth() + 1)
+    let day = String(dte.getDate())
+    let hour = String(dte.getHours())
+    let minute = String(dte.getMinutes())
+    let second = String(dte.getSeconds())
+    month = month.length === 2 ? month : `0${month}`
+    day = day.length === 2 ? day : `0${day}`
+    hour = hour.length === 2 ? hour : `0${hour}`
+    minute = minute.length === 2 ? minute : `0${minute}`
+    second = second.length === 2 ? second : `0${second}`
+    const dateTime = `${year}-${month}-${day}_${hour}-${minute}-${second}`
+
     const mimeType = mediaRecorder.mimeType
     audioBlob = new Blob(audioBlobs, { type: mimeType })
     if (capturedStream) {
@@ -138,9 +139,9 @@ async function stopRecording() {
     }
     const mode = getOpt('file-handling')
     if (mode === 'download') {
-      downloadBlob(audioBlob, filename)
+      downloadBlob(audioBlob, `${dateTime}_${filenameLoc}.wav`)
     } else if (mode === 'opfs') {
-      opfsSaveFile(audioBlob, filename)
+      opfsSaveFile(audioBlob, `${dateTime}_${filenameLoc}.wav`)
     }
     if (getOpt('automatic-playback') === "true") {
       playback = new Audio()
