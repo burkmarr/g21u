@@ -123,7 +123,12 @@ export async function getMetadata() {
     }
     
     // CSVs
-   
+    const csvDiv = collapsibleDiv('csv-details', 'Exported to CSV on...', el('metadata-details'))
+    if (json.metadata.csvs.length) {
+      unorderedList('csv-details-list', json.metadata.csvs, csvDiv)
+    } else {
+      csvDiv.innerHTML = "No exports to CSV are recorded for this record."
+    }
   }
 
   const {quota, usage, usageDetails} = await navigator.storage.estimate()

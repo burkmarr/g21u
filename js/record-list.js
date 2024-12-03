@@ -1,8 +1,8 @@
 import { storGetRecs, storDeleteFiles, downloadFile, 
-  fileExists, storGetFile, getRecordJson, shareFiles
+  fileExists, storGetFile, getRecordJson, shareFiles, recsToCsv
 } from './file-handling.js'
 import { selectAll, transition, easeLinear } from './nl.min.js'
-import { getOpt, detailsFromFilename, getSs, setSs } from './common.js'
+import { getOpt, detailsFromFilename, getSs, setSs, getDateTime } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 
@@ -190,7 +190,7 @@ export async function shareChecked(e) {
 }
 
 export async function downloadChecked(e) {
-  console.log('e', e)
+  //console.log('e', e)
   flash(e.target.id)
   const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
@@ -214,8 +214,12 @@ export async function downloadChecked(e) {
 }
 
 export async function csvChecked(e) {
-  console.log('Make CSV')
   flash(e.target.id)
+  const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  if (n) {
+    const recs = storRecs.filter((sr,i) => document.getElementById(`record-checkbox-${i}`).checked).map(sr => sr.filename)
+    recsToCsv(recs)
+  }
 }
 
 export function uncheckAll(e) {

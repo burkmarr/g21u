@@ -1,4 +1,5 @@
 import { getFieldDefs, getOpt, getDateTime } from './common.js'
+import { mkConfig, generateCsv, asBlob } from './nl.min.js'
 
 // Function names that start with 'stor' indicate
 // functions that retrieve or write to storage and
@@ -177,6 +178,32 @@ export async function shareFiles(files) {
   navigator.share({files: files})
 }
 
+export async function recsToCsv(recs) {
+  const csvRecs = []
+  const formattedDateTime = getDateTime(true)
+  const unformattedDateTime = getDateTime()
+  for (let i=0; i<recs.length; i++) {
+    const name = recs[i]
+    const json = await getRecordJson(`${name}.txt`)
+    // Copy the record json object minus the metadata
+    const cjson = JSON.parse(JSON.stringify(json))
+    delete cjson.metadata
+    csvRecs.push(cjson)
+    // Update record metadata
+    json.metadata.csvs.push(formattedDateTime)
+    const jsonString = JSON.stringify(json)
+    await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${name}.txt`)
+  }
+  const csvConfig = mkConfig({ 
+    useKeysAsHeaders: true 
+  })
+  const csv = generateCsv(csvConfig)(csvRecs)
+  const blob = asBlob(csvConfig)(csv)
+
+  // The CSV file is given a name based on the current timestamp
+  await storSaveFile(blob, `g21-recs-${unformattedDateTime}.csv`)
+}
+
 export async function getRecordJson(filename) {
   // This function takes care of getting the record json
   // from a given record json text file.
@@ -202,7 +229,7 @@ export async function getRecordJson(filename) {
     json = {}
     // Add record fields
     getFieldDefs(filename).forEach(f => {
-      json.jsonId = f.default
+      json[f.jsonId] = f.default
     })
     // Add metadata
     json.metadata = metadata
