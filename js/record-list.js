@@ -114,8 +114,9 @@ export async function setRecordText(filename) {
   let html = details.date
   html = buildText(html, details.time.substring(0, 5), ' ')
   html = buildText(html, details.gridref, '<br/>')
-  html = buildText(html, `<i>${details['scientific-name']}</i>`, '<br/>')
-
+  if (getOpt('emulate-v1') !== 'true') {
+    html = buildText(html, `<i>${details['scientific-name']}</i>`, '<br/>')
+  }
   document.getElementById(`rec-text-${filename}`).innerHTML = html
 
   function buildText(txt1, txt2, sep) {
