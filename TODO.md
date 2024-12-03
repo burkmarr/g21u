@@ -1,12 +1,12 @@
 # TODO
-- Record download, share & CSV inclusion attempts in metadata in record json (txt)
 - If metadata shows that a file is downloaded, shared or exported to a CSV, indicate in the record list with icons
 - Will need something to clear this metadata (by type) for all checked records - in case where there is a failure that the software cannot detect
-- Create CSV from selected records
-- Adding custom taxa
+- Need a button for deleting sound file
+- Need a button for duplicating a record (maybe this goes on record itself)
+- Dealing with lat/lon
 - indexDB
 - OS File system storage
-- Dealing with lat/lon
+- Adding custom taxa
 - Add mapping details
 - Adding custom locations
 - Adding custom fields (iRecord extra fields)

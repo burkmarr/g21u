@@ -28,6 +28,14 @@
   width: calc(var(--but-size) * 6);
   margin: 0 auto;
 }
+body.emulate-v1 #navtop-inner-left {
+  width: calc(var(--but-size) * 5);
+  margin: 0 auto;
+}
+body.emulate-v1 .nabvar-icon.v2 {
+  display: none;
+}
+
 #navtop-inner-right {
   width: calc(var(--but-size) * 2);
   margin: 0 auto;
@@ -100,7 +108,6 @@ body.emulate-v1 .navtop-inner-container.right {
 }
 
 .nabvar-icon {
-
   width: var(--but-width);
   cursor: pointer;
   float: left;
