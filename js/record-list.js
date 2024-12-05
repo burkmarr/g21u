@@ -1,8 +1,7 @@
 import { storGetRecs, storDeleteFiles, downloadFile, 
   fileExists, storGetFile, getRecordJson, shareFiles, recsToCsv
 } from './file-handling.js'
-import { selectAll, transition, easeLinear } from './nl.min.js'
-import { getOpt, detailsFromFilename, getSs, setSs, getDateTime } from './common.js'
+import { getOpt, detailsFromFilename, getSs, setSs } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 
@@ -223,7 +222,7 @@ export async function csvChecked(e) {
   }
 }
 
-export function uncheckAll(e) {
+export function uncheckAllRecs(e) {
   flash(e.target.id)
   const checkboxes = document.getElementsByClassName('record-checkbox')
   for(let i=0, n=checkboxes.length;i<n;i++) {
@@ -231,7 +230,7 @@ export function uncheckAll(e) {
   }
 }
 
-export function checkAll(e) {
+export function checkAllRecs(e) {
   flash(e.target.id)
   const checkboxes = document.getElementsByClassName('record-checkbox')
   for(let i=0, n=checkboxes.length;i<n;i++) {
@@ -240,13 +239,7 @@ export function checkAll(e) {
 }
 
 function flash(id) {
-  const t = transition().duration(300).ease(easeLinear)
-  selectAll(`#${id}.ionic path, #${id}.nabvar-icon circle`)
-    .transition(t).style("stroke", "#00FF21")
-    .transition(t).style("stroke", "white")
-  selectAll(`#${id}.fill path`)
-    .transition(t).style("fill", "#00FF21")
-    .transition(t).style("fill", "white")
+  document.getElementById(id).classList.add('flash')
 }
 
 function recordChecked(e) {

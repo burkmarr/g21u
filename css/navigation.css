@@ -32,7 +32,7 @@ body.emulate-v1 #navtop-inner-left {
   width: calc(var(--but-size) * 5);
   margin: 0 auto;
 }
-body.emulate-v1 .nabvar-icon.v2 {
+body.emulate-v1 .navbar-icon.v2 {
   display: none;
 }
 
@@ -107,7 +107,7 @@ body.emulate-v1 .navtop-inner-container.right {
   }
 }
 
-.nabvar-icon {
+.navbar-icon {
   width: var(--but-width);
   cursor: pointer;
   float: left;
@@ -116,24 +116,62 @@ body.emulate-v1 .navtop-inner-container.right {
   padding: var(--but-padding);
   text-decoration: none;
 }
-.nabvar-icon path:not([stroke]) {
+.navbar-icon path, .navbar-icon circle {
+  pointer-events: none;
+}
+.navbar-icon path[fill="none"], .navbar-icon circle[fill="none"],
+.navbar-icon path:not([fill]), .navbar-icon circle:not([fill]) {
+  fill: none;
+  stroke: white;
+}
+.navbar-icon path[stroke="none"], .navbar-icon circle[stroke="none"],
+.navbar-icon path:not([stroke]), .navbar-icon circle:not([stroke]) {
   fill: white;
-  pointer-events: none;
+  stroke: none;
 }
-.nabvar-icon path {
-  stroke: white;
-  pointer-events: none;
+/* Selected navigation buttons */
+.selected-nav .navbar-icon path[fill="none"], .selected-nav .navbar-icon circle[fill="none"],
+.selected-nav .navbar-icon path:not([fill]), .selected-nav .navbar-icon circle:not([fill]) {
+  fill: none;
+  stroke: rgb(12, 237, 12);
 }
-.nabvar-icon circle {
-  stroke: white;
-  pointer-events: none;
-}
-.selected-nav .nabvar-icon path:not([stroke]) {
+.selected-nav .navbar-icon path[stroke="none"], .selected-nav .navbar-icon circle[stroke="none"],
+.selected-nav .navbar-icon path:not([stroke]), .selected-nav .navbar-icon circle:not([stroke]) {
   fill: rgb(12, 237, 12);
+  stroke: none;
 }
-.selected-nav .nabvar-icon path {
-  stroke: rgb(12, 237, 12);
+/* Flash animation for list toolbar icons */
+.flash.navbar-icon path[fill="none"], .flash.navbar-icon circle[fill="none"],
+.flash.navbar-icon path:not([fill]), .flash.navbar-icon circle:not([fill]) {
+  animation-name: flashStroke;
+  animation-duration: 0.6s;
+  animation-iteration-count: 1;
 }
-.selected-nav .nabvar-icon circle {
-  stroke: rgb(12, 237, 12);
+.flash.navbar-icon path[stroke="none"], .flash.navbar-icon circle[stroke="none"],
+.flash.navbar-icon path:not([stroke]), .flash.navbar-icon circle:not([stroke]) {
+  animation-name: flashFill;
+  animation-duration: 0.6s;
+  animation-iteration-count: 1;
+}
+@keyframes flashFill {
+  0% {
+    fill: white;
+  }
+  50% {
+    fill: rgb(12, 237, 12);
+  }
+  100% {
+    fill: white;
+  }
+}
+@keyframes flashStroke {
+  0% {
+    stroke: white;
+  }
+  50% {
+    stroke: rgb(12, 237, 12);
+  }
+  100% {
+    stroke: white;
+  }
 }

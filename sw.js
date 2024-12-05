@@ -1,5 +1,5 @@
 const VERSION = "v1.0.0"
-const BUILD = 36
+const BUILD = 37
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -24,6 +24,7 @@ const APP_STATIC_RESOURCES = [
   "js/record-list.js",
   "js/record-details.js",
   "js/play.js",
+  "js/svg-icons.js",
   "js/nl.min.js",
   "manifest.json",
   "images/icon-512x512.svg",

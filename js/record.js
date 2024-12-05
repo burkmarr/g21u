@@ -1,7 +1,8 @@
-import { selectAll, transition, easeLinear, wavMediaRecorder, registerWavEncoder, getGr } from './nl.min.js'
+import { wavMediaRecorder, registerWavEncoder, getGr } from './nl.min.js'
 import { beep, doubleBeep, playBlob } from './play.js'
 import { getOpt, getDateTime } from "./common.js"
 import { downloadBlob, storSaveFile } from './file-handling.js'
+import { gps } from './svg-icons.js'
 
 // No exports from this module
 // so safe to have module level functionlity
@@ -14,6 +15,15 @@ let audioBlobs = []
 let audioBlob
 let capturedStream = null
 let playback
+
+// Add event handler to gps icon to remove blink class
+// on animation completion
+const gpsEl = document.getElementById('gps-rec-gps')
+gpsEl.setAttribute('viewBox', gps.viewBox)
+gpsEl.innerHTML=gps.svgEls
+gpsEl.addEventListener("animationend", () => {
+  gpsEl.classList.remove('blink-gps')
+})
 
 // Register the wav encoder
 await registerWavEncoder()
@@ -35,12 +45,8 @@ function geolocated(position) {
     isGeolocated = true
   }
   
-  // Can't find a way to do this transition/animation with CSS because of
-  // the need to chain transitions, so using D3
-  const t = transition().duration(200).ease(easeLinear)
-  selectAll(".gps-path")
-    .transition(t).style("fill", "#00FF21")
-    .transition(t).style("fill", "lightgrey")
+  // Blink the GPS icon
+  document.getElementById('gps-rec-gps').classList.add('blink-gps')
 
   // Update position
   let lat = position.coords.latitude
