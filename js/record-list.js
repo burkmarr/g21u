@@ -206,6 +206,7 @@ export async function shareChecked(e) {
     }
     const share = await shareRecs(recs)
     if (share === 'success') {
+      await initialiseList()
       populateRecordFields()
     } else if (share.startsWith('error')) {
       if (!share.includes('AbortError')) {
@@ -246,6 +247,7 @@ export async function downloadChecked(e) {
       }
     }
     await Promise.all(promises)
+    await initialiseList()
     populateRecordFields()
   }
 }
@@ -255,7 +257,8 @@ export async function csvChecked(e) {
   const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const recs = storRecs.filter((sr,i) => document.getElementById(`record-checkbox-${i}`).checked).map(sr => sr.filename)
-    recsToCsv(recs)
+    await recsToCsv(recs)
+    await initialiseList()
   }
 }
 
