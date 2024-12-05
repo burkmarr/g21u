@@ -43,7 +43,7 @@ h3 {
   background-image: linear-gradient(to bottom, white, rgb(238, 238, 120));
 }
 .record-play-image {
-  width: 60px;
+  width: 50px;
   /* cursor:pointer required on iOS browsers otherwise click event not recognised */
   cursor: pointer;
 }
@@ -52,7 +52,7 @@ h3 {
 }
 .record-logo {
   margin-left: 10px;
-  width: 50px;
+  width: 40px;
   pointer-events: none;
 }
 .record-div-text {
