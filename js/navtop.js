@@ -104,12 +104,10 @@ export function navtop () {
       div.classList.add('selected-nav')
     }
     navtopInnerRight.appendChild(div)
-    // See comment in navbot.js for reason why below isn't built dynamically
-    // Classes built dynamically because they can be added
-    // both by navigation item and icon
+    // Class built dynamically because they can be added
+    // both by navigation item
     let classes = 'navbar-icon'
     classes = n.classes ? `${classes} ${n.classes}` : classes
-    classes = n.icon.classes ? `${classes} ${n.icon.classes}` : classes
     div.innerHTML = `<svg id="${n.id}" data-div="${n.div}" viewBox="${n.icon.viewBox}" class="${classes}">${n.icon.svgEls}</svg>`
 
     // Handle highlighting of clicked div

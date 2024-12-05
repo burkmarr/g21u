@@ -163,19 +163,59 @@ export async function downloadFile(filename) {
   }
 }
 
-export async function shareFiles(files) {
-  // For json text record files, add record
-  // of share into metadata.
-  const txtFiles = files.filter(f => f.name.endsWith('.txt'))
-  for (let i=0; i<txtFiles.length; i++) {
-    const filename = txtFiles[i].name
-    const json = await getRecordJson(filename)
-    json.metadata.shares.push(getDateTime(true))
-    // Write the file
-    const jsonString = JSON.stringify(json)
-    await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
+export async function shareRecs(recs) {
+  const files = []
+  const txtFiles = []
+  for (let i=0; i<recs.length; i++) {
+    const name = recs[i]
+    if (await fileExists(`${name}.wav`)) {
+      const wav = await storGetFile(`${name}.wav`)
+      files.push(wav)
+    }
+    if (await fileExists(`${name}.txt`)) {
+      const txt = await storGetFile(`${name}.txt`)
+      files.push(txt)
+      txtFiles.push(name)
+    } 
   }
-  navigator.share({files: files})
+  // Attempt the share
+  const share = await shareApi(files)
+
+  if (share === 'success') {
+    // The share was potentially successful
+    // (doesn't guarantee that the user went through with it)
+    // Update the metadata of record files
+    // For json text record files, add record
+    // of share into metadata.
+    const dateTime = getDateTime(true)
+    for (let i=0; i<txtFiles.length; i++) {
+      const name = txtFiles[i]
+      const json = await getRecordJson(`${name}.txt`)
+      json.metadata.shares.push(dateTime)
+      // Write the updated file
+      const jsonString = JSON.stringify(json)
+      await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${name}.txt`)
+    }
+  }
+  return share
+}
+
+async function shareApi(files) {
+// Check browser support
+  if (navigator.share) {
+    const ret = await navigator.share({files: files})
+      .then(() => {
+        return 'success'
+      })
+      .catch((error) => {
+        return `error: ${error}`
+      })
+    return ret
+  } 
+  else {
+    // you can have you own implementation here
+    return ("Your browser does not support the WebShare API.")
+  }
 }
 
 export async function recsToCsv(recs) {

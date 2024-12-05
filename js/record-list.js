@@ -1,5 +1,5 @@
 import { storGetRecs, storDeleteFiles, downloadFile, 
-  fileExists, storGetFile, getRecordJson, shareFiles, recsToCsv
+  fileExists, storGetFile, getRecordJson, shareRecs, recsToCsv
 } from './file-handling.js'
 import { getOpt, detailsFromFilename, getSs, setSs } from './common.js'
 import { playBlob } from './play.js'
@@ -163,29 +163,34 @@ export async function deleteYesNo(e) {
 export async function shareChecked(e) {
   flash(e.target.id)
 
-  if (!navigator.share) {
-    document.querySelector('#share-not-supported #agent').innerHTML = navigator.userAgent
-    document.getElementById('share-not-supported').showModal()
-    return
-  }
   const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
-    const files = []
+    const recs = []
     for (let i=0; i<storRecs.length; i++) {
       const name = storRecs[i].filename
-      if (document.getElementById(`record-checkbox-${i}`).checked) {
-        if (await fileExists(`${name}.wav`)) {
-          const wav = await storGetFile(`${name}.wav`)
-          files.push(wav)
-        }
-        if (await fileExists(`${name}.txt`)) {
-          const txt = await storGetFile(`${name}.txt`)
-          files.push(txt)
-        }   
+      if (document.getElementById(`record-checkbox-${i}`).checked) { 
+        recs.push(name)
       }
     }
-    await shareFiles(files)
-    populateRecordFields()
+    const share = await shareRecs(recs)
+    if (share === 'success') {
+      populateRecordFields()
+    } else if (share.startsWith('error')) {
+      if (!share.includes('AbortError')) {
+        document.getElementById('share-problem-message').innerHTML = `<p>
+          The share failed. The most likely reason is that you exceeded the 
+          limit allowed. Try sharing fewer files.</p>
+          <p style="font-size: 0.8em">(Reported error was: ${share})</p>.`
+        document.getElementById('share-problem').showModal()
+      }   
+    } else {
+      // Share not supported by browser
+      document.getElementById('share-problem-message').innerHTML = `<p>
+        This browser does not support the web share API. 
+        Consider using a browser that does, e.g. Chrome.</p>
+        <p style="font-size: 0.8em">(Reported browser is: ${navigator.userAgent})</p>.`
+      document.getElementById('share-problem').showModal()
+    }
   }
 }
 
