@@ -1,8 +1,9 @@
-import { downloadChecked, shareChecked, deleteChecked, csvChecked, uncheckAllRecs, checkAllRecs } from './record-list.js'
+import { downloadChecked, shareChecked, deleteChecked, csvChecked, 
+  uncheckAllRecs, checkAllRecs, manageMetadataChecked, deleteSound } from './record-list.js'
 import { editNavigation } from './record-details.js'
 import { getSs, setSs } from './common.js'
 import { bin, download, share, csv, checkAll, uncheckAll,
-  edit, beetle, metadata } from './svg-icons.js'
+  edit, beetle, metadata, closeMetadata, delSound } from './svg-icons.js'
 
 export function navtop () {
   const listNavs = [
@@ -10,6 +11,18 @@ export function navtop () {
       id: 'delete-selected',
       fn: deleteChecked,
       icon: bin
+    },
+    {
+      id: 'manage-metadata-selected',
+      fn: manageMetadataChecked,
+      icon: closeMetadata,
+      classes: 'v2'
+    },
+    {
+      id: 'delete-sound-selected',
+      fn: deleteSound,
+      icon: delSound,
+      classes: 'v2'
     },
     {
       id: 'download-selected',

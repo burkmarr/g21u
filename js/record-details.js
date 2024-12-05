@@ -1,6 +1,6 @@
 import { el, getFieldDefs, keyValuePairTable, detailsFromFilename, collapsibleDiv, unorderedList, getSs } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
-import { setRecordText } from './record-list.js'
+import { setRecordContent } from './record-list.js'
 import { getRecordJson, storSaveFile } from './file-handling.js'
 
 
@@ -159,7 +159,7 @@ async function saveRecord() {
   highlightFields()
 
   // Update the record text in case details changed
-  setRecordText(selectedFile)
+  setRecordContent(selectedFile)
 
   // Get taxon details in case taxon changes
   taxonDetails()
@@ -183,7 +183,7 @@ export async function populateRecordFields() {
     // Get corresponding record JSON if it exists
     json = await getRecordJson(`${selectedFile}.txt`)
   }
-  console.log('record', json)
+  //console.log('record', json)
 
   getFieldDefs(selectedFile ? selectedFile : null).forEach(f => {
     if (json) {

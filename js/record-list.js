@@ -4,6 +4,7 @@ import { storGetRecs, storDeleteFiles, downloadFile,
 import { getOpt, detailsFromFilename, getSs, setSs } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
+import { download, share, csv } from './svg-icons.js'
 
 let storRecs, audioPlayers = {}
 
@@ -83,7 +84,11 @@ export async function initialiseList() {
     textDiv.setAttribute('id', `rec-text-${name}`)
     textDiv.classList.add('record-div-text')
     fileDiv.appendChild(textDiv)
-    
+    // Metadata icons
+    const iconDiv = document.createElement('div')
+    iconDiv.setAttribute('id', `rec-icons-${name}`)
+    iconDiv.classList.add('record-div-icons')
+    fileDiv.appendChild(iconDiv)
     // Select checkbox
     const check = document.createElement('input')
     check.setAttribute('type', 'checkbox')
@@ -97,12 +102,15 @@ export async function initialiseList() {
     // If I set the text immediately after fileDiv.appendChild(textDiv)
     // it fails (for v1) because element appears not yet created,
     // so doing it here at end which seems to work.
-    setRecordText(name)
+    setRecordContent(name)
   }
 }
 
-export async function setRecordText(filename) {
+export async function setRecordContent(filename) {
+  
   let details
+
+  // Text
   if (getOpt('emulate-v1') === 'true') {
     // Base text on the filename
     details = detailsFromFilename(filename)
@@ -127,6 +135,22 @@ export async function setRecordText(filename) {
       return txt2
     }
   }
+
+  // Metadata icons
+  if (getOpt('emulate-v1') !== 'true') {
+    const iconDiv = document.getElementById(`rec-icons-${filename}`)
+    let icons = ''
+    if (details.metadata.downloads.length) {
+      icons = `<svg viewBox="${download.viewBox}">${download.svgEls}</svg>`
+    }
+    if (details.metadata.shares.length) {
+      icons = `${icons}<svg viewBox="${share.viewBox}">${share.svgEls}</svg>`
+    }
+    if (details.metadata.csvs.length) {
+      icons = `${icons}<svg viewBox="${csv.viewBox}">${csv.svgEls}</svg>`
+    }
+    iconDiv.innerHTML = icons
+  }
 }
 
 export async function deleteChecked(e) {
@@ -137,6 +161,14 @@ export async function deleteChecked(e) {
     document.getElementById('file-text').innerText = n === 1 ? 'file' : 'files'
     document.getElementById('delete-confirm-dialog').showModal()
   }
+}
+
+export async function manageMetadataChecked(e) {
+  flash(e.target.id)
+}
+
+export async function deleteSound(e) {
+  flash(e.target.id)
 }
 
 export async function deleteYesNo(e) {

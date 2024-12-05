@@ -25,7 +25,7 @@
   width: 100%
 }
 #navtop-inner-left {
-  width: calc(var(--but-size) * 6);
+  width: calc(var(--but-size) * 8);
   margin: 0 auto;
 }
 body.emulate-v1 #navtop-inner-left {

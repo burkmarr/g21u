@@ -1,8 +1,20 @@
 :root {
   --but-padding: 10px;
-  --but-width: 30px;
+  --but-width: 35px;
   --but-size: calc(var(--but-width) + 2 * var(--but-padding));
   --body-margin: 6px;
+}
+@media only screen and (max-width: 440px) {
+  :root {
+    --but-padding: 8px;
+    --but-width: 30px;
+  }
+}
+@media only screen and (max-width: 370px) {
+  :root {
+    --but-padding: 6px;
+    --but-width: 25px;
+  }
 }
 
 body {

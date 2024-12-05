@@ -36,7 +36,8 @@ h3 {
   display: flex;
   align-items: center; 
   position: relative;
-  min-width: 350px;
+  min-width: 250px;
+  padding-right: 70px;
 }
 .record-div.record-selected {
   background-image: linear-gradient(to bottom, white, rgb(238, 238, 120));
@@ -58,10 +59,32 @@ h3 {
   margin-left: 20px;
   pointer-events: none;
 }
+.record-div-icons {
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+.record-div-icons svg {
+  width: 21px;
+}
 .record-checkbox {
   position: absolute;
-  right: 25px;
+  right: 15px;
   transform: scale(2);
+}
+.record-div-icons {
+  position: absolute;
+  right: 50px;
+}
+.record-div-icons path[fill="none"], .record-div-icons circle[fill="none"],
+.record-div-icons path:not([fill]), .record-div-icons circle:not([fill]) {
+  fill: none;
+  stroke: black;
+}
+.record-div-icons path[stroke="none"], .record-div-icons circle[stroke="none"],
+.record-div-icons path:not([stroke]), .record-div-icons circle:not([stroke]) {
+  fill: black;
+  stroke: none;
 }
 
 /* Modal dialog deletion confirm buttons */
@@ -158,41 +181,3 @@ body:not(.small-edit) #record-details {
 .scientific-name .name {
   font-style: italic;
 }
-
-/* Tab control for switching between 
- * Record and Field details
- */
-/* #record-field-tab-buttons {
-  margin: 0 0 1em 0;
-}
-#record-field-tab-buttons.hide {
-  display: none;
-}
-#record-field-details.hide {
-  display: none;
-}
-.tab {
-  overflow: hidden;
-  display: flex;
-}
-.tab.hide {
-  display: none;
-}
-button.tablinks {
-  background-color: white;
-  border: 1px solid #bbb; 
-  width: 100px;
-  cursor: pointer;
-  padding: 14px 16px;
-  transition: 0.3s;
-  font-size: 1em;
-}
-button.tabdummy {
-  width: 100%;
-  background-color: white;
-  border: none;
-  border-bottom: 1px solid #bbb; 
-}
-button.tablinks.active {
-  border-bottom: none;
-} */
