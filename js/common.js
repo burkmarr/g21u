@@ -1,5 +1,6 @@
-export function detailsFromFilename(name) {
-  if (!name) return ''
+export function detailsFromFilename(filename) {
+  if (!filename) return ''
+  const name = filename.indexOf('.') > -1 ? filename.substring(0,filename.length-4) : filename
   const sName = name.split('_')
   const date = `${sName[0].substring(8,10)}/${sName[0].substring(5,7)}/${sName[0].substring(0,4)}`
   const time = sName[1].replace(/-/g, ':')
@@ -8,12 +9,12 @@ export function detailsFromFilename(name) {
     // Name is in GR
     location = sName[2]
     accuracy = sName[3]
-    altitude = sName[4].substring(0, sName[4].length-4)
+    altitude = sName[4] === 'none' ? '' :  sName[4]
   } else {
     // Name is lat/lon format
     location = `${sName[2]}/${sName[3]}`
     accuracy = sName[4]
-    altitude = sName[5].substring(0, sName[5].length-4)
+    altitude = sName[5] === 'none' ? '' :  sName[5]
   }
   return {
     filename: name,

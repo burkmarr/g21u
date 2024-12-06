@@ -1,5 +1,4 @@
 # TODO
-- Need a button for deleting sound file
 - Need a button for duplicating a record (maybe this goes on record itself)
 - Dealing with lat/lon
 - indexDB
