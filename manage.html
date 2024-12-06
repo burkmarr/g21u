@@ -14,6 +14,37 @@
 
 <body id="manage">
 
+  <dialog id="metadata-dialog">
+    <div>What metadata do you want to remove?</div>
+    <table>
+      <tr><td></td><td>All</td><td>Last</td><td>None</td></tr>
+      <tr>
+        <td class="label">Downloads</td>
+        <td><input type="radio" name="radio-download" value="all"/></td>
+        <td><input type="radio" name="radio-download" value="last"/></td>
+        <td><input type="radio" name="radio-download" value="none" checked/></td>
+      </tr>
+      <tr>
+        <td class="label">Shares</td>
+        <td><input type="radio" name="radio-share" value="all"/></td>
+        <td><input type="radio" name="radio-share" value="last"/></td>
+        <td><input type="radio" name="radio-share" value="none" checked/></td>
+      </tr>
+      <tr>
+        <td class="label">CSVs</td>
+        <td><input type="radio" name="radio-csv" value="all"/></td>
+        <td><input type="radio" name="radio-csv" value="last"/></td>
+        <td><input type="radio" name="radio-csv" value="none" checked/></td>
+      </tr>
+      <tr></tr>
+    </table>
+    <div id="metadata-dialog-buttons">
+      <button id="metadata-remove-confirm">Confirrm</button>
+      <button id="metadata-remove-cancel">Cancel</button>
+    </div>
+    
+  </dialog>
+
   <dialog id="delete-confirm-dialog" align="end">
     <p>Are you sure that you want to delete <span id="file-num"></span> <span id="file-text"></span>?</p>
     <button id="delete-reject">No</button>
@@ -40,7 +71,7 @@
   <script type="module" defer>
     import { navbot } from './js/navbot.js'
     import { navtop } from './js/navtop.js'
-    import { deleteYesNo, initialiseList } from './js/record-list.js'
+    import { deleteYesNo, initialiseList, metadataRemoveYesNo } from './js/record-list.js'
     import { generateRecordFields, populateRecordFields, editNavigation } from './js/record-details.js'
     import { getOpt, getSs, setSs } from './js/common.js'
 
@@ -53,9 +84,11 @@
       document.body.classList.add('small-edit')
     }
  
-    // Add event handlers
+    // Add event handlers for dialogs
     document.getElementById('delete-reject').addEventListener('click', deleteYesNo)
     document.getElementById('delete-confirm').addEventListener('click', deleteYesNo)
+    document.getElementById('metadata-remove-cancel').addEventListener('click', metadataRemoveYesNo)
+    document.getElementById('metadata-remove-confirm').addEventListener('click', metadataRemoveYesNo)
     
     //document.getElementById('tab-button-record-details').addEventListener('click', openTab)
     //document.getElementById('tab-button-field-details').addEventListener('click', openTab)

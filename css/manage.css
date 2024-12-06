@@ -32,12 +32,12 @@ h3 {
 /* Representation of records in record list */
 .record-div {
   background-image: linear-gradient(to bottom,  #ffffff 0%,#EFEFEF 100%);
-  height: 70px;
+  height: 75px;
   display: flex;
   align-items: center; 
   position: relative;
   min-width: 250px;
-  padding-right: 70px;
+  padding-right: 72px;
 }
 .record-div.record-selected {
   background-image: linear-gradient(to bottom, white, rgb(238, 238, 120));
@@ -56,7 +56,7 @@ h3 {
   pointer-events: none;
 }
 .record-div-text {
-  margin-left: 20px;
+  margin-left: 5px;
   pointer-events: none;
 }
 .record-div-icons {
@@ -67,14 +67,10 @@ h3 {
 .record-div-icons svg {
   width: 21px;
 }
-.record-checkbox {
-  position: absolute;
-  right: 15px;
-  transform: scale(2);
-}
 .record-div-icons {
+  /* margin-left: 10px; */
   position: absolute;
-  right: 50px;
+  right: 45px;
 }
 .record-div-icons path[fill="none"], .record-div-icons circle[fill="none"],
 .record-div-icons path:not([fill]), .record-div-icons circle:not([fill]) {
@@ -85,6 +81,11 @@ h3 {
 .record-div-icons path:not([stroke]), .record-div-icons circle:not([stroke]) {
   fill: black;
   stroke: none;
+}
+.record-checkbox {
+  position: absolute;
+  right: 15px;
+  transform: scale(2);
 }
 
 /* Modal dialog deletion confirm buttons */
@@ -180,4 +181,30 @@ body:not(.small-edit) #record-details {
 /* Formatting of names provided by NBN API */
 .scientific-name .name {
   font-style: italic;
+}
+
+/* Metadata dialog */
+#metadata-dialog td {
+  text-align: center;
+  vertical-align: bottom;
+  width: 40px;
+  height: 30px;
+  /* padding-left: 10px; */
+}
+#metadata-dialog td.label {
+  text-align: right;
+}
+#metadata-dialog input {
+  margin: 0;
+  transform: scale(2);
+}
+#metadata-dialog button {
+  margin-left: 1em;
+  font-size: 1em;
+  padding: 8px;
+}
+#metadata-dialog-buttons {
+  margin-top: 15px;
+  display:flex; 
+  flex-direction: row-reverse;
 }

@@ -1,4 +1,4 @@
-import { storGetRecs, storDeleteFiles, downloadFile, 
+import { storGetRecs, storDeleteFiles, storSaveFile, downloadFile, 
   fileExists, storGetFile, getRecordJson, shareRecs, recsToCsv
 } from './file-handling.js'
 import { getOpt, detailsFromFilename, getSs, setSs } from './common.js'
@@ -10,6 +10,15 @@ let storRecs, audioPlayers = {}
 
 export async function initialiseList() {
 
+  // Get the currently checked items in order to re-check them
+  const currentlyChecked = []
+  if (storRecs) {
+    for (let i=0; i<storRecs.length; i++) {
+      if (document.getElementById(`record-checkbox-${i}`).checked) {
+        currentlyChecked.push(i)
+      }
+    }
+  }
   storRecs = await storGetRecs()
 
   // If the currently selected file indicated by
@@ -74,11 +83,11 @@ export async function initialiseList() {
       playImage.classList.add('no-wav')
     }
     fileDiv.appendChild(playImage)
-    // Logo
-    const logoImage = document.createElement('img')
-    logoImage.setAttribute('src', 'images/gilbert.png')
-    logoImage.classList.add('record-logo')
-    fileDiv.appendChild(logoImage)
+    // // Logo
+    // const logoImage = document.createElement('img')
+    // logoImage.setAttribute('src', 'images/gilbert.png')
+    // logoImage.classList.add('record-logo')
+    // fileDiv.appendChild(logoImage)
     // Text
     const textDiv = document.createElement('div')
     textDiv.setAttribute('id', `rec-text-${name}`)
@@ -93,10 +102,13 @@ export async function initialiseList() {
     const check = document.createElement('input')
     check.setAttribute('type', 'checkbox')
     check.setAttribute('id', `record-checkbox-${i}`)
+    if (currentlyChecked.includes(i)) {
+      check.setAttribute('checked', 'checked')
+    }
     check.classList.add('record-checkbox')
     check.addEventListener('click', recordChecked)
     fileDiv.appendChild(check)
-    
+
     document.getElementById('record-list').appendChild(fileDiv)
 
     // If I set the text immediately after fileDiv.appendChild(textDiv)
@@ -165,6 +177,18 @@ export async function deleteChecked(e) {
 
 export async function manageMetadataChecked(e) {
   flash(e.target.id)
+  // Reset radio buttons
+  document.querySelector('[name=radio-download][value=none]').checked = true;
+  document.querySelector('[name=radio-share][value=none]').checked = true;
+  document.querySelector('[name=radio-csv][value=none]').checked = true;
+  // Show modal if at least one record checked
+  let checked = false
+  for (let i=0; i<storRecs.length; i++) {
+    checked = document.getElementById(`record-checkbox-${i}`).checked ? true : checked
+  }
+  if (checked) {
+    document.getElementById('metadata-dialog').showModal()
+  }
 }
 
 export async function deleteSound(e) {
@@ -183,13 +207,67 @@ export async function deleteYesNo(e) {
         }
         if (await fileExists(`${name}.txt`)) {
           files.push(`${name}.txt`)
-        }   
+        }
+        // Uncheck all checkboxes when deleting otherwise wrong items
+        // reselected.
+        document.getElementById(`record-checkbox-${i}`).checked = false
       }
     }
     await storDeleteFiles(files)
     await initialiseList()
     populateRecordFields()
   }
+}
+
+export async function metadataRemoveYesNo(e) {
+  document.getElementById('metadata-dialog').close()
+  if (e.target.getAttribute('id') === 'metadata-remove-confirm') {
+    const radsDownload = document.getElementsByName('radio-download')
+    const radsShare = document.getElementsByName('radio-share')
+    const radsCsv = document.getElementsByName('radio-csv')
+    let valDownload, valShare, valCsv
+    for(let i=0; i<3; i++) {
+      if (radsDownload[i].checked) {
+        valDownload = radsDownload[i].value
+      }
+      if (radsShare[i].checked) {
+        valShare = radsShare[i].value
+      }
+      if (radsCsv[i].checked) {
+        valCsv = radsCsv[i].value
+      }
+    }
+
+    if (valDownload !== 'none' || valShare !== 'none' || valCsv !== 'none') {
+      for (let i=0; i<storRecs.length; i++) {
+        const name = storRecs[i].filename
+        if (document.getElementById(`record-checkbox-${i}`).checked) {
+          if (await fileExists(`${name}.txt`)) {
+            const json = await getRecordJson(`${name}.txt`)
+            if (valDownload === 'all') {
+              json.metadata.downloads = []
+            } else if (valDownload === 'last') {
+              json.metadata.downloads.pop()
+            }
+            if (valShare === 'all') {
+              json.metadata.shares = []
+            } else if (valShare === 'last') {
+              json.metadata.shares.pop()
+            }
+            if (valCsv === 'all') {
+              json.metadata.csvs = []
+            } else if (valCsv === 'last') {
+              json.metadata.csvs.pop()
+            }
+            const jsonString = JSON.stringify(json)
+            await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${name}.txt`)
+          }   
+        }
+      }
+    }
+  }
+  await initialiseList()
+  populateRecordFields()
 }
 
 export async function shareChecked(e) {
