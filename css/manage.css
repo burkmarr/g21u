@@ -200,3 +200,18 @@ dialog {
   margin: 0;
   transform: scale(2);
 }
+
+#record-details-title {
+  margin-bottom: 0;
+}
+#record-details-playback-div {
+  display: flex;
+  align-items: center;
+}
+#record-details-playback-div button {
+  margin-left: 10px;
+  font-size: 1em;
+}
+#record-details-playback-image {
+  width: 50px;
+}

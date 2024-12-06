@@ -53,6 +53,8 @@ export async function taxonDetails() {
     noDataText = '- no scientific name set'
   }
 
+  el('taxa-details').innerHTML = ''
+
   if (scientific) {
     el('taxa-details').innerHTML = `<h3>NBN UKSI details <span class="header-note">for selected record</span></h3>`
   } else {
@@ -74,14 +76,16 @@ export async function taxonDetails() {
   `
   el('taxa-details').appendChild(para)
   
-  if (scientific) {
-    para = document.createElement('p')
-    para.innerHTML= `
-      NBN taxonomy searched on the
-      scientific name: <b><i>${scientific}</i></b>.
-    `
-    el('taxa-details').appendChild(para)
+  console.log('scientific', scientific )
+  if (!scientific) {
+    return
   }
+  para = document.createElement('p')
+  para.innerHTML= `
+    NBN taxonomy searched on the
+    scientific name: <b><i>${scientific}</i></b>.
+  `
+  el('taxa-details').appendChild(para)
 
   // Get the guid for the scientific name
   const matches = await fetch(`https://species-ws.nbnatlas.org/search/auto?q=${scientific}`).then(data => data.json())

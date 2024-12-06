@@ -330,3 +330,19 @@ export async function fileExists(filename) {
       // No default handler
   }
 }
+
+export async function copyRecord(originalName, newName) {
+  // If the wav file exists, copy it
+  if (await fileExists(`${originalName}.wav`)) {
+    const oWavFile = await storGetFile(`${originalName}.wav`)
+    await storSaveFile(oWavFile, `${newName}.wav`)
+  }
+  const json = await getRecordJson(`${originalName}.txt`) 
+  json['scientific-name'] = ''
+  json['common-name'] = ''
+  json.metadata.downloads = []
+  json.metadata.shares = []
+  json.metadata.csvs = []
+  const jsonString = JSON.stringify(json)
+  await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${newName}.txt`)
+}

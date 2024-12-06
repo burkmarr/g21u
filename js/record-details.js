@@ -1,8 +1,11 @@
-import { el, getFieldDefs, keyValuePairTable, detailsFromFilename, collapsibleDiv, unorderedList, getSs } from './common.js'
+import { el, getFieldDefs, keyValuePairTable, detailsFromFilename, 
+  collapsibleDiv, unorderedList, setSs, getSs, getOpt } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
-import { setRecordContent } from './record-list.js'
-import { getRecordJson, storSaveFile } from './file-handling.js'
+import { setRecordContent, initialiseList } from './record-list.js'
+import { getRecordJson, storSaveFile, fileExists, storGetFile, copyRecord } from './file-handling.js'
+import { playBlob } from './play.js'
 
+let audioPlayer = new Audio()
 
 function createInputLabel(parent, label) {
   const ldiv = document.createElement('div')
@@ -21,7 +24,13 @@ function createInputDiv(parent, id) {
 export function generateRecordFields() {
 
   const parent = el('record-details')
-  parent.innerHTML = '<h3 id="record-details-title"></h3>'
+  parent.innerHTML = `<h3 id="record-details-title"></h3>
+    <div id ="record-details-playback-div">
+      <img id="record-details-playback-image">
+      <button id="record-duplicate">Duplicate</button>
+    </div>
+  `
+  document.getElementById('record-duplicate').addEventListener('click', duplicateRecord)
 
   // Generate the input fields
   getFieldDefs().forEach(f => {
@@ -166,15 +175,28 @@ async function saveRecord() {
 }
 
 export async function populateRecordFields() {
-
   // Selected file
   const selectedFile = getSs('selectedFile')
   //console.log('selectedFile', selectedFile)
 
   if (!selectedFile) {
     document.getElementById('record-details-title').innerHTML = 'Record details <span class="header-note">- no record selected</span>'
+    document.getElementById('record-details-playback-image').setAttribute('src', 'images/playback-grey.png')
   } else {
     document.getElementById('record-details-title').innerHTML = 'Record details <span class="header-note">for selected record</span>'
+    // Interrupt any current playing
+    audioPlayer.pause()
+    audioPlayer.currentTime = 0
+    const img = document.getElementById('record-details-playback-image')
+    img.removeEventListener('click', playRecordWav)
+    img.removeEventListener('click', stopPlaybackWav)
+    // Set up listerners and playing image
+    if (await fileExists(`${selectedFile}.wav`)) {
+      img.setAttribute('src', 'images/playback-green.png')
+      img.addEventListener('click', playRecordWav)
+    } else {
+      img.setAttribute('src', 'images/playback-grey.png')
+    }
   }
 
   let json
@@ -257,4 +279,58 @@ export function editNavigation(e) {
   }
   // Show the current contents div
   document.getElementById(divId).classList.remove('hide')
+}
+
+async function playRecordWav(e) {
+  e.stopPropagation()
+
+  const img = document.getElementById('record-details-playback-image')
+
+  img.removeEventListener('click', playRecordWav)
+  img.src = "images/playback-red.png"
+  img.classList.add("flashing")
+  img.addEventListener('click', stopPlaybackWav)
+
+  audioPlayer = new Audio()
+  const audioFile = await storGetFile(`${getSs('selectedFile')}.wav`)
+  await playBlob(audioPlayer, audioFile, getOpt('playback-volume'))
+
+  img.removeEventListener('click', stopPlaybackWav)
+  img.src = "images/playback-green.png"
+  img.classList.remove("flashing")
+  img.addEventListener('click', playRecordWav)
+}
+
+function stopPlaybackWav(e) {
+
+  e.stopPropagation()
+
+  const img = document.getElementById('record-details-playback-image')
+
+  audioPlayer.pause()
+  audioPlayer.currentTime = 0
+
+  img.removeEventListener('click', stopPlaybackWav)
+  img.src = "images/playback-green.png"
+  img.classList.remove("flashing")
+  img.addEventListener('click', playRecordWav)
+}
+
+async function duplicateRecord() {
+  const originalName = getSs('selectedFile')
+  const dateOriginal = new Date(detailsFromFilename(originalName).date)
+  const dateNew = new Date()
+  const millisecsDiff = dateNew.getTime() - dateOriginal.getTime()
+  // Named after the original record with a suffix of number of deciseconds
+  // difference between original record made and this duplication to guarantee
+  // a unique filename.
+  const newName = `${originalName}-${Math.floor(millisecsDiff/100)}`
+  await copyRecord(originalName, newName)
+
+  console.log('file copied')
+
+  setSs('selectedFile', newName)
+
+  initialiseList()
+  populateRecordFields()
 }
