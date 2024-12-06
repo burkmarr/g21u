@@ -1,5 +1,5 @@
 import { downloadChecked, shareChecked, deleteChecked, csvChecked, 
-  uncheckAllRecs, checkAllRecs, manageMetadataChecked, deleteSound } from './record-list.js'
+  uncheckAllRecs, checkAllRecs, manageMetadataChecked, deleteSoundChecked } from './record-list.js'
 import { editNavigation } from './record-details.js'
 import { getSs, setSs } from './common.js'
 import { bin, download, share, csv, checkAll, uncheckAll,
@@ -20,7 +20,7 @@ export function navtop () {
     },
     {
       id: 'delete-sound-selected',
-      fn: deleteSound,
+      fn: deleteSoundChecked,
       icon: delSound,
       classes: 'v2'
     },

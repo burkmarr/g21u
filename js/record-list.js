@@ -83,12 +83,12 @@ export async function initialiseList() {
       playImage.classList.add('no-wav')
     }
     fileDiv.appendChild(playImage)
-    // // Logo
-    // const logoImage = document.createElement('img')
-    // logoImage.setAttribute('src', 'images/gilbert.png')
-    // logoImage.classList.add('record-logo')
-    // fileDiv.appendChild(logoImage)
-    // Text
+    // Logo
+    const logoImage = document.createElement('img')
+    logoImage.setAttribute('src', 'images/gilbert.png')
+    logoImage.classList.add('record-logo')
+    fileDiv.appendChild(logoImage)
+    Text
     const textDiv = document.createElement('div')
     textDiv.setAttribute('id', `rec-text-${name}`)
     textDiv.classList.add('record-div-text')
@@ -170,7 +170,7 @@ export async function deleteChecked(e) {
   const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     document.getElementById('file-num').innerText = n
-    document.getElementById('file-text').innerText = n === 1 ? 'file' : 'files'
+    document.getElementById('file-text').innerText = n === 1 ? 'record' : 'records'
     document.getElementById('delete-confirm-dialog').showModal()
   }
 }
@@ -191,8 +191,14 @@ export async function manageMetadataChecked(e) {
   }
 }
 
-export async function deleteSound(e) {
+export async function deleteSoundChecked(e) {
   flash(e.target.id)
+  const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  if (n) {
+    document.getElementById('sound-file-num').innerText = n
+    document.getElementById('sound-file-text').innerText = n === 1 ? 'record' : 'records'
+    document.getElementById('delete-sound-confirm-dialog').showModal()
+  }
 }
 
 export async function deleteYesNo(e) {
@@ -211,6 +217,24 @@ export async function deleteYesNo(e) {
         // Uncheck all checkboxes when deleting otherwise wrong items
         // reselected.
         document.getElementById(`record-checkbox-${i}`).checked = false
+      }
+    }
+    await storDeleteFiles(files)
+    await initialiseList()
+    populateRecordFields()
+  }
+}
+
+export async function deleteSoundYesNo(e) {
+  document.getElementById('delete-sound-confirm-dialog').close()
+  if (e.target.getAttribute('id') === 'delete-sound-confirm') {
+    const files = []
+    for (let i=0; i<storRecs.length; i++) {
+      const name = storRecs[i].filename
+      if (document.getElementById(`record-checkbox-${i}`).checked) {
+        if (await fileExists(`${name}.wav`)) {
+          files.push(`${name}.wav`)
+        }
       }
     }
     await storDeleteFiles(files)
@@ -290,7 +314,7 @@ export async function shareChecked(e) {
       if (!share.includes('AbortError')) {
         document.getElementById('share-problem-message').innerHTML = `<p>
           The share failed. The most likely reason is that you exceeded the 
-          limit allowed. Try sharing fewer files.</p>
+          limit allowed for this browser. Try sharing in smaller batches.</p>
           <p style="font-size: 0.8em">(Reported error was: ${share})</p>.`
         document.getElementById('share-problem').showModal()
       }   
