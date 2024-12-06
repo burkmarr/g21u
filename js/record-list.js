@@ -1,5 +1,5 @@
 import { storGetRecs, storDeleteFiles, storSaveFile, downloadFile, 
-  fileExists, storGetFile, getRecordJson, shareRecs, recsToCsv
+  storFileExists, storGetFile, getRecordJson, shareRecs, recsToCsv
 } from './file-handling.js'
 import { getOpt, detailsFromFilename, getSs, setSs } from './common.js'
 import { playBlob } from './play.js'
@@ -68,7 +68,7 @@ export async function initialiseList() {
     // Play image
     const playImage = document.createElement('img')
     let img
-    if (await fileExists(`${name}.wav`)) {
+    if (await storFileExists(`${name}.wav`)) {
       img = 'images/playback-green.png'
     } else {
       img = 'images/playback-grey.png'
@@ -77,7 +77,7 @@ export async function initialiseList() {
     playImage.setAttribute('data-index', i)
     playImage.setAttribute('id', `record-play-image-${i}`)
     playImage.classList.add('record-play-image')
-    if (await fileExists(`${name}.wav`)) {
+    if (await storFileExists(`${name}.wav`)) {
       playImage.addEventListener('click', playRecording)
     } else {
       playImage.classList.add('no-wav')
@@ -208,10 +208,10 @@ export async function deleteYesNo(e) {
     for (let i=0; i<storRecs.length; i++) {
       const name = storRecs[i].filename
       if (document.getElementById(`record-checkbox-${i}`).checked) {
-        if (await fileExists(`${name}.wav`)) {
+        if (await storFileExists(`${name}.wav`)) {
           files.push(`${name}.wav`)
         }
-        if (await fileExists(`${name}.txt`)) {
+        if (await storFileExists(`${name}.txt`)) {
           files.push(`${name}.txt`)
         }
         // Uncheck all checkboxes when deleting otherwise wrong items
@@ -232,7 +232,7 @@ export async function deleteSoundYesNo(e) {
     for (let i=0; i<storRecs.length; i++) {
       const name = storRecs[i].filename
       if (document.getElementById(`record-checkbox-${i}`).checked) {
-        if (await fileExists(`${name}.wav`)) {
+        if (await storFileExists(`${name}.wav`)) {
           files.push(`${name}.wav`)
         }
       }
@@ -266,7 +266,7 @@ export async function metadataRemoveYesNo(e) {
       for (let i=0; i<storRecs.length; i++) {
         const name = storRecs[i].filename
         if (document.getElementById(`record-checkbox-${i}`).checked) {
-          if (await fileExists(`${name}.txt`)) {
+          if (await storFileExists(`${name}.txt`)) {
             const json = await getRecordJson(`${name}.txt`)
             if (valDownload === 'all') {
               json.metadata.downloads = []
@@ -339,11 +339,11 @@ export async function downloadChecked(e) {
       const name = storRecs[i].filename
       if (document.getElementById(`record-checkbox-${i}`).checked) {
         // Download WAV if it exists
-        if (await fileExists(`${name}.wav`)) {
+        if (await storFileExists(`${name}.wav`)) {
           promises.push(downloadFile(`${name}.wav`))
         }
         // Download JSON (txt) if it exists and not emulating v1
-        if (getOpt('emulate-v1') === 'false' && await fileExists(`${name}.txt`)) {
+        if (getOpt('emulate-v1') === 'false' && await storFileExists(`${name}.txt`)) {
           promises.push(downloadFile(`${name}.txt`))
         }
       }

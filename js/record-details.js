@@ -2,7 +2,7 @@ import { el, getFieldDefs, keyValuePairTable, detailsFromFilename,
   collapsibleDiv, unorderedList, setSs, getSs, getOpt } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { setRecordContent, initialiseList } from './record-list.js'
-import { getRecordJson, storSaveFile, fileExists, storGetFile, copyRecord } from './file-handling.js'
+import { getRecordJson, storSaveFile, storFileExists, storGetFile, copyRecord } from './file-handling.js'
 import { playBlob } from './play.js'
 
 let audioPlayer = new Audio()
@@ -165,6 +165,7 @@ async function saveRecord() {
   // Save the file
   const jsonString = JSON.stringify(json)
   await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${selectedFile}.txt`)
+
   highlightFields()
 
   // Update the record text in case details changed
@@ -191,7 +192,7 @@ export async function populateRecordFields() {
     img.removeEventListener('click', playRecordWav)
     img.removeEventListener('click', stopPlaybackWav)
     // Set up listerners and playing image
-    if (await fileExists(`${selectedFile}.wav`)) {
+    if (await storFileExists(`${selectedFile}.wav`)) {
       img.setAttribute('src', 'images/playback-green.png')
       img.addEventListener('click', playRecordWav)
     } else {

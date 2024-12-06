@@ -5,6 +5,7 @@ import { connect } from 'extendable-media-recorder-wav-encoder'
 // export * from 'd3-transition'
 // export * from 'd3-ease'
 export * from 'export-to-csv'
+import { get, set, getMany, delMany, entries, keys } from 'idb-keyval'
 
 export async function registerWavEncoder() {
   await register(await connect())
@@ -17,4 +18,13 @@ export function wavMediaRecorder(stream) {
 }
 export function getGr(lon, lat, from, to, precisions) {
   return getGrFromCoords(lon, lat, from, to, precisions)
+}
+
+export const idb = {
+  get: get,
+  set: set,
+  getMany: getMany,
+  delMany: delMany,
+  entries: entries,
+  keys: keys
 }

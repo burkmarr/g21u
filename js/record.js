@@ -135,7 +135,7 @@ async function stopRecording() {
     const dateTime = getDateTime()
     if (mode === 'download') {
       downloadBlob(audioBlob, `${dateTime}_${filenameLoc}.wav`)
-    } else if (mode === 'opfs') {
+    } else {
       storSaveFile(audioBlob, `${dateTime}_${filenameLoc}.wav`)
     }
     if (getOpt('automatic-playback') === "true") {

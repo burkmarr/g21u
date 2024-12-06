@@ -76,7 +76,6 @@ export async function taxonDetails() {
   `
   el('taxa-details').appendChild(para)
   
-  console.log('scientific', scientific )
   if (!scientific) {
     return
   }

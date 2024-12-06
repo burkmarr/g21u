@@ -1,8 +1,7 @@
 # TODO
-- Need a button for duplicating a record (maybe this goes on record itself)
-- Dealing with lat/lon
 - indexDB
 - OS File system storage
+- Dealing with lat/lon
 - Add mapping details
 - Adding custom locations
 - Adding custom taxa

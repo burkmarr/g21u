@@ -1,9 +1,27 @@
 import { getFieldDefs, getOpt, getDateTime } from './common.js'
-import { mkConfig, generateCsv, asBlob } from './nl.min.js'
+import { mkConfig, generateCsv, asBlob, idb } from './nl.min.js'
 
 // Function names that start with 'stor' indicate
 // functions that retrieve or write to storage and
 // are all responsive to the type of storage selected.
+
+export async function storFileExists(filename) {
+  let file
+  switch(getOpt('file-handling')) {
+    case 'opfs':
+      const storRoot = await navigator.storage.getDirectory()
+      const fileHandle = await storRoot.getFileHandle(filename, { create: false })
+        .catch( error => {
+          Promise.resolve(null)
+        })
+      return typeof fileHandle !== 'undefined'
+    case 'idb':
+      const file = await idb.get(filename)
+      return typeof file !== 'undefined'
+    default:
+      // No default handler
+  }
+}
 
 export async function storSaveFile(blob, name) {
 
@@ -18,6 +36,20 @@ export async function storSaveFile(blob, name) {
       await writable.write(blob)
       await writable.close()
       break
+    case 'idb':
+      let mimeType
+      switch (name.substring(name.length-3)) {
+        case 'txt':
+          mimeType = 'text/plain'
+        case 'wav':
+          mimeType = 'audio/wav'
+        case 'csv':
+          mimeType = 'text/csv'
+        default:
+      }
+      const file = new File([blob], name, {type: mimeType})
+      await idb.set(name, file)
+      break
     default:
       // No default handler
   }
@@ -31,44 +63,12 @@ export async function storDeleteFiles(files) {
         await storRoot.removeEntry(file).catch(e => console.log(`Could not delete ${file}`))
       }
       break
-    default:
-      // No default handler
-  }
-}
-
-export async function storGetRecFiles () {
-  // Returns a list of file names (without extension)
-  // which will be used to build a list of records in
-  // the application. In v1 emulation, just return the
-  // list of wav files. For v2 return a list of all
-  // json files plus names of wavs which don't have a
-  // json file - the record listing code will create
-  // the json if it is missing.
-  let files
-  const wav = []
-  const txt = []
-  const ext = getOpt('emulate-v1') === 'true' ? 'wav' : 'txt'
-  switch(getOpt('file-handling')) {
-    case 'opfs':
-      const storRoot = await navigator.storage.getDirectory()
-      const entries = storRoot.values()
-      for await (const entry of entries) {
-        if (entry.name.endsWith('.wav')) {
-          wav.push(entry.name.substring(0, entry.name.length - 4))
-        } else if (entry.name.endsWith('.txt')) {
-          txt.push(entry.name.substring(0, entry.name.length - 4))
-        }
-      }
+    case 'idb':
+      await idb.delMany(files)
       break
     default:
       // No default handler
   }
-  if (ext === 'wav') {
-    files = wav
-  } else {
-    files = [...new Set([...txt, ...wav])]
-  }
-  return files
 }
 
 export async function storGetRecs () {
@@ -77,8 +77,8 @@ export async function storGetRecs () {
   switch(getOpt('file-handling')) {
     case 'opfs':
       const storRoot = await navigator.storage.getDirectory()
-      const entries = storRoot.values()
-      for await (const entry of entries) {
+      const ofpsEntries = storRoot.values()
+      for await (const entry of ofpsEntries) {
         const ext = entry.name.substring(entry.name.length - 4)
         const name = entry.name.substring(0, entry.name.length - 4)
         if (ext === '.wav') {
@@ -92,7 +92,31 @@ export async function storGetRecs () {
         } else if (!v1 && ext === '.txt') {
           // Add only if there is no corresponding wav file
           // those with wav files are added above
-          if (!await fileExists(`${name}.wav`)) {
+          if (!await storFileExists(`${name}.wav`)) {
+            const json = await getRecordJson(`${name}.txt`)
+            json.filename = name
+            recs.push(json)
+          }
+        }
+      }
+      break
+    case 'idb':
+      const idbKeys = await idb.keys()
+      for (const key of idbKeys) {
+        const ext = key.substring(key.length - 4)
+        const name = key.substring(0, key.length - 4)
+        if (ext === '.wav') {
+          if (v1) {
+            recs.push({filename: name})
+          } else { //v2
+            const json = await getRecordJson(`${name}.txt`)
+            json.filename = name
+            recs.push(json)
+          }
+        } else if (!v1 && ext === '.txt') {
+          // Add only if there is no corresponding wav file
+          // those with wav files are added above
+          if (!await storFileExists(`${name}.wav`)) {
             const json = await getRecordJson(`${name}.txt`)
             json.filename = name
             recs.push(json)
@@ -119,6 +143,9 @@ export async function storGetFile (filename) {
         return null
       }
       file = await fileHandle.getFile()
+      break
+    case 'idb':
+      file = await idb.get(filename)
       break
     default:
       // No default handler
@@ -168,16 +195,19 @@ export async function shareRecs(recs) {
   const txtFiles = []
   for (let i=0; i<recs.length; i++) {
     const name = recs[i]
-    if (await fileExists(`${name}.wav`)) {
+    if (await storFileExists(`${name}.wav`)) {
       const wav = await storGetFile(`${name}.wav`)
       files.push(wav)
     }
-    if (await fileExists(`${name}.txt`)) {
+    if (await storFileExists(`${name}.txt`)) {
       const txt = await storGetFile(`${name}.txt`)
       files.push(txt)
       txtFiles.push(name)
     } 
   }
+
+  console.log('Files for share', files)
+
   // Attempt the share
   const share = await shareApi(files)
 
@@ -264,7 +294,7 @@ export async function getRecordJson(filename) {
     csvs: []
   }
   let json
-  if (!await fileExists(filename)) {
+  if (!await storFileExists(filename)) {
     // No json text file with this filename, so create one
     json = {}
     // Add record fields
@@ -316,24 +346,9 @@ export async function getRecordJson(filename) {
   return json
 }
 
-export async function fileExists(filename) {
-  let file
-  switch(getOpt('file-handling')) {
-    case 'opfs':
-      const storRoot = await navigator.storage.getDirectory()
-      const fileHandle = await storRoot.getFileHandle(filename, { create: false })
-        .catch( error => {
-          Promise.resolve(null)
-        })
-      return typeof fileHandle !== 'undefined'
-    default:
-      // No default handler
-  }
-}
-
 export async function copyRecord(originalName, newName) {
   // If the wav file exists, copy it
-  if (await fileExists(`${originalName}.wav`)) {
+  if (await storFileExists(`${originalName}.wav`)) {
     const oWavFile = await storGetFile(`${originalName}.wav`)
     await storSaveFile(oWavFile, `${newName}.wav`)
   }
