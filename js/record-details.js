@@ -317,20 +317,27 @@ function stopPlaybackWav(e) {
 }
 
 async function duplicateRecord() {
-  const originalName = getSs('selectedFile')
+  let originalName = getSs('selectedFile')
+  if (!originalName) {
+    return
+  }
+  const oSplit = originalName.split('_')
+  if (oSplit[oSplit.length-1].startsWith('d')) {
+    // The original record is a duplicate of another one - reset
+    // the original name
+    oSplit.pop()
+    originalName = oSplit.join('_')
+  }
   const dateOriginal = new Date(detailsFromFilename(originalName).date)
   const dateNew = new Date()
   const millisecsDiff = dateNew.getTime() - dateOriginal.getTime()
   // Named after the original record with a suffix of number of deciseconds
   // difference between original record made and this duplication to guarantee
   // a unique filename.
-  const newName = `${originalName}-${Math.floor(millisecsDiff/100)}`
+  const newName = `${originalName}_d${Math.floor(millisecsDiff/100)}`
   await copyRecord(originalName, newName)
-
   console.log('file copied')
-
   setSs('selectedFile', newName)
-
   initialiseList()
   populateRecordFields()
 }
