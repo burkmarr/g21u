@@ -101,7 +101,6 @@ export async function getMetadata() {
 
   if (selectedFile) {
     const json = await getRecordJson(`${selectedFile}.txt`)
-    //console.log(json)
 
     // Original recording details
     const ordDiv = collapsibleDiv('original-recording-details', 'Original recording details', el('metadata-details'))
@@ -110,7 +109,7 @@ export async function getMetadata() {
     ordRows.push({caption: 'Filename', value: selectedFile})
     ordRows.push({caption: 'Date', value: details.date})
     ordRows.push({caption: 'Time', value: details.time})
-    ordRows.push({caption: 'Loc', value: details.gridref})
+    ordRows.push({caption: 'Loc', value: details.location})
     ordRows.push({caption: 'Accuracy', value: details.accuracy + ' m'})
     ordRows.push({caption: 'Altitude', value: details.altitude === '' ? 'not recorded' : details.altitude + ' m'})
     keyValuePairTable('wav-details', ordRows, ordDiv)

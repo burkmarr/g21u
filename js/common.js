@@ -6,20 +6,22 @@ export function detailsFromFilename(filename) {
   const sName = name.split('_')
   const date = `${sName[0].substring(8,10)}/${sName[0].substring(5,7)}/${sName[0].substring(0,4)}`
   const time = sName[1].replace(/-/g, ':')
-  let accuracy, altitude, gridref, lat, lon
+  let accuracy, altitude, gridref, lat, lon, location
   if (sName.length === 5) {
     // Name is in GR
     gridref = sName[2]
     accuracy = sName[3]
     altitude = sName[4] === 'none' ? '' :  sName[4]
+    location = gridref // For filename metadata
     // Get lat and lon
     const ll = getCent(gridref, 'wg')
-    lat = ll.centroid[1]
-    lon = ll.centroid[0]
+    lat = String(Math.round(ll.centroid[1]*100000)/100000)
+    lon = String(Math.round(ll.centroid[0]*100000)/100000)
   } else {
     // Name is lat/lon format
-    lat = Math.round(Number(sName[2])*100000)/100000
-    lon = Math.round(Number(sName[3])*100000)/100000
+    lat = sName[2]
+    lon = sName[3]
+    location = `${lat}/${lon}` // For filename metadata
     accuracy = sName[4]
     altitude = sName[5] === 'none' ? '' :  sName[5]
     // Get gridref
@@ -42,6 +44,7 @@ export function detailsFromFilename(filename) {
     gridref: gridref,
     latitude: String(lat),
     longitude: String(lon),
+    location: location,
     accuracy: accuracy,
     altitude: altitude
   }

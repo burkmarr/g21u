@@ -58,6 +58,10 @@ export async function storSaveFile(blob, name) {
     case 'opfs':
       const storRoot = await navigator.storage.getDirectory()
       const opfsHandle = await storRoot.getFileHandle(name, {create: true})
+        .catch( error => {
+          console.log('Error in storSaveFile', error)
+          Promise.resolve(null)
+        })
       const opfsWritable = await opfsHandle.createWritable()
       // https://developer.mozilla.org/en-US/docs/Web/API/FileSystemWritableFileStream/write
       // May not work on iOS 
@@ -71,6 +75,10 @@ export async function storSaveFile(blob, name) {
     case 'native':
       const dirHandle = await idb.get('native-folder')
       const nativeHandle = await dirHandle.getFileHandle(name, { create: true })
+        .catch( error => {
+          console.log('Error in storSaveFile', error)
+          Promise.resolve(null)
+        })
       const nativeWritable = await nativeHandle.createWritable()
       await nativeWritable.write(file)
       await nativeWritable.close()
@@ -159,10 +167,10 @@ export async function storGetRecs () {
       const dirHandle = await idb.get('native-folder')
       const nativeEntries = dirHandle.values()
       for await (const entry of nativeEntries) {
-        //console.log('etnry', entry)
+        console.log('etnry', entry)
         const ext = entry.name.substring(entry.name.length - 4)
         const name = entry.name.substring(0, entry.name.length - 4)
-        //console.log(entry.name)
+        console.log(entry.name)
         if (ext === '.wav') {
           if (v1) {
             recs.push({filename: name})
@@ -197,6 +205,7 @@ export async function storGetFile (filename) {
       const storRoot = await navigator.storage.getDirectory()
       const fileHandle = await storRoot.getFileHandle(filename, { create: false })
         .catch( error => {
+          console.log('Error in storGetFile', error)
           Promise.resolve(null)
         })
       if (!fileHandle) {
@@ -211,6 +220,7 @@ export async function storGetFile (filename) {
       const dirHandle = await idb.get('native-folder')
       const nativeHandle = await dirHandle.getFileHandle(filename, { create: false })
         .catch( error => {
+          console.log('Error in storGetFile', error)
           Promise.resolve(null)
         })
       if (!nativeHandle) {
