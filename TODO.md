@@ -1,6 +1,7 @@
 # TODO
-- indexDB
 - OS File system storage
+- Enable/disable storage options depending on whats available on device
+- Need a dialog to say when CSV creation is done.
 - Dealing with lat/lon
 - Add mapping details
 - Adding custom locations

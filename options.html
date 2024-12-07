@@ -35,13 +35,15 @@
       <option value="osgr">OSGR</option>
       <option value="latlon">Lat/lon</option>
     </select>
-    <div class="opts-label"><b>Storage:</b> indicate how sound files are to be handled on creation.</div>
+    <div class="opts-label"><b>Storage:</b> indicate how sound files are to be handled & stored on device.</div>
     <select id="file-handling">
       <option value="download">Immediate download</option>
-      <option value="opfs">Private origin file system</option>
       <option value="idb">IndexedDB</option>
+      <option value="opfs">Private origin file system</option>
+      <option value="native">Native file system</option>
     </select>
-
+    <div class="opts-label"><b>Folder:</b> for native file systems select a folder for g21u files.</div>
+    <button id="native-browse-folder-button" class="opts-button">Browse folder</button><div id="native-folder"></div>
     <div class="opts-category">Sound</div>
     <hr/>
     <div class="opts-label"><b>Automatic playback:</b> indicate whether or not to automatically playback at end of recording.</div>
@@ -76,7 +78,8 @@
     import { getOpt } from './js/common.js'
     import { navbot } from './js/navbot.js'
     import { filenameFormat, automaticPlayback, playbackVolume, beepVolume, 
-      fileHandling, defaultRecorder, defaultDeterminer, useMode, initialiseGui 
+      fileHandling, defaultRecorder, defaultDeterminer, useMode, initialiseGui ,
+      nativeFolder
     } from './js/options.js'
 
     // Add class to body if emulating v1
@@ -93,6 +96,7 @@
     document.getElementById('file-handling').addEventListener('change', fileHandling)
     document.getElementById('default-recorder').addEventListener('change', defaultRecorder)
     document.getElementById('default-determiner').addEventListener('change', defaultDeterminer)
+    document.getElementById('native-browse-folder-button').addEventListener('click', nativeFolder)
 
     // Initialise the gui
     initialiseGui()

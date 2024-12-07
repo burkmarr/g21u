@@ -337,7 +337,6 @@ async function duplicateRecord() {
   // a unique filename.
   const newName = `${originalName}_d${Math.floor(millisecsDiff/100)}`
   await copyRecord(originalName, newName)
-  console.log('file copied')
   setSs('selectedFile', newName)
   initialiseList()
   populateRecordFields()

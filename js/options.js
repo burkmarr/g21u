@@ -1,4 +1,5 @@
 import { getOpt, setOpt, keyValuePairTable } from "./common.js"
+import { idb } from './nl.min.js'
 
 export function initialiseGui() {
   // Initialise GUI option values
@@ -10,8 +11,25 @@ export function initialiseGui() {
   document.getElementById("file-handling").value = getOpt('file-handling')
   document.getElementById("default-recorder").value = getOpt('default-recorder')
   document.getElementById("default-determiner").value = getOpt('default-determiner')
+  document.getElementById("native-folder").value = getOpt('native-folder')
 
+  initNativeFolder()
   storageMetrics()
+}
+
+async function initNativeFolder() {
+  if (getOpt('file-handling') === 'native') {
+    document.getElementById("native-browse-folder-button").disabled = false
+    let directoryHandle = await idb.get('native-folder')
+    if (directoryHandle) {
+      document.getElementById("native-folder").innerHTML = `Folder name: ${directoryHandle.name}`
+    } else {
+      document.getElementById("native-folder").innerHTML = `No folder selected`
+    }
+  } else {
+    document.getElementById("native-browse-folder-button").disabled = true
+    document.getElementById("native-folder").innerHTML = ''
+  }
 }
 
 export function useMode() {
@@ -35,6 +53,7 @@ export function beepVolume() {
 
 export function fileHandling() {
   setOpt('file-handling', document.getElementById("file-handling").value)
+  initNativeFolder()
 }
 
 export function defaultRecorder() {
@@ -43,6 +62,20 @@ export function defaultRecorder() {
 
 export function defaultDeterminer() {
   setOpt('default-determiner', document.getElementById("default-determiner").value)
+}
+
+export async function nativeFolder() {
+  try {
+    let directoryHandle = await idb.get('native-folder')
+    if (!directoryHandle) {
+      directoryHandle = await window.showDirectoryPicker()
+      await idb.set('native-folder', directoryHandle)
+    }
+    document.getElementById("native-folder").innerHTML = `Folder name: ${directoryHandle.name}`
+    setOpt('native-folder', directoryHandle.name)
+  } catch (error) {
+    document.getElementById("native-folder").innerHTML =`${error.name}: ${error.message}`
+  }
 }
 
 async function storageMetrics() {

@@ -206,8 +206,6 @@ export async function shareRecs(recs) {
     } 
   }
 
-  console.log('Files for share', files)
-
   // Attempt the share
   const share = await shareApi(files)
 
