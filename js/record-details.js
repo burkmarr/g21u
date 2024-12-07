@@ -242,6 +242,7 @@ export async function highlightFields() {
   if (selectedFile) {
     // Get corresponding record JSON if it exists
     json = await getRecordJson(`${selectedFile}.txt`)
+    console.log(json)
   }
   let edited = false
   getFieldDefs(selectedFile ? selectedFile : null).forEach(f => {
@@ -253,6 +254,7 @@ export async function highlightFields() {
         if (fld.value === json[f.jsonId]) {
           fld.classList.add('saved')
         } else {
+          console.log(f.jsonId, 'edited', json[f.jsonId], fld.value)
           fld.classList.add('edited')
           edited = true
         }

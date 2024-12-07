@@ -3,7 +3,7 @@
 - Add mapping details
 - Adding custom locations
 - Adding custom taxa
-- Adding custom fields (iRecord extra fields)
+- Adding custom fields (iRecord extra fields) & make gridref/latlong either or both.
   - Will need to revisit CSV export
 - New page for dealing with CSVs
   - delete CSV

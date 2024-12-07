@@ -1,20 +1,30 @@
+import { getCent, getGr } from './nl.min.js'
+
 export function detailsFromFilename(filename) {
   if (!filename) return ''
   const name = filename.indexOf('.') > -1 ? filename.substring(0,filename.length-4) : filename
   const sName = name.split('_')
   const date = `${sName[0].substring(8,10)}/${sName[0].substring(5,7)}/${sName[0].substring(0,4)}`
   const time = sName[1].replace(/-/g, ':')
-  let location, accuracy, altitude
+  let accuracy, altitude, gridref, lat, lon
   if (sName.length === 5) {
     // Name is in GR
-    location = sName[2]
+    gridref = sName[2]
     accuracy = sName[3]
     altitude = sName[4] === 'none' ? '' :  sName[4]
+    // Get lat and lon
+    const ll = getCent(gridref, 'wg')
+    lat = ll.centroid[1]
+    lon = ll.centroid[0]
   } else {
     // Name is lat/lon format
-    location = `${sName[2]}/${sName[3]}`
+    lat = Math.round(Number(sName[2])*100000)/100000
+    lon = Math.round(Number(sName[3])*100000)/100000
     accuracy = sName[4]
     altitude = sName[5] === 'none' ? '' :  sName[5]
+    // Get gridref
+    const gr = getGr(Number(lon), Number(lat), 'wg', '', [1])
+    gridref = gr.p1
   }
   // If files have been duplidated, e.g. by multipled
   // shares to same folder in Windows they can have a
@@ -29,7 +39,9 @@ export function detailsFromFilename(filename) {
     filename: name,
     date: date,
     time: time,
-    gridref: location,
+    gridref: gridref,
+    latitude: String(lat),
+    longitude: String(lon),
     accuracy: accuracy,
     altitude: altitude
   }
@@ -96,6 +108,22 @@ export function getFieldDefs(filename) {
       inputLabel: 'Grid reference',
       jsonId: 'gridref',
       default: filenameDetails ? filenameDetails.gridref : '',
+      novalue: ''
+    },
+    {
+      inputId: 'lat-input',
+      inputType: 'text',
+      inputLabel: 'Latitude',
+      jsonId: 'latitude',
+      default: filenameDetails ? filenameDetails.latitude : '',
+      novalue: ''
+    },
+    {
+      inputId: 'lon-input',
+      inputType: 'text',
+      inputLabel: 'Longitude',
+      jsonId: 'longitude',
+      default: filenameDetails ? filenameDetails.longitude : '',
       novalue: ''
     },
     {

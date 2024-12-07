@@ -351,7 +351,7 @@ export async function getRecordJson(filename) {
   // This function is called when the application lists 
   // records - passing the name of any record json text file
   // or wav files without record json text files.
-  // The function also deals with cases when a new record filed
+  // The function also deals with cases when a new record field
   // is added to the apps record field defintions and an existing
   // record json text file does not have the file by adding that
   // field in and saving the new json text file. This situation
@@ -363,9 +363,7 @@ export async function getRecordJson(filename) {
     csvs: []
   }
   let json
-  //console.log('getRecordJson', filename)
   if (!await storFileExists(filename)) {
-    //console.log('Doesnt exist')
     // No json text file with this filename, so create one
     json = {}
     // Add record fields
@@ -376,7 +374,7 @@ export async function getRecordJson(filename) {
     json.metadata = metadata
     // Write the file
     const jsonString = JSON.stringify(json)
-    //console.log('created'. json)
+    console.log('created'. json)
     await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
   } else {
     //console.log('Does exist')
