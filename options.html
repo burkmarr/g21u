@@ -79,7 +79,7 @@
     import { navbot } from './js/navbot.js'
     import { filenameFormat, automaticPlayback, playbackVolume, beepVolume, 
       fileHandling, defaultRecorder, defaultDeterminer, useMode, initialiseGui ,
-      nativeFolder
+      browseNativeFolder
     } from './js/options.js'
 
     // Add class to body if emulating v1
@@ -96,7 +96,7 @@
     document.getElementById('file-handling').addEventListener('change', fileHandling)
     document.getElementById('default-recorder').addEventListener('change', defaultRecorder)
     document.getElementById('default-determiner').addEventListener('change', defaultDeterminer)
-    document.getElementById('native-browse-folder-button').addEventListener('click', nativeFolder)
+    document.getElementById('native-browse-folder-button').addEventListener('click', browseNativeFolder)
 
     // Initialise the gui
     initialiseGui()

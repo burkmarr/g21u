@@ -13,8 +13,17 @@ export function initialiseGui() {
   document.getElementById("default-determiner").value = getOpt('default-determiner')
   document.getElementById("native-folder").value = getOpt('native-folder')
 
+  initFileHandlingOptions()
   initNativeFolder()
   storageMetrics()
+}
+
+function initFileHandlingOptions() {
+  // Disable file system options that are not available on this device
+  console.log(typeof window.showDirectoryPicker === 'undefined')
+  if (typeof window.showDirectoryPicker === 'undefined') {
+    document.querySelector('#file-handling option[value=native').setAttribute('disabled', '')
+  }
 }
 
 async function initNativeFolder() {
@@ -64,17 +73,15 @@ export function defaultDeterminer() {
   setOpt('default-determiner', document.getElementById("default-determiner").value)
 }
 
-export async function nativeFolder() {
+export async function browseNativeFolder() {
   try {
-    let directoryHandle = await idb.get('native-folder')
-    if (!directoryHandle) {
-      directoryHandle = await window.showDirectoryPicker()
-      await idb.set('native-folder', directoryHandle)
-    }
-    document.getElementById("native-folder").innerHTML = `Folder name: ${directoryHandle.name}`
+    directoryHandle = await window.showDirectoryPicker()
+    await idb.set('native-folder', directoryHandle)
     setOpt('native-folder', directoryHandle.name)
+    document.getElementById("native-folder").innerHTML = `Folder name: ${directoryHandle.name}`
   } catch (error) {
-    document.getElementById("native-folder").innerHTML =`${error.name}: ${error.message}`
+    // Will get here if the open folder dialog is cancelled by user, so do nothing
+    //document.getElementById("native-folder").innerHTML =`${error.name}: ${error.message}`
   }
 }
 

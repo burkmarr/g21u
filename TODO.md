@@ -1,7 +1,4 @@
 # TODO
-- OS File system storage
-- Enable/disable storage options depending on whats available on device
-- Need a dialog to say when CSV creation is done.
 - Dealing with lat/lon
 - Add mapping details
 - Adding custom locations
@@ -14,3 +11,4 @@
   - download CSV
   - share CSV
   - combine CSVs
+- For native file system have folder options for deleted sound files and deleted records. If set, deleting sound file or record just moves the associated files to those folders instead of deleting completely (same for CSV)

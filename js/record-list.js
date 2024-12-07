@@ -363,6 +363,7 @@ export async function csvChecked(e) {
     const recs = storRecs.filter((sr,i) => document.getElementById(`record-checkbox-${i}`).checked).map(sr => sr.filename)
     await recsToCsv(recs)
     await initialiseList()
+    document.getElementById('csv-created').showModal()
   }
 }
 
