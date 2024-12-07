@@ -7,17 +7,27 @@ import { mkConfig, generateCsv, asBlob, idb } from './nl.min.js'
 
 export async function storFileExists(filename) {
   let file
+  //console.log('storeFileExists', filename)
   switch(getOpt('file-handling')) {
     case 'opfs':
       const storRoot = await navigator.storage.getDirectory()
-      const fileHandle = await storRoot.getFileHandle(filename, { create: false })
+      const opfsHandle = await storRoot.getFileHandle(filename, { create: false })
         .catch( error => {
           Promise.resolve(null)
         })
-      return typeof fileHandle !== 'undefined'
+      return typeof opfsHandle !== 'undefined'
     case 'idb':
       const file = await idb.get(filename)
       return typeof file !== 'undefined'
+    case 'native':
+      //console.log('storFileExists', filename)
+      const dirHandle = await idb.get('native-folder')
+      //console.log('dirHandle', dirHandle)
+      const nativeHandle = await dirHandle.getFileHandle(filename, { create: false })
+        .catch( error => {
+          Promise.resolve(null)
+        })
+      return typeof nativeHandle !== 'undefined'
     default:
       // No default handler
   }
@@ -25,30 +35,45 @@ export async function storFileExists(filename) {
 
 export async function storSaveFile(blob, name) {
 
+  // Check if the blob is already a file and if not
+  // convert it to one
+  let file
+  if (blob.name) {
+    file = blob
+  } else {
+    let mimeType
+    switch (name.substring(name.length-3)) {
+      case 'txt':
+        mimeType = 'text/plain'
+      case 'wav':
+        mimeType = 'audio/wav'
+      case 'csv':
+        mimeType = 'text/csv'
+      default:
+    }
+    file = new File([blob], name, {type: mimeType})
+  }
+
   switch(getOpt('file-handling')) {
     case 'opfs':
       const storRoot = await navigator.storage.getDirectory()
-      const fileHandle = await storRoot.getFileHandle(name, {create: true})
-      const writable = await fileHandle.createWritable()
+      const opfsHandle = await storRoot.getFileHandle(name, {create: true})
+      const opfsWritable = await opfsHandle.createWritable()
       // https://developer.mozilla.org/en-US/docs/Web/API/FileSystemWritableFileStream/write
       // May not work on iOS 
-      // Writes a zero byte file on tested iPhone
-      await writable.write(blob)
-      await writable.close()
+      // Writes a zero byte file on tested iPhone (could it be because mime type not correctly set? May be fixed now)
+      await opfsWritable.write(file)
+      await opfsWritable.close()
       break
     case 'idb':
-      let mimeType
-      switch (name.substring(name.length-3)) {
-        case 'txt':
-          mimeType = 'text/plain'
-        case 'wav':
-          mimeType = 'audio/wav'
-        case 'csv':
-          mimeType = 'text/csv'
-        default:
-      }
-      const file = new File([blob], name, {type: mimeType})
       await idb.set(name, file)
+      break
+    case 'native':
+      const dirHandle = await idb.get('native-folder')
+      const nativeHandle = await dirHandle.getFileHandle(name, { create: true })
+      const nativeWritable = await nativeHandle.createWritable()
+      await nativeWritable.write(file)
+      await nativeWritable.close()
       break
     default:
       // No default handler
@@ -65,6 +90,12 @@ export async function storDeleteFiles(files) {
       break
     case 'idb':
       await idb.delMany(files)
+      break
+    case 'native':
+      const dirHandle = await idb.get('native-folder')
+      for (const file of files) {
+        await dirHandle.removeEntry(file).catch(e => console.log(`Could not delete ${file}`))
+      }
       break
     default:
       // No default handler
@@ -124,9 +155,38 @@ export async function storGetRecs () {
         }
       }
       break
+    case 'native':
+      const dirHandle = await idb.get('native-folder')
+      const nativeEntries = dirHandle.values()
+      for await (const entry of nativeEntries) {
+        //console.log('etnry', entry)
+        const ext = entry.name.substring(entry.name.length - 4)
+        const name = entry.name.substring(0, entry.name.length - 4)
+        //console.log(entry.name)
+        if (ext === '.wav') {
+          if (v1) {
+            recs.push({filename: name})
+          } else { //v2
+            //console.log('get json')
+            const json = await getRecordJson(`${name}.txt`)
+            //console.log(json)
+            json.filename = name
+            recs.push(json)
+          }
+        } else if (!v1 && ext === '.txt') {
+          // Add only if there is no corresponding wav file
+          // those with wav files are added above
+          if (!await storFileExists(`${name}.wav`)) {
+            const json = await getRecordJson(`${name}.txt`)
+            json.filename = name
+            recs.push(json)
+          }
+        }
+      }
     default:
       // No default handler
   }
+  //console.log('return')
   return recs
 }
 
@@ -146,6 +206,17 @@ export async function storGetFile (filename) {
       break
     case 'idb':
       file = await idb.get(filename)
+      break
+    case 'native':
+      const dirHandle = await idb.get('native-folder')
+      const nativeHandle = await dirHandle.getFileHandle(filename, { create: false })
+        .catch( error => {
+          Promise.resolve(null)
+        })
+      if (!nativeHandle) {
+        return null
+      }
+      file = await nativeHandle.getFile()
       break
     default:
       // No default handler
@@ -292,7 +363,9 @@ export async function getRecordJson(filename) {
     csvs: []
   }
   let json
+  //console.log('getRecordJson', filename)
   if (!await storFileExists(filename)) {
+    //console.log('Doesnt exist')
     // No json text file with this filename, so create one
     json = {}
     // Add record fields
@@ -303,8 +376,10 @@ export async function getRecordJson(filename) {
     json.metadata = metadata
     // Write the file
     const jsonString = JSON.stringify(json)
+    //console.log('created'. json)
     await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
   } else {
+    //console.log('Does exist')
     const blob = await storGetFile(filename)
     json = JSON.parse(await blob.text())
     // In case property or metadata has been added to definition since this 

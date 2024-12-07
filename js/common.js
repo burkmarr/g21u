@@ -16,6 +16,15 @@ export function detailsFromFilename(filename) {
     accuracy = sName[4]
     altitude = sName[5] === 'none' ? '' :  sName[5]
   }
+  // If files have been duplidated, e.g. by multipled
+  // shares to same folder in Windows they can have a
+  // suffix to indicate the duplicate number, e.g.
+  // '<filename> (1).txt'. So on split this gets
+  // appended to the altitude. So remove if there.
+  const sAltitude = altitude.split(' ')
+  if (sAltitude.length > 1) {
+    altitude = sAltitude[0]
+  }
   return {
     filename: name,
     date: date,

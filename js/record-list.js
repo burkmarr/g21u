@@ -19,7 +19,9 @@ export async function initialiseList() {
       }
     }
   }
+  console.log('storGetRecs')
   storRecs = await storGetRecs()
+  console.log('storRecs', storRecs)
 
   // If the currently selected file indicated by
   // session storage is no longer present, then
