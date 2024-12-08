@@ -11,7 +11,6 @@ export function initialiseGui() {
   document.getElementById("file-handling").value = getOpt('file-handling')
   document.getElementById("default-recorder").value = getOpt('default-recorder')
   document.getElementById("default-determiner").value = getOpt('default-determiner')
-  document.getElementById("native-folder").value = getOpt('native-folder')
 
   initFileHandlingOptions()
   initNativeFolder()
@@ -20,7 +19,6 @@ export function initialiseGui() {
 
 function initFileHandlingOptions() {
   // Disable file system options that are not available on this device
-  console.log(typeof window.showDirectoryPicker === 'undefined')
   if (typeof window.showDirectoryPicker === 'undefined') {
     document.querySelector('#file-handling option[value=native').setAttribute('disabled', '')
   }
@@ -75,10 +73,25 @@ export function defaultDeterminer() {
 
 export async function browseNativeFolder() {
   try {
-    directoryHandle = await window.showDirectoryPicker()
-    await idb.set('native-folder', directoryHandle)
-    setOpt('native-folder', directoryHandle.name)
-    document.getElementById("native-folder").innerHTML = `Folder name: ${directoryHandle.name}`
+    const directoryHandle = await window.showDirectoryPicker()
+
+    let granted = false
+    if (await directoryHandle.queryPermission({mode: 'readwrite'}) === 'granted') {
+      granted =  true
+    }
+    if (!granted) {
+      // Request permission
+      if (await directoryHandle.requestPermission({mode: 'readwrite'}) === 'granted') {
+        granted =  true
+      }
+    }
+    if (granted) {
+      await idb.set('native-folder', directoryHandle)
+      document.getElementById("native-folder").innerHTML = `Folder name: ${directoryHandle.name}`
+    } else {
+      await idb.set('native-folder', null)
+      document.getElementById("native-folder").innerHTML = `No folder selected`
+    }
   } catch (error) {
     // Will get here if the open folder dialog is cancelled by user, so do nothing
     //document.getElementById("native-folder").innerHTML =`${error.name}: ${error.message}`

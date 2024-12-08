@@ -1,4 +1,5 @@
 # TODO
+- Deal with error if selected native folder deleted.
 - Dealing with lat/lon
 - Add mapping details
 - Adding custom locations

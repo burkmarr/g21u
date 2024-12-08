@@ -59,7 +59,7 @@ export async function storSaveFile(blob, name) {
       const storRoot = await navigator.storage.getDirectory()
       const opfsHandle = await storRoot.getFileHandle(name, {create: true})
         .catch( error => {
-          console.log('Error in storSaveFile', error)
+          console.warn('Error in storSaveFile', error)
           Promise.resolve(null)
         })
       const opfsWritable = await opfsHandle.createWritable()
@@ -74,11 +74,16 @@ export async function storSaveFile(blob, name) {
       break
     case 'native':
       const dirHandle = await idb.get('native-folder')
+      if (!verifyPermission(dirHandle, true)) {
+        console.warn('Readwrite permission not granted on folder')
+        return
+      }
       const nativeHandle = await dirHandle.getFileHandle(name, { create: true })
         .catch( error => {
-          console.log('Error in storSaveFile', error)
+          console.warn('Error in storSaveFile', error)
           Promise.resolve(null)
         })
+      //console.log('nativeHandle', nativeHandle)
       const nativeWritable = await nativeHandle.createWritable()
       await nativeWritable.write(file)
       await nativeWritable.close()
@@ -88,12 +93,29 @@ export async function storSaveFile(blob, name) {
   }
 }
 
+export async function verifyPermission(fileHandle, readWrite) {
+  const options = {};
+  if (readWrite) {
+    options.mode = 'readwrite';
+  }
+  // Check if permission was already granted. If so, return true.
+  if ((await fileHandle.queryPermission(options)) === 'granted') {
+    return true;
+  }
+  // Request permission. If the user grants permission, return true.
+  if ((await fileHandle.requestPermission(options)) === 'granted') {
+    return true;
+  }
+  // The user didn't grant permission, so return false.
+  return false;
+}
+
 export async function storDeleteFiles(files) {
   switch(getOpt('file-handling')) {
     case 'opfs':
       const storRoot = await navigator.storage.getDirectory()
       for (const file of files) {
-        await storRoot.removeEntry(file).catch(e => console.log(`Could not delete ${file}`))
+        await storRoot.removeEntry(file).catch(e => console.warn(`Could not delete ${file}`))
       }
       break
     case 'idb':
@@ -102,7 +124,7 @@ export async function storDeleteFiles(files) {
     case 'native':
       const dirHandle = await idb.get('native-folder')
       for (const file of files) {
-        await dirHandle.removeEntry(file).catch(e => console.log(`Could not delete ${file}`))
+        await dirHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}`))
       }
       break
     default:
@@ -167,10 +189,8 @@ export async function storGetRecs () {
       const dirHandle = await idb.get('native-folder')
       const nativeEntries = dirHandle.values()
       for await (const entry of nativeEntries) {
-        console.log('etnry', entry)
         const ext = entry.name.substring(entry.name.length - 4)
         const name = entry.name.substring(0, entry.name.length - 4)
-        console.log(entry.name)
         if (ext === '.wav') {
           if (v1) {
             recs.push({filename: name})
@@ -205,7 +225,7 @@ export async function storGetFile (filename) {
       const storRoot = await navigator.storage.getDirectory()
       const fileHandle = await storRoot.getFileHandle(filename, { create: false })
         .catch( error => {
-          console.log('Error in storGetFile', error)
+          console.warn('Error in storGetFile', error)
           Promise.resolve(null)
         })
       if (!fileHandle) {
@@ -220,7 +240,7 @@ export async function storGetFile (filename) {
       const dirHandle = await idb.get('native-folder')
       const nativeHandle = await dirHandle.getFileHandle(filename, { create: false })
         .catch( error => {
-          console.log('Error in storGetFile', error)
+          console.warn('Error in storGetFile', error)
           Promise.resolve(null)
         })
       if (!nativeHandle) {
@@ -384,7 +404,7 @@ export async function getRecordJson(filename) {
     json.metadata = metadata
     // Write the file
     const jsonString = JSON.stringify(json)
-    console.log('created'. json)
+    //console.log('created'. json)
     await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
   } else {
     //console.log('Does exist')
