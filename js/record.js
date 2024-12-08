@@ -51,16 +51,16 @@ function geolocated(position) {
   // Update position
   let lat = position.coords.latitude
   let lon =  position.coords.longitude
-  lat = Math.round(lat * 100000) / 100000
-  lon = Math.round(lon * 100000) / 100000
+  lat = Math.round(lat * 1000000) / 1000000
+  lon = Math.round(lon * 1000000) / 1000000
   const accuracy = Math.ceil(position.coords.accuracy)
   const altitude = position.coords.altitude ? Math.floor(position.coords.altitude) : null
   const gr = getGr(lon, lat, 'wg', 'gb', [1,10])
   const gr10 = gr.p1
-  const gr8 = gr.p10
+  //const gr8 = gr.p10
   if (getOpt('filename-format') === 'osgr') {
     //2015-02-14_20-54-29_SD65821128_18_0.wav
-    filenameLoc = `${gr8}_${accuracy}_${altitude ? altitude : 'none'}`
+    filenameLoc = `${gr10}_${accuracy}_${altitude ? altitude : 'none'}`
   } else {
     //2015-02-14_20-54-45_53.59675_-2.51646_15_0.wav
     filenameLoc = `${lat}_${lon}_${accuracy}_${altitude ? altitude : 'none'}`

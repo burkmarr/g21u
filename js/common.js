@@ -15,8 +15,8 @@ export function detailsFromFilename(filename) {
     location = gridref // For filename metadata
     // Get lat and lon
     const ll = getCent(gridref, 'wg')
-    lat = String(Math.round(ll.centroid[1]*100000)/100000)
-    lon = String(Math.round(ll.centroid[0]*100000)/100000)
+    lat = String(Math.round(ll.centroid[1]*1000000)/1000000)
+    lon = String(Math.round(ll.centroid[0]*1000000)/1000000)
   } else {
     // Name is lat/lon format
     lat = sName[2]
