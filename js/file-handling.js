@@ -74,10 +74,6 @@ export async function storSaveFile(blob, name) {
       break
     case 'native':
       const dirHandle = await idb.get('native-folder')
-      if (!verifyPermission(dirHandle, true)) {
-        console.warn('Readwrite permission not granted on folder')
-        return
-      }
       const nativeHandle = await dirHandle.getFileHandle(name, { create: true })
         .catch( error => {
           console.warn('Error in storSaveFile', error)
@@ -91,23 +87,6 @@ export async function storSaveFile(blob, name) {
     default:
       // No default handler
   }
-}
-
-export async function verifyPermission(fileHandle, readWrite) {
-  const options = {};
-  if (readWrite) {
-    options.mode = 'readwrite';
-  }
-  // Check if permission was already granted. If so, return true.
-  if ((await fileHandle.queryPermission(options)) === 'granted') {
-    return true;
-  }
-  // Request permission. If the user grants permission, return true.
-  if ((await fileHandle.requestPermission(options)) === 'granted') {
-    return true;
-  }
-  // The user didn't grant permission, so return false.
-  return false;
 }
 
 export async function storDeleteFiles(files) {
