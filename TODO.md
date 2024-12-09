@@ -1,6 +1,4 @@
 # TODO
-- Deal with error if selected native folder deleted.
-- Deal better with file system errors.
 - Stop selected record toggle - always have one record selected if any displayed. First if none already selected.
 - Have 'next' and 'previous' buttons on record details. Next should get focus when save button used.
 - Dealing with lat/lon

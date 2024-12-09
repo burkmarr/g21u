@@ -65,3 +65,20 @@ textarea {
 .collapsible-caption {
   margin: 1em 0 0.5em 0;
 }
+
+/* Dialogs */
+dialog {
+  max-width: 300px;
+}
+.dialog-buttons {
+  margin-top: 15px;
+  display:flex; 
+  flex-direction: row-reverse;
+}
+.dialog-buttons button {
+  margin-left: 1em;
+  font-size: 1em;
+  padding: 8px;
+  width: 100px;
+  height: 40px;
+}

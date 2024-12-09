@@ -1,4 +1,4 @@
-import { getFieldDefs, getOpt, getDateTime } from './common.js'
+import { getFieldDefs, getOpt, getDateTime, generalMessage } from './common.js'
 import { mkConfig, generateCsv, asBlob, idb } from './nl.min.js'
 
 // Function names that start with 'stor' indicate
@@ -12,9 +12,7 @@ export async function storFileExists(filename) {
     case 'opfs':
       const storRoot = await navigator.storage.getDirectory()
       const opfsHandle = await storRoot.getFileHandle(filename, { create: false })
-        .catch( error => {
-          Promise.resolve(null)
-        })
+        .catch( e => {Promise.resolve()})
       return typeof opfsHandle !== 'undefined'
     case 'idb':
       const file = await idb.get(filename)
@@ -24,9 +22,7 @@ export async function storFileExists(filename) {
       const dirHandle = await idb.get('native-folder')
       //console.log('dirHandle', dirHandle)
       const nativeHandle = await dirHandle.getFileHandle(filename, { create: false })
-        .catch( error => {
-          Promise.resolve(null)
-        })
+        .catch( e => {Promise.resolve()})
       return typeof nativeHandle !== 'undefined'
     default:
       // No default handler
@@ -45,10 +41,13 @@ export async function storSaveFile(blob, name) {
     switch (name.substring(name.length-3)) {
       case 'txt':
         mimeType = 'text/plain'
+        break
       case 'wav':
         mimeType = 'audio/wav'
+        break
       case 'csv':
         mimeType = 'text/csv'
+        break
       default:
     }
     file = new File([blob], name, {type: mimeType})
@@ -58,10 +57,6 @@ export async function storSaveFile(blob, name) {
     case 'opfs':
       const storRoot = await navigator.storage.getDirectory()
       const opfsHandle = await storRoot.getFileHandle(name, {create: true})
-        .catch( error => {
-          console.warn('Error in storSaveFile', error)
-          Promise.resolve(null)
-        })
       const opfsWritable = await opfsHandle.createWritable()
       // https://developer.mozilla.org/en-US/docs/Web/API/FileSystemWritableFileStream/write
       // May not work on iOS 
@@ -74,15 +69,18 @@ export async function storSaveFile(blob, name) {
       break
     case 'native':
       const dirHandle = await idb.get('native-folder')
-      const nativeHandle = await dirHandle.getFileHandle(name, { create: true })
-        .catch( error => {
-          console.warn('Error in storSaveFile', error)
-          Promise.resolve(null)
-        })
-      //console.log('nativeHandle', nativeHandle)
-      const nativeWritable = await nativeHandle.createWritable()
-      await nativeWritable.write(file)
-      await nativeWritable.close()
+      if (!dirHandle) {
+        generalMessage(`
+          Native file system selected but folder is not set in options.
+          Specify a folder into which to save files.
+        `)
+      } else {
+        const nativeHandle = await dirHandle.getFileHandle(name, { create: true })
+        //console.log('nativeHandle', nativeHandle)
+        const nativeWritable = await nativeHandle.createWritable()
+        await nativeWritable.write(file)
+        await nativeWritable.close()
+      }
       break
     default:
       // No default handler
@@ -166,43 +164,55 @@ export async function storGetRecs () {
       break
     case 'native':
       const dirHandle = await idb.get('native-folder')
-      const nativeEntries = dirHandle.values()
-      try {
-        for await (const entry of nativeEntries) {
-          const ext = entry.name.substring(entry.name.length - 4)
-          const name = entry.name.substring(0, entry.name.length - 4)
-          if (ext === '.wav') {
-            if (v1) {
-              recs.push({filename: name})
-            } else { //v2
-              //console.log('get json')
-              const json = await getRecordJson(`${name}.txt`)
-              //console.log(json)
-              json.filename = name
-              recs.push(json)
-            }
-          } else if (!v1 && ext === '.txt') {
-            // Add only if there is no corresponding wav file
-            // those with wav files are added above
-            if (!await storFileExists(`${name}.wav`)) {
-              const json = await getRecordJson(`${name}.txt`)
-              json.filename = name
-              recs.push(json)
-            }
+      if (!dirHandle) {
+        generalMessage(`
+          Native file system selected but folder is not set in options.
+          Specify a folder into which to save files.
+        `)
+      } else {
+        let checkDir = true
+        const nativeEntries = dirHandle.values()
+        try {
+          for await (const entry of nativeEntries) {}
+        } catch (e) {
+          checkDir = false
+          if (String(e).includes('directory could not be found')) {
+            generalMessage(`
+              The folder ${dirHandle.name} could not be read - check that
+              it hasn't been deleted. Reset the native folder in the options.
+            `)
+          } else {
+            generalMessage(`Unexpected error. ${e}`)
           }
         }
-      } catch (err) {
-        if (String(err).includes('directory could not be found')) {
-          document.getElementById('general-message-text').innerHTML = `
-            The folder ${dirHandle.name} could not be read - check that
-            it hasn't been deleted. Reset the native folder in the options.`
-        } else {
-          document.getElementById('general-message-text').innerHTML = `
-            Unexpected error. ${err}`
-        }
-        document.getElementById('general-message').showModal()
+        if (checkDir) {
+          const nativeEntries = dirHandle.values()
+          for await (const entry of nativeEntries) {
+            const ext = entry.name.substring(entry.name.length - 4)
+            const name = entry.name.substring(0, entry.name.length - 4)
+            if (ext === '.wav') {
+              if (v1) {
+                recs.push({filename: name})
+              } else { //v2
+                //console.log('get json')
+                const json = await getRecordJson(`${name}.txt`)
+                //console.log(json)
+                json.filename = name
+                recs.push(json)
+              }
+            } else if (!v1 && ext === '.txt') {
+              // Add only if there is no corresponding wav file
+              // those with wav files are added above
+              if (!await storFileExists(`${name}.wav`)) {
+                const json = await getRecordJson(`${name}.txt`)
+                json.filename = name
+                recs.push(json)
+              }
+            }
+          }
+        } 
       }
-
+      break
     default:
       // No default handler
   }
@@ -216,13 +226,6 @@ export async function storGetFile (filename) {
     case 'opfs':
       const storRoot = await navigator.storage.getDirectory()
       const fileHandle = await storRoot.getFileHandle(filename, { create: false })
-        .catch( error => {
-          console.warn('Error in storGetFile', error)
-          Promise.resolve(null)
-        })
-      if (!fileHandle) {
-        return null
-      }
       file = await fileHandle.getFile()
       break
     case 'idb':
@@ -231,13 +234,6 @@ export async function storGetFile (filename) {
     case 'native':
       const dirHandle = await idb.get('native-folder')
       const nativeHandle = await dirHandle.getFileHandle(filename, { create: false })
-        .catch( error => {
-          console.warn('Error in storGetFile', error)
-          Promise.resolve(null)
-        })
-      if (!nativeHandle) {
-        return null
-      }
       file = await nativeHandle.getFile()
       break
     default:
@@ -360,7 +356,6 @@ export async function recsToCsv(recs) {
   })
   const csv = generateCsv(csvConfig)(csvRecs)
   const blob = asBlob(csvConfig)(csv)
-
   // The CSV file is given a name based on the current timestamp
   await storSaveFile(blob, `g21-recs-${unformattedDateTime}.csv`)
 }

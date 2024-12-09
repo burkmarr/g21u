@@ -1,5 +1,32 @@
 import { getCent, getGr } from './nl.min.js'
 
+export function generalMessage(msg) {
+  if (!document.getElementById('general-message')) {
+    // Create dialog
+    const dialog = document.createElement('dialog')
+    dialog.setAttribute('id', 'general-message')
+    document.getElementsByTagName('body')[0].appendChild(dialog)
+    // Create div element for message
+    const message = document.createElement('div')
+    message.setAttribute('id', 'general-message-text')
+    dialog.appendChild(message)
+    // Create div for okay button
+    const buttonDiv = document.createElement('div')
+    buttonDiv.classList.add('id', 'dialog-buttons')
+    dialog.appendChild(buttonDiv)
+    // Create form for okay button
+    const form = document.createElement('form')
+    form.setAttribute('method', 'dialog')
+    buttonDiv.appendChild(form)
+    // Create okay button
+    const okay = document.createElement('button')
+    form.appendChild(okay)
+    okay.innerHTML = 'OK'
+  }
+  document.getElementById('general-message-text').innerHTML = msg
+  document.getElementById('general-message').showModal()
+}
+
 export function detailsFromFilename(filename) {
   if (!filename) return ''
   const name = filename.indexOf('.') > -1 ? filename.substring(0,filename.length-4) : filename

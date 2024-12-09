@@ -1,4 +1,4 @@
-import { getOpt, setOpt, keyValuePairTable } from "./common.js"
+import { getOpt, setOpt, keyValuePairTable, generalMessage } from "./common.js"
 import { idb } from './nl.min.js'
 
 export function initialiseGui() {
@@ -83,6 +83,9 @@ export async function browseNativeFolder() {
       // Request permission
       if (await directoryHandle.requestPermission({mode: 'readwrite'}) === 'granted') {
         granted =  true
+      }
+      if (!granted) {
+        generalMessage(`You must grant read & write access to the folder you select.`)
       }
     }
     if (granted) {
