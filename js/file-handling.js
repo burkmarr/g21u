@@ -167,29 +167,42 @@ export async function storGetRecs () {
     case 'native':
       const dirHandle = await idb.get('native-folder')
       const nativeEntries = dirHandle.values()
-      for await (const entry of nativeEntries) {
-        const ext = entry.name.substring(entry.name.length - 4)
-        const name = entry.name.substring(0, entry.name.length - 4)
-        if (ext === '.wav') {
-          if (v1) {
-            recs.push({filename: name})
-          } else { //v2
-            //console.log('get json')
-            const json = await getRecordJson(`${name}.txt`)
-            //console.log(json)
-            json.filename = name
-            recs.push(json)
-          }
-        } else if (!v1 && ext === '.txt') {
-          // Add only if there is no corresponding wav file
-          // those with wav files are added above
-          if (!await storFileExists(`${name}.wav`)) {
-            const json = await getRecordJson(`${name}.txt`)
-            json.filename = name
-            recs.push(json)
+      try {
+        for await (const entry of nativeEntries) {
+          const ext = entry.name.substring(entry.name.length - 4)
+          const name = entry.name.substring(0, entry.name.length - 4)
+          if (ext === '.wav') {
+            if (v1) {
+              recs.push({filename: name})
+            } else { //v2
+              //console.log('get json')
+              const json = await getRecordJson(`${name}.txt`)
+              //console.log(json)
+              json.filename = name
+              recs.push(json)
+            }
+          } else if (!v1 && ext === '.txt') {
+            // Add only if there is no corresponding wav file
+            // those with wav files are added above
+            if (!await storFileExists(`${name}.wav`)) {
+              const json = await getRecordJson(`${name}.txt`)
+              json.filename = name
+              recs.push(json)
+            }
           }
         }
+      } catch (err) {
+        if (String(err).includes('directory could not be found')) {
+          document.getElementById('general-message-text').innerHTML = `
+            The folder ${dirHandle.name} could not be read - check that
+            it hasn't been deleted. Reset the native folder in the options.`
+        } else {
+          document.getElementById('general-message-text').innerHTML = `
+            Unexpected error. ${err}`
+        }
+        document.getElementById('general-message').showModal()
       }
+
     default:
       // No default handler
   }

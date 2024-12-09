@@ -314,19 +314,19 @@ export async function shareChecked(e) {
       populateRecordFields()
     } else if (share.startsWith('error')) {
       if (!share.includes('AbortError')) {
-        document.getElementById('share-problem-message').innerHTML = `<p>
+        document.getElementById('general-message-text').innerHTML = `<p>
           The share failed. The most likely reason is that you exceeded the 
           limit allowed for this browser. Try sharing in smaller batches.</p>
           <p style="font-size: 0.8em">(Reported error was: ${share})</p>.`
-        document.getElementById('share-problem').showModal()
+        document.getElementById('general-message').showModal()
       }   
     } else {
       // Share not supported by browser
-      document.getElementById('share-problem-message').innerHTML = `<p>
+      document.getElementById('general-message-text').innerHTML = `<p>
         This browser does not support the web share API. 
         Consider using a browser that does, e.g. Chrome.</p>
         <p style="font-size: 0.8em">(Reported browser is: ${navigator.userAgent})</p>.`
-      document.getElementById('share-problem').showModal()
+      document.getElementById('general-message').showModal()
     }
   }
 }
@@ -363,7 +363,8 @@ export async function csvChecked(e) {
     const recs = storRecs.filter((sr,i) => document.getElementById(`record-checkbox-${i}`).checked).map(sr => sr.filename)
     await recsToCsv(recs)
     await initialiseList()
-    document.getElementById('csv-created').showModal()
+    document.getElementById('general-message-text').innerHTML = 'The CSV was created successfully!'
+    document.getElementById('general-message').showModal()
   }
 }
 

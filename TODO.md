@@ -1,5 +1,8 @@
 # TODO
-- Deal with error if selected native folder deleted. (May need a general error dialog.)
+- Deal with error if selected native folder deleted.
+- Deal better with file system errors.
+- Stop selected record toggle - always have one record selected if any displayed. First if none already selected.
+- Have 'next' and 'previous' buttons on record details. Next should get focus when save button used.
 - Dealing with lat/lon
 - Add mapping details
 - Adding custom locations
@@ -13,3 +16,8 @@
   - share CSV
   - combine CSVs
 - For native file system have folder options for deleted sound files and deleted records. If set, deleting sound file or record just moves the associated files to those folders instead of deleting completely (same for CSV)
+- When all is done, rethink buttons
+  - could there be a collapsible element to toolbar? e..g to hide the remove metadata and remove soundfile until needed? Or what about like the QGIS button groups where you click selector and change the function of the button (e.g. for the qgis select buttons)
+  - could play sound and duplicate button go on middle toobar?
+  - Or maybe sound should recieve foucus 
+  - look at how focus moves on record details - try to make record entry as efficient as possible.
