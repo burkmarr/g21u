@@ -1,6 +1,4 @@
 # TODO
-- Stop selected record toggle - always have one record selected if any displayed. First if none already selected.
-- Have 'next' and 'previous' buttons on record details. Next should get focus when save button used.
 - Dealing with lat/lon
 - Add mapping details
 - Adding custom locations
@@ -18,4 +16,4 @@
   - could there be a collapsible element to toolbar? e..g to hide the remove metadata and remove soundfile until needed? Or what about like the QGIS button groups where you click selector and change the function of the button (e.g. for the qgis select buttons)
   - could play sound and duplicate button go on middle toobar?
   - Or maybe sound should recieve foucus 
-  - look at how focus moves on record details - try to make record entry as efficient as possible.
+  - look at how focus moves on record details - try to make record entry as efficient as possible. Next should get focus when save button used.

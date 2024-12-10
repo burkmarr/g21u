@@ -19,22 +19,14 @@ export async function initialiseList() {
       }
     }
   }
+  // Now re-fetch storRecs
   console.log('storGetRecs')
   storRecs = await storGetRecs()
-  console.log('storRecs', storRecs)
-
-  // If the currently selected file indicated by
-  // session storage is no longer present, then
-  // reset it.
-  if (!storRecs.find(r => r.filename === getSs('selectedFile'))) {
-    setSs('selectedFile', '')
-  }
-
   if (!storRecs.length) {
     document.getElementById('record-list').innerHTML = `<h3>No records to display</h3><p>Make some!</p>`
+    setSs('selectedFile', '')
     return
   }
-
   storRecs = storRecs.sort((a,b) => {
     // Sort on date first and then time
     let comparison = 0
@@ -52,6 +44,18 @@ export async function initialiseList() {
     }
     return comparison
   })
+  console.log('storRecs', storRecs)
+
+  // If the currently selected file indicated by
+  // session storage is no longer present, then
+  // reset it to the first record if there are any.
+  if (!storRecs.find(r => r.filename === getSs('selectedFile'))) {
+    if (storRecs.length) {
+      setSs('selectedFile', storRecs[0].filename)
+    } else {
+      setSs('selectedFile', '')
+    }
+  }
 
   // Populate with files from storage (large devices)
   document.getElementById('record-list').innerHTML = ''
@@ -221,6 +225,7 @@ export async function deleteYesNo(e) {
         document.getElementById(`record-checkbox-${i}`).checked = false
       }
     }
+    console.log('delete', files)
     await storDeleteFiles(files)
     await initialiseList()
     populateRecordFields()
@@ -393,23 +398,12 @@ function recordChecked(e) {
 
 function recordSelected(e) {
   const currentSelected = document.getElementsByClassName("record-selected")
-  let deselect = false
-  if (currentSelected.length) {
-    if(currentSelected[0].getAttribute('data-file-name') === e.target.getAttribute('data-file-name')) {
-      // User has clicked on an already selected record
-      deselect = true
-    }
+  if(currentSelected[0].getAttribute('data-file-name') !== e.target.getAttribute('data-file-name')) {
     currentSelected[0].classList.remove("record-selected")
-  }
-
-  // Select the record
-  if (!deselect) {
     e.target.classList.add("record-selected")
     setSs( 'selectedFile', e.target.getAttribute('data-file-name'))
-  } else {
-    setSs( 'selectedFile', '')
+    populateRecordFields()
   }
-  populateRecordFields()
 }
 
 async function playRecording(e) {
@@ -450,4 +444,26 @@ function stopPlayback(e) {
   playbackImage.src = "images/playback-green.png"
   playbackImage.classList.remove("flashing")
   playbackImage.addEventListener('click', playRecording)
+}
+
+export async function moveSelected(backward) {
+  let iSelected
+  for (let i=0; i<storRecs.length; i++) {
+    if (storRecs[i].filename ===  getSs('selectedFile')) {
+      let iNext
+      if (backward) {
+        iNext = i === 0 ? i : i-1
+      } else {
+        iNext = i === storRecs.length-1 ? i : i+1
+      }
+      if (iNext !== i) {
+        document.getElementById(`file-div-${i}`).classList.remove('record-selected')
+        document.getElementById(`file-div-${iNext}`).classList.add('record-selected')
+        document.getElementById(`file-div-${iNext}`).scrollIntoView({ behavior: "smooth", block: "nearest" })
+        setSs('selectedFile', storRecs[iNext].filename)
+        populateRecordFields()
+      }
+      break
+    }
+  }
 }

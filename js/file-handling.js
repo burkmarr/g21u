@@ -101,6 +101,7 @@ export async function storDeleteFiles(files) {
     case 'native':
       const dirHandle = await idb.get('native-folder')
       for (const file of files) {
+        console.log('deleting', file)
         await dirHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}`))
       }
       break

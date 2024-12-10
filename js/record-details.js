@@ -1,7 +1,7 @@
 import { el, getFieldDefs, keyValuePairTable, detailsFromFilename, 
   collapsibleDiv, unorderedList, setSs, getSs, getOpt } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
-import { setRecordContent, initialiseList } from './record-list.js'
+import { setRecordContent, initialiseList, moveSelected } from './record-list.js'
 import { getRecordJson, storSaveFile, storFileExists, storGetFile, copyRecord } from './file-handling.js'
 import { playBlob } from './play.js'
 
@@ -73,6 +73,16 @@ export function generateRecordFields() {
   // Save/cancel buttons
   const ctrl = createInputDiv(parent, 'record-save-cancel')
   parent.appendChild(ctrl)
+  const previous = document.createElement('button')
+  previous.setAttribute('id', 'previous-record')
+  previous.innerText = 'Previous'
+  previous.addEventListener('click', moveSelectedRec)
+  ctrl.appendChild(previous)
+  const next = document.createElement('button')
+  next.setAttribute('id', 'next-record')
+  next.innerText = 'Next'
+  next.addEventListener('click', moveSelectedRec)
+  ctrl.appendChild(next)
   const cancel = document.createElement('button')
   cancel.innerText = 'Cancel'
   cancel.addEventListener('click', cancelRecord)
@@ -143,6 +153,10 @@ export async function getMetadata() {
   // console.log('quota', quota)
   // console.log('usage', usage)
   // console.log('usageDetails', usageDetails)
+}
+
+async function moveSelectedRec(e) {
+  moveSelected(e.target.id === 'previous-record')
 }
 
 async function cancelRecord() {
