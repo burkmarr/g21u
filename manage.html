@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="css/navigation.css">
   <link rel="stylesheet" href="css/manage.css">
   <link rel="stylesheet" href="css/taxon-select.css">
+  <link rel="stylesheet" href="css/mapping.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
   <link rel="manifest" href="manifest.json" />
 </head>
 
@@ -59,24 +63,28 @@
       <button id="delete-sound-reject">No</button>
     </div>
   </dialog>
-  
+
   <div id="navtop" style="display: flex"></div>
   </div>
   <div id="manage-div" style="display: flex">
     <div id="record-list"></div>
     <div id="record-field-details">
       <div id="record-details" class="details-div"></div>
+      <div id="location-details" class="details-div"></div>
       <div id="taxa-details" class="details-div"></div>
       <div id="metadata-details" class="details-div"></div>
     </div>
   </div>
   <div id="navbot"></div>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
   <script type="module" defer>
     import { navbot } from './js/navbot.js'
     import { navtop } from './js/navtop.js'
     import { deleteYesNo, deleteSoundYesNo, initialiseList, metadataRemoveYesNo } from './js/record-list.js'
-    import { generateRecordFields, populateRecordFields, editNavigation } from './js/record-details.js'
+    import { initRecordDetails, populateRecordFields, editNavigation } from './js/record-details.js'
     import { getOpt, getSs, setSs } from './js/common.js'
 
     // Add class to body if emulating v1
@@ -105,7 +113,7 @@
     await initialiseList()
 
     // Record fields
-    generateRecordFields()
+    initRecordDetails()
     await populateRecordFields()
 
     // Manage screen layout depending on:

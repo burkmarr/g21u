@@ -3,7 +3,7 @@ import { downloadChecked, shareChecked, deleteChecked, csvChecked,
 import { editNavigation } from './record-details.js'
 import { getSs, setSs } from './common.js'
 import { bin, download, share, csv, checkAll, uncheckAll,
-  edit, beetle, metadata, closeMetadata, delSound } from './svg-icons.js'
+  edit, beetle, metadata, closeMetadata, delSound, map } from './svg-icons.js'
 
 export function navtop () {
   const listNavs = [
@@ -57,6 +57,11 @@ export function navtop () {
       id: 'edit-record',
       div: 'record-details',
       icon: edit
+    },
+    {
+      id: 'edit-location',
+      div: 'location-details',
+      icon: map
     },
     {
       id: 'edit-taxa',

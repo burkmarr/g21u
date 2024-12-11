@@ -1,0 +1,13 @@
+#location-details {
+  --ctrl-height: 100px;
+  --head-height: 30px;
+}
+#head-div {
+  height: var(--head-height);
+}
+#map-div {
+  height: calc(100% - var(--ctrl-height) - var(--head-height));
+}
+#ctls-div {
+  height: var(--ctrl-height);
+}

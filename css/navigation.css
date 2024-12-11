@@ -37,7 +37,7 @@ body.emulate-v1 .navbar-icon.v2 {
 }
 
 #navtop-inner-right {
-  width: calc(var(--but-size) * 2);
+  width: calc(var(--but-size) * 3);
   margin: 0 auto;
 }
 #navtop svg#edit-record {
@@ -45,7 +45,7 @@ body.emulate-v1 .navbar-icon.v2 {
 }
 @media only screen and (max-width: 1024px) {
   #navtop-inner-right {
-    width: calc(var(--but-size) * 3);
+    width: calc(var(--but-size) * 4);
     margin: 0 auto;
   }
   #navtop svg#edit-record {

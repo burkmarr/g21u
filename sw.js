@@ -1,5 +1,5 @@
 const VERSION = "v1.0.0"
-const BUILD = 43
+const BUILD = 44
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -12,8 +12,10 @@ const APP_STATIC_RESOURCES = [
   "css/record.css",
   "css/manage.css",
   "css/taxon-select.css",
+  "css/mapping.css",
   "css/navigation.css",
   "js/taxonomy.js",
+  "js/mapping.js",
   "js/location.js",
   "js/record.js",
   "js/navtop.js",
@@ -44,6 +46,11 @@ const APP_STATIC_RESOURCES = [
   "images/playback-green.png",
   "images/playback-grey.png",
   "images/gilbert.png"
+]
+const APP_INTERNET_RESOURCES = [
+  "species-ws.nbnatlas.org",
+  "unpkg.com",
+  "openstreetmap",
 ]
 
 self.addEventListener("install", (event) => {
@@ -96,13 +103,15 @@ self.addEventListener("fetch", (event) => {
   } else {
     event.respondWith(
       (async () => {
+        const useInternet = APP_INTERNET_RESOURCES.find(r => event.request.url.includes(r))
+        if (useInternet) {
+          return fetch(event.request)
+        }
         const cache = await caches.open(CACHE_NAME)
         const cachedResponse = await cache.match(event.request.url)
         if (cachedResponse) {
           // Return the cached response if it's available.
           return cachedResponse
-        } else if (event.request.url.includes('species-ws.nbnatlas.org')) {
-          return fetch(event.request)
         } else {
           // This is where we would implement a request to network
           // for resource in a cache first then network strategy

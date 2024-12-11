@@ -1,6 +1,7 @@
 import { el, getFieldDefs, keyValuePairTable, detailsFromFilename, 
   collapsibleDiv, unorderedList, setSs, getSs, getOpt } from './common.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
+import { initLocationDetails, invalidateSize, updateMap } from './mapping.js'
 import { setRecordContent, initialiseList, moveSelected } from './record-list.js'
 import { getRecordJson, storSaveFile, storFileExists, storGetFile, copyRecord } from './file-handling.js'
 import { playBlob } from './play.js'
@@ -21,7 +22,12 @@ function createInputDiv(parent, id) {
   return div
 }
 
-export function generateRecordFields() {
+export function initRecordDetails() {
+  initRecordFields()
+  initLocationDetails()
+}
+
+function initRecordFields() {
 
   const parent = el('record-details')
   parent.innerHTML = `<h3 id="record-details-title"></h3>
@@ -239,6 +245,9 @@ export async function populateRecordFields() {
   // Initialise the taxon details panel
   taxonDetails()
 
+  // Map details
+  updateMap()
+
   // Disable all the input fields if no record selected
   if (selectedFile) {
     el('record-details').classList.remove('disable') 
@@ -295,6 +304,10 @@ export function editNavigation(e) {
   }
   // Show the current contents div
   document.getElementById(divId).classList.remove('hide')
+
+  if (divId === 'location-details') {
+    invalidateSize()
+  }
 }
 
 async function playRecordWav(e) {
