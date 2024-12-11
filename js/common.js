@@ -82,7 +82,7 @@ export function getFieldDefs(filename) {
   // for some fields.
   const filenameDetails = filename ? detailsFromFilename(filename) : null
 
-  return [
+  const fieldDefs =  [
     {
       inputId: 'recorder-name-input',
       inputType: 'text',
@@ -173,6 +173,22 @@ export function getFieldDefs(filename) {
       novalue: ''
     },
   ]
+
+  return fieldDefs.filter(fd => {
+    let ret = true
+    if (getOpt('georef-format') === 'osgr') {
+      // Grid reference is being used
+      if (fd.inputId === 'lat-input' || fd.inputId === 'lon-input') {
+        ret = false
+      }
+    } else {
+      // Lat long is being used
+      if (fd.inputId === 'gridref-input') {
+        ret = false
+      }
+    }
+    return ret
+  })
 }
 
 export function dateFromString(dateString) {
@@ -209,7 +225,7 @@ export function getDateTime(formatted) {
 export function getOpt(id) {
   const defaultOpts = {
     'emulate-v1': 'false',
-    'filename-format': 'osgr',
+    'georef-format': 'osgr',
     'automatic-playback': 'false',
     'playback-volume': '0.5',
     'beep-volume': '0.5',

@@ -138,7 +138,11 @@ export async function setRecordContent(filename) {
   }
   let html = details.date
   html = buildText(html, details.time.substring(0, 5), ' ')
-  html = buildText(html, details.gridref, '<br/>')
+  if (getOpt('georef-format') === 'osgr') {
+    html = buildText(html, details.gridref, '<br/>')
+  } else {
+    html = buildText(html, `${details.longitude}/${details.latitude}`, '<br/>')
+  }
   if (getOpt('emulate-v1') !== 'true') {
     html = buildText(html, `<i>${details['scientific-name']}</i>`, '<br/>')
   }

@@ -58,7 +58,7 @@ function geolocated(position) {
   const gr = getGr(lon, lat, 'wg', 'gb', [1,10])
   const gr10 = gr.p1
   //const gr8 = gr.p10
-  if (getOpt('filename-format') === 'osgr') {
+  if (getOpt('georef-format') === 'osgr') {
     //2015-02-14_20-54-29_SD65821128_18_0.wav
     filenameLoc = `${gr10}_${accuracy}_${altitude ? altitude : 'none'}`
   } else {

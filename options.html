@@ -30,8 +30,9 @@
 
     <div class="opts-category">File handling</div>
     <hr/>
-    <div class="opts-label"><b>Filename format:</b> indicate whether sound files should use OSGR or lat/lon in their names.</div>
-    <select id="filename-format">
+    <div class="opts-label"><b>Geolocation format:</b> indicate whether sound records should 
+      use OSGR or lat/lon for geolocation. This also governs the file naming convention of new records.</div>
+    <select id="georef-format">
       <option value="osgr">OSGR</option>
       <option value="latlon">Lat/lon</option>
     </select>
@@ -77,7 +78,7 @@
   <script type="module" defer>
     import { getOpt } from './js/common.js'
     import { navbot } from './js/navbot.js'
-    import { filenameFormat, automaticPlayback, playbackVolume, beepVolume, 
+    import { georefFormat, automaticPlayback, playbackVolume, beepVolume, 
       fileHandling, defaultRecorder, defaultDeterminer, useMode, initialiseGui ,
       browseNativeFolder
     } from './js/options.js'
@@ -89,7 +90,7 @@
 
     // Add event handlers
     document.getElementById('emulate-v1').addEventListener('change', useMode)
-    document.getElementById('filename-format').addEventListener('change', filenameFormat)
+    document.getElementById('georef-format').addEventListener('change', georefFormat)
     document.getElementById('automatic-playback').addEventListener('change', automaticPlayback)
     document.getElementById('playback-volume').addEventListener('change', playbackVolume)
     document.getElementById('beep-volume').addEventListener('change', beepVolume)

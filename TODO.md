@@ -1,5 +1,4 @@
 # TODO
-- Dealing with lat/lon
 - Add mapping details
 - Adding custom locations
 - Adding custom taxa
