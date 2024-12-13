@@ -1,8 +1,5 @@
 # TODO
 - Add mapping details
-  - Add aerial imagery options to map
-  - Add grid square of selected gr
-  - Add marker if lat/lon specified
   - Add click event to generate new GR/lat-lng plus button to use for selected record.
   - Add ctrls to change between 10, 8, 6 and 4 fig GR.
 - Adding custom locations

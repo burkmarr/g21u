@@ -11,3 +11,6 @@
 #ctls-div {
   height: var(--ctrl-height);
 }
+.current-lat-lon {
+  filter: hue-rotate(120deg);
+}

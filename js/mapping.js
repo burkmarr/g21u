@@ -1,7 +1,7 @@
 import { el, getSs, getOpt } from './common.js'
-import { getCent, getGr } from './nl.min.js'
+import { getCent, getSquare } from './nl.min.js'
 
-let map
+let map, currentGr, currentLatLon
 
 export function initLocationDetails() {
 
@@ -56,7 +56,7 @@ export function updateMap() {
     subText.innerHTML = 'no record selected'
   }
 
-  // Move map to location of selected record
+  // Move map to location of selected record and plot marker
   let lat, lon
   if (georef === 'osgr') {
     const gr = el('gridref-input').value
@@ -64,10 +64,25 @@ export function updateMap() {
       const ll = getCent(gr, 'wg')
       lat = ll.centroid[1]
       lon = ll.centroid[0]
+      const grJson = getSquare(gr)
+      const latlons = grJson.coordinates[0].map(lonlat => [lonlat[1], lonlat[0]])
+      latlons.pop()
+      if (!currentGr) {
+        currentGr = L.polygon(latlons, {color: 'red'}).addTo(map)
+      } else {
+        currentGr.setLatLngs(latlons)
+      }
     } 
   } else {
     lat = Number(el('lat-input').value)
     lon = Number(el('lon-input').value)
+    if (!currentLatLon) {
+      currentLatLon = L.marker([lat, lon]).addTo(map)
+      currentLatLon._icon.classList.add("current-lat-lon")
+    } else {
+      currentLatLon.setLatLng([lat, lon])
+    }
   }
   map.panTo(L.latLng(lat, lon))
+
 }

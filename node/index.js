@@ -1,4 +1,4 @@
-import { getGrFromCoords, getCentroid } from 'brc-atlas-bigr'
+import { getGrFromCoords, getCentroid, getGjson } from 'brc-atlas-bigr'
 import { MediaRecorder, register } from 'extendable-media-recorder'
 import { connect } from 'extendable-media-recorder-wav-encoder'
 // export * from 'd3-selection'
@@ -21,6 +21,10 @@ export function getGr(lon, lat, from, to, precisions) {
 }
 export function getCent(gridref, proj) {
   return getCentroid(gridref, proj)
+}
+
+export function getSquare(gr) {
+  return getGjson(gr, 'wg', 'square', 1)
 }
 
 export const idb = {

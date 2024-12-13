@@ -192,6 +192,9 @@ async function saveRecord() {
 
   // Get taxon details in case taxon changes
   taxonDetails()
+
+  // Map details
+  updateMap()
 }
 
 export async function populateRecordFields() {
