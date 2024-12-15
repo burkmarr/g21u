@@ -20,6 +20,10 @@
   align-items: center;
   grid-template-columns: auto auto auto auto;
 }
+#georef-div.latlon {
+  grid-template-columns: auto auto auto;
+}
+
 #georef-div button {
   height: calc(100% - 4px);
   font-size: 1em;

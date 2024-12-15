@@ -112,7 +112,7 @@ export async function getMetadata() {
   }
 
   const para = document.createElement('p')
-  para.innerHTML = `<i>For information only - these data are not explicitly stored with the record.</i>`
+  para.innerHTML = `<i>For information only - these data will not be exported to CSV.</i>`
   el('metadata-details').appendChild(para)
 
   if (selectedFile) {

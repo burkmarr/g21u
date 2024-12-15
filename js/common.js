@@ -1,5 +1,14 @@
 import { getCent, getGr } from './nl.min.js'
-import { precisions } from './mapping.js'
+
+export const precisions = [
+  {caption: '10 figure (1m)', value: 1, regexp: /^[a-zA-Z]{1,2}[0-9]{10}$/}, 
+  {caption: '8 figure (10m)', value: 10,  regexp: /^[a-zA-Z]{1,2}[0-9]{8}$/},
+  {caption: '6 figure (100m)', value: 100, regexp: /^[a-zA-Z]{1,2}[0-9]{6}$/},
+  {caption: 'Monad (1km)', value: 1000, regexp: /^[a-zA-Z]{1,2}[0-9]{4}$/},
+  {caption: 'Tetrad (2km)', value: 2000, regexp: /^[a-zA-Z]{1,2}[0-9]{2}[a-np-zA-NP-Z]$/},
+  {caption: 'Quadrant (5km)', value: 5000, regexp: /^[a-zA-Z]{1,2}[0-9]{2}[SsNn][WwEe]$/},
+  {caption: 'Hectad (10km)', value: 10000, regexp: /^[a-zA-Z]{1,2}[0-9]{2}$/}
+]
 
 export function generalMessage(msg) {
   if (!document.getElementById('general-message')) {
@@ -350,9 +359,12 @@ export function grChangePrecision(gr, precision) {
   const ll = getCent(gr, 'wg')
   const lat = ll.centroid[1]
   const lon = ll.centroid[0]
-  if (precision < fromPrecision) {
+  if (precision <= fromPrecision) {
+    // If the required precision is higher (smaller number)
+    // than the current precision, just return current GR
     return gr
   } else {
+    // Return lower precision GR
     const grs = getGr(lon, lat, 'wg', '', [precision])
     return grs[`p${precision}`]
   }
