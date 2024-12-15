@@ -1,4 +1,5 @@
 import { getCent, getGr } from './nl.min.js'
+import { precisions } from './mapping.js'
 
 export function generalMessage(msg) {
   if (!document.getElementById('general-message')) {
@@ -34,6 +35,9 @@ export function detailsFromFilename(filename) {
   const date = `${sName[0].substring(8,10)}/${sName[0].substring(5,7)}/${sName[0].substring(0,4)}`
   const time = sName[1].replace(/-/g, ':')
   let accuracy, altitude, gridref, lat, lon, location
+  if (sName[sName.length-1].startsWith('d')) {
+    sName.pop()
+  }
   if (sName.length === 5) {
     // Name is in GR
     gridref = sName[2]
@@ -82,6 +86,7 @@ export function getFieldDefs(filename) {
   // for some fields.
   const filenameDetails = filename ? detailsFromFilename(filename) : null
 
+  //console.log('filenameDetails', filenameDetails) 
   const fieldDefs =  [
     {
       inputId: 'recorder-name-input',
@@ -137,7 +142,7 @@ export function getFieldDefs(filename) {
       inputType: 'text',
       inputLabel: 'Grid reference',
       jsonId: 'gridref',
-      default: filenameDetails ? filenameDetails.gridref : '',
+      default: filenameDetails ? grChangePrecision(filenameDetails.gridref, Number(getOpt('georef-precision'))) : '',
       novalue: ''
     },
     {
@@ -226,6 +231,7 @@ export function getOpt(id) {
   const defaultOpts = {
     'emulate-v1': 'false',
     'georef-format': 'osgr',
+    'georef-precision': '10',
     'automatic-playback': 'false',
     'playback-volume': '0.5',
     'beep-volume': '0.5',
@@ -330,4 +336,24 @@ export function collapsibleDiv(id, caption, parent) {
   })
 
   return document.querySelector(`#${id} .collapsible-content`)
+}
+
+export function grChangePrecision(gr, precision) {
+  let fromPrecision
+  for (let i=0; i<precisions.length; i++) {
+    const p = precisions[i]
+    if (p.regexp.test(gr)) {
+      fromPrecision = p.precision
+      break
+    }
+  }
+  const ll = getCent(gr, 'wg')
+  const lat = ll.centroid[1]
+  const lon = ll.centroid[0]
+  if (precision < fromPrecision) {
+    return gr
+  } else {
+    const grs = getGr(lon, lat, 'wg', '', [precision])
+    return grs[`p${precision}`]
+  }
 }

@@ -28,13 +28,24 @@
       <span class="slider round"></span>
     </label>
 
-    <div class="opts-category">File handling</div>
+    <div class="opts-category">File & geolocation handling</div>
     <hr/>
     <div class="opts-label"><b>Geolocation format:</b> indicate whether sound records should 
       use OSGR or lat/lon for geolocation. This also governs the file naming convention of new records.</div>
     <select id="georef-format">
       <option value="osgr">OSGR</option>
       <option value="latlon">Lat/lon</option>
+    </select>
+    <div class="opts-label"><b>Default grid ref precision:</b> indicate the default precision
+      to use for grid references.</div>
+    <select id="georef-precision">
+      <option value="1">10 figure (1m)</option>
+      <option value="10">8 figure (10m)</option>
+      <option value="100">6 figure (100m)</option>
+      <option value="1000">Monad (1km)</option>
+      <option value="2000">Tetrad (2km)</option>
+      <option value="5000">Quadrant (5km)</option>
+      <option value="10000">Hectad (10km)</option>
     </select>
     <div class="opts-label"><b>Storage:</b> indicate how sound files are to be handled & stored on device.</div>
     <select id="file-handling">
@@ -78,7 +89,7 @@
   <script type="module" defer>
     import { getOpt } from './js/common.js'
     import { navbot } from './js/navbot.js'
-    import { georefFormat, automaticPlayback, playbackVolume, beepVolume, 
+    import { georefFormat, georefPrecision, automaticPlayback, playbackVolume, beepVolume, 
       fileHandling, defaultRecorder, defaultDeterminer, useMode, initialiseGui ,
       browseNativeFolder
     } from './js/options.js'
@@ -91,6 +102,7 @@
     // Add event handlers
     document.getElementById('emulate-v1').addEventListener('change', useMode)
     document.getElementById('georef-format').addEventListener('change', georefFormat)
+    document.getElementById('georef-precision').addEventListener('change', georefPrecision)
     document.getElementById('automatic-playback').addEventListener('change', automaticPlayback)
     document.getElementById('playback-volume').addEventListener('change', playbackVolume)
     document.getElementById('beep-volume').addEventListener('change', beepVolume)

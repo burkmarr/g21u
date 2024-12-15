@@ -14,3 +14,19 @@
 .current-lat-lon {
   filter: hue-rotate(120deg);
 }
+
+#georef-div {
+  display: grid;
+  align-items: center;
+  grid-template-columns: auto auto auto auto;
+}
+#georef-div button {
+  height: calc(100% - 4px);
+  font-size: 1em;
+}
+.georef-label {
+  font-weight: bold;
+}
+#georef-div > * {
+  margin: 2px;
+}

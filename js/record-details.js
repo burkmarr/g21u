@@ -360,9 +360,11 @@ async function duplicateRecord() {
     oSplit.pop()
     originalName = oSplit.join('_')
   }
-  const dateOriginal = new Date(detailsFromFilename(originalName).date)
+  const ds = detailsFromFilename(originalName).date.split('/')
+  const dateOriginal = new Date(ds[2], Number(ds[1])-1, ds[0])
   const dateNew = new Date()
   const millisecsDiff = dateNew.getTime() - dateOriginal.getTime()
+
   // Named after the original record with a suffix of number of deciseconds
   // difference between original record made and this duplication to guarantee
   // a unique filename.

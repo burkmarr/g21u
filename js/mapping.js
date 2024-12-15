@@ -1,8 +1,21 @@
 import { el, getSs, getOpt } from './common.js'
-import { getCent, getSquare } from './nl.min.js'
+import { getCent, getSquare, getGr } from './nl.min.js'
 
-let map, currentGr, currentLatLon
+let map
+let currentGrPoly, currentLatLonMkr
+let clickedGrPoly, clickedLatLon
+let clickedLatLng
 
+export const precisions = [
+  {caption: '10 figure (1m)', value: 1, regexp: /^[a-zA-Z]{1,2}[0-9]{10}$/}, 
+  {caption: '8 figure (10m)', value: 10,  regexp: /^[a-zA-Z]{1,2}[0-9]{8}$/},
+  {caption: '6 figure (100m)', value: 100, regexp: /^[a-zA-Z]{1,2}[0-9]{6}$/},
+  {caption: 'Monad (1km)', value: 1000, regexp: /^[a-zA-Z]{1,2}[0-9]{4}$/},
+  {caption: 'Tetrad (2km)', value: 2000, regexp: /^[a-zA-Z]{1,2}[0-9]{2}[a-np-zA-NP-Z]$/},
+  {caption: 'Quadrant (5km)', value: 5000, regexp: /^[a-zA-Z]{1,2}[0-9]{2}[SsNn][WwEe]$/},
+  {caption: 'Hectad (10km)', value: 10000, regexp: /^[a-zA-Z]{1,2}[0-9]{2}$/}
+]
+    
 export function initLocationDetails() {
 
   const detailsDiv = el('location-details')
@@ -21,7 +34,11 @@ export function initLocationDetails() {
   detailsDiv.appendChild(ctlsDiv)
   ctlsDiv.setAttribute('id', 'ctls-div')
 
+  // Create map
   map = L.map('map-div').setView([51.505, -0.09], 13)
+  // Add event handlers
+  map.on('click', mapClicked)
+  // Add base layers and control
   const baseLayers = {
     'Open Street Map': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
@@ -38,6 +55,69 @@ export function initLocationDetails() {
       }),
   }
   L.control.layers(baseLayers, []).addTo(map)
+
+  // Controls
+  // Grid ref or lat/lon 
+  const georefDiv = document.createElement('div')
+  ctlsDiv.appendChild(georefDiv)
+  georefDiv.setAttribute('id', 'georef-div')
+
+  let elm
+
+  // Clicked
+  elm = document.createElement('div')
+  georefDiv.appendChild(elm)
+  elm.innerHTML = 'Clicked:'
+  elm.classList.add('georef-label')
+
+  elm = document.createElement('div')
+  georefDiv.appendChild(elm)
+  elm.setAttribute('id', 'clicked-gr')
+
+  elm = document.createElement('select')
+  georefDiv.appendChild(elm)
+  elm.setAttribute('id', 'clicked-precision')
+  setPrecisionOptions(elm)
+
+  elm = document.createElement('button')
+  georefDiv.appendChild(elm)
+  elm.setAttribute('id', 'clicked-precision-use')
+  elm.innerText = 'Use'
+
+  // Current
+  elm = document.createElement('div')
+  georefDiv.appendChild(elm)
+  elm.innerHTML = 'Current:'
+  elm.classList.add('georef-label')
+
+  elm = document.createElement('div')
+  georefDiv.appendChild(elm)
+  elm.setAttribute('id', 'current-gr')
+
+  elm = document.createElement('select')
+  georefDiv.appendChild(elm)
+  elm.setAttribute('id', 'current-precision')
+  setPrecisionOptions(elm)
+
+  elm = document.createElement('button')
+  georefDiv.appendChild(elm)
+  elm.setAttribute('id', 'current-precision-use')
+  elm.innerText = 'Use'
+  elm.addEventListener('click', () => {
+    console.log('Use current')
+  })
+
+  function setPrecisionOptions(elm) {
+    let opt 
+    precisions.forEach(p => {
+      opt = document.createElement('option')
+      elm.appendChild(opt)
+      opt.innerText = p.caption
+      opt.setAttribute('value', p.value)
+      
+    })
+    elm.value = getOpt('georef-precision')
+  }
 }
 
 export function invalidateSize() {
@@ -67,22 +147,48 @@ export function updateMap() {
       const grJson = getSquare(gr)
       const latlons = grJson.coordinates[0].map(lonlat => [lonlat[1], lonlat[0]])
       latlons.pop()
-      if (!currentGr) {
-        currentGr = L.polygon(latlons, {color: 'red'}).addTo(map)
+      if (!currentGrPoly) {
+        currentGrPoly = L.polygon(latlons, {color: 'red'}).addTo(map)
       } else {
-        currentGr.setLatLngs(latlons)
+        currentGrPoly.setLatLngs(latlons)
       }
     } 
   } else {
     lat = Number(el('lat-input').value)
     lon = Number(el('lon-input').value)
-    if (!currentLatLon) {
-      currentLatLon = L.marker([lat, lon]).addTo(map)
-      currentLatLon._icon.classList.add("current-lat-lon")
+    if (!currentLatLonMkr) {
+      currentLatLonMkr = L.marker([lat, lon]).addTo(map)
+      currentLatLonMkr._icon.classList.add("current-lat-lon")
     } else {
-      currentLatLon.setLatLng([lat, lon])
+      currentLatLonMkr.setLatLng([lat, lon])
     }
   }
   map.panTo(L.latLng(lat, lon))
 
+}
+
+function mapClicked(e) {
+  clickedLatLng = e.latlng
+  const georef = getOpt('georef-format')
+  const lat = clickedLatLng.lat
+  const lon = clickedLatLng.lng
+  if (georef === 'osgr') {
+    const grs = getGr(lon, lat, 'wg', 'gb', [1,10,100,1000,2000,5000,10000]) 
+    const gr = grs[`p${el('clicked-precision').options[el('clicked-precision').selectedIndex].value}`]
+    const grJson = getSquare(gr)
+    const latlons = grJson.coordinates[0].map(lonlat => [lonlat[1], lonlat[0]])
+    latlons.pop()
+    if (!clickedGrPoly) {
+      clickedGrPoly = L.polygon(latlons, {color: 'blue'}).addTo(map)
+    } else {
+      clickedGrPoly.setLatLngs(latlons)
+    }
+    el('clicked-gr').innerText = gr
+  } else {
+    if (!clickedLatLon) {
+      clickedLatLon = L.marker([lat, lon]).addTo(map)
+    } else {
+      clickedLatLon.setLatLng([lat, lon])
+    }
+  }
 }

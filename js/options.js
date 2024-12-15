@@ -5,6 +5,7 @@ export function initialiseGui() {
   // Initialise GUI option values
   document.getElementById("emulate-v1").checked = getOpt('emulate-v1') === "true"
   document.getElementById("georef-format").value = getOpt('georef-format')
+  document.getElementById("georef-precision").value = getOpt('georef-precision')
   document.getElementById("automatic-playback").checked = getOpt('automatic-playback') === "true"
   document.getElementById("playback-volume").value = getOpt('playback-volume')
   document.getElementById("beep-volume").value = getOpt('beep-volume')
@@ -44,6 +45,10 @@ export function useMode() {
 }
 export function georefFormat() {
   setOpt('georef-format', document.getElementById("georef-format").value)
+}
+
+export function georefPrecision() {
+  setOpt('georef-precision', document.getElementById("georef-precision").value)
 }
 
 export function automaticPlayback() {

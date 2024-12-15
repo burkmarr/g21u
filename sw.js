@@ -51,6 +51,8 @@ const APP_INTERNET_RESOURCES = [
   "species-ws.nbnatlas.org",
   "unpkg.com",
   "openstreetmap",
+  "stadiamaps",
+  "arcgisonline",
 ]
 
 self.addEventListener("install", (event) => {
