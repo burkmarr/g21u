@@ -348,14 +348,7 @@ export function collapsibleDiv(id, caption, parent) {
 }
 
 export function grChangePrecision(gr, precision) {
-  let fromPrecision
-  for (let i=0; i<precisions.length; i++) {
-    const p = precisions[i]
-    if (p.regexp.test(gr)) {
-      fromPrecision = p.precision
-      break
-    }
-  }
+  const fromPrecision = precisionFromGr(gr)
   const ll = getCent(gr, 'wg')
   const lat = ll.centroid[1]
   const lon = ll.centroid[0]
@@ -367,5 +360,14 @@ export function grChangePrecision(gr, precision) {
     // Return lower precision GR
     const grs = getGr(lon, lat, 'wg', '', [precision])
     return grs[`p${precision}`]
+  }
+}
+
+export function precisionFromGr(gr) {
+  for (let i=0; i<precisions.length; i++) {
+    const p = precisions[i]
+    if (p.regexp.test(gr)) {
+      return p.value
+    }
   }
 }

@@ -1,4 +1,5 @@
-import { el, getSs, getOpt, precisions } from './common.js'
+import { el, getSs, getOpt, precisions, precisionFromGr, detailsFromFilename } from './common.js'
+import { getRecordJson } from './file-handling.js'
 import { getCent, getSquare, getGr } from './nl.min.js'
 import { highlightFields } from './record-details.js'
 
@@ -96,14 +97,13 @@ export function initLocationDetails() {
     georefDiv.appendChild(elm)
     elm.setAttribute('id', 'current-precision')
     setPrecisionOptions(elm)
+    elm.addEventListener('change', currentPrecisionChanged)
 
     elm = document.createElement('button')
     georefDiv.appendChild(elm)
     elm.setAttribute('id', 'current-precision-use')
     elm.innerText = 'Use'
-    elm.addEventListener('click', () => {
-      console.log('Use current')
-    })
+    elm.addEventListener('click', useCurrentGeoref)
   }
 
   function setPrecisionOptions(elm) {
@@ -113,7 +113,6 @@ export function initLocationDetails() {
       elm.appendChild(opt)
       opt.innerText = p.caption
       opt.setAttribute('value', p.value)
-      
     })
     elm.value = getOpt('georef-precision')
   }
@@ -123,11 +122,14 @@ export function invalidateSize() {
   map.invalidateSize()
 }
 
-export function updateMap() {
-  clearClickedMarkers()
-  const selectedFile = getSs('selectedFile')
-  const georef = getOpt('georef-format')
+export async function updateMap() {
 
+  const georef = getOpt('georef-format')
+  const selectedFile = getSs('selectedFile')
+  const json = await getRecordJson(`${selectedFile}.txt`)
+
+  clearClickedMarkers()
+  
   // Ensure header text correct
   const subText = document.querySelector('#head-div .header-note')
   if (selectedFile) {
@@ -136,10 +138,20 @@ export function updateMap() {
     subText.innerHTML = 'no record selected'
   }
 
+  // Initialise current GR
+  if (georef === 'osgr') {
+    el('current-gr').innerHTML = json.gridref //el('gridref-input').value
+    if (json.gridref) {
+      el('current-precision').value = String(precisionFromGr(json.gridref))
+    } else {
+      el('current-precision').value = getOpt('georef-precision')
+    }
+  }
+  
   // Move map to location of selected record and plot marker
   let lat, lon
   if (georef === 'osgr') {
-    const gr = el('gridref-input').value
+    const gr = json.gridref //el('gridref-input').value
     if (gr) {
       const ll = getCent(gr, 'wg')
       lat = ll.centroid[1]
@@ -154,8 +166,8 @@ export function updateMap() {
       }
     } 
   } else {
-    lat = Number(el('lat-input').value)
-    lon = Number(el('lon-input').value)
+    lat = Number(json.latitude) // Number(el('lat-input').value)
+    lon = Number(json.longitude) //Number(el('lon-input').value)
     if (!currentLatLonMkr) {
       currentLatLonMkr = L.marker([lat, lon]).addTo(map)
       currentLatLonMkr._icon.classList.add("current-lat-lon")
@@ -163,7 +175,13 @@ export function updateMap() {
       currentLatLonMkr.setLatLng([lat, lon])
     }
   }
-  map.panTo(L.latLng(lat, lon))
+  try {
+    // Catch in case invalid or null lat/lon
+    map.panTo(L.latLng(lat, lon))
+  } catch(e) {
+    console.warn(e)
+  }
+  
 
 }
 
@@ -175,7 +193,43 @@ function mapClicked(e) {
   setMapClickedGR()
 }
 
-function clickedPrecisionChanged(e) {
+async function currentPrecisionChanged(e) {
+  // Check first if current GR is consistent with
+  // the original GPS derived location. If it is
+  // then use the original lat/lon as the basis
+  // for working out the new GR, otherwise
+  // use the centroid of current GR.
+  const selectedFile = getSs('selectedFile')
+  const json = await getRecordJson(`${selectedFile}.txt`)
+  if (!json.gridref) return
+  const originalDetails = detailsFromFilename(selectedFile)
+  const originalLat = Number(originalDetails.latitude)
+  const originalLon = Number(originalDetails.longitude)
+  const currentPrecision = precisionFromGr(json.gridref)
+  let grs = getGr(originalLon, originalLat, 'wg', 'gb', [currentPrecision]) 
+  const consistent = grs[`p${currentPrecision}`] === json.gridref
+  let lat, lon
+  if (consistent) {
+    lat = originalLat
+    lon = originalLon
+  } else {
+    const ll = getCent(json.gridref, 'wg')
+    lat = ll.centroid[1]
+    lon = ll.centroid[0]
+  }
+  grs = getGr(lon, lat, 'wg', 'gb', [Number(e.target.value)]) 
+  el('current-gr').innerHTML = grs[`p${e.target.value}`]
+  const grJson = getSquare(grs[`p${e.target.value}`])
+  const latlons = grJson.coordinates[0].map(lonlat => [lonlat[1], lonlat[0]])
+  latlons.pop()
+  if (!currentGrPoly) {
+    currentGrPoly = L.polygon(latlons, {color: 'red'}).addTo(map)
+  } else {
+    currentGrPoly.setLatLngs(latlons)
+  }
+}
+
+function clickedPrecisionChanged() {
   setMapClickedGR()
 }
 
@@ -216,6 +270,12 @@ function useClickedGeoref() {
     el('lat-input').value = clickedLatLon.lat
     el('lon-input').value = clickedLatLon.lon
   }
+  highlightFields()
+}
+
+function useCurrentGeoref() {
+  // Only available when georef-format is osgr
+  el('gridref-input').value = el('current-gr').innerText
   highlightFields()
 }
 
