@@ -1,12 +1,28 @@
 #location-details {
-  --ctrl-height: 100px;
+  --ctrl-height: 150px;
   --head-height: 30px;
+  --message-height: 25px;
 }
 #head-div {
   height: var(--head-height);
 }
-#map-div {
+#map-div-outer {
   height: calc(100% - var(--ctrl-height) - var(--head-height));
+  overflow: hidden;
+  resize: vertical;
+}
+#map-div {
+  height: calc(100% - var(--message-height));
+}
+#map-message {
+  margin-right: 10px;
+  text-align: right;
+  font-size: 0.8em;
+  height: var(--message-height);
+  line-height: var(--message-height);
+}
+#nominatim-location {
+  margin-top: 5px;
 }
 #ctls-div {
   height: var(--ctrl-height);
@@ -18,18 +34,30 @@
 #georef-div {
   display: grid;
   align-items: center;
-  grid-template-columns: auto auto auto auto;
+  grid-template-columns: 65px auto 140px 40px;
+  grid-column-gap: 5px;
 }
 #georef-div.latlon {
-  grid-template-columns: auto auto auto;
+  grid-template-columns: 65px auto 40px;
 }
+/* #georef-div #nominatim-location {
+  grid-column: span 3;
+}
+#georef-div.latlon #nominatim-location {
+  grid-column: span 2;
+} */
 
+#georef-div select {
+  padding: 0.1em;
+}
 #georef-div button {
   height: calc(100% - 4px);
   font-size: 1em;
+  padding: 0px;
 }
 .georef-label {
   font-weight: bold;
+  text-align: left;
 }
 #georef-div > * {
   margin: 2px;

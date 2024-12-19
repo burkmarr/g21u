@@ -18,9 +18,18 @@ export function initLocationDetails() {
   headDiv.setAttribute('id', 'head-div')
   headDiv.innerHTML = `<h3>Location details <span class="header-note">for selected record</span></h3>`
 
+  const mapDivOuter = document.createElement('div')
+  detailsDiv.appendChild(mapDivOuter)
+  mapDivOuter.setAttribute('id', 'map-div-outer')
+
   const mapDiv = document.createElement('div')
-  detailsDiv.appendChild(mapDiv)
+  mapDivOuter.appendChild(mapDiv)
   mapDiv.setAttribute('id', 'map-div')
+
+  const messageDiv = document.createElement('div')
+  mapDivOuter.appendChild(messageDiv)
+  messageDiv.setAttribute('id', 'map-message')
+  messageDiv.innerHTML = 'Change map height by dragging bottom right corner'
 
   const ctlsDiv = document.createElement('div')
   detailsDiv.appendChild(ctlsDiv)
@@ -59,29 +68,6 @@ export function initLocationDetails() {
   }
 
   let elm
-  // Clicked
-  elm = document.createElement('div')
-  georefDiv.appendChild(elm)
-  elm.innerHTML = 'Clicked:'
-  elm.classList.add('georef-label')
-
-  elm = document.createElement('div')
-  georefDiv.appendChild(elm)
-  elm.setAttribute('id', 'clicked-gr')
-
-  if (georef === 'osgr') {
-    elm = document.createElement('select')
-    georefDiv.appendChild(elm)
-    elm.setAttribute('id', 'clicked-precision')
-    setPrecisionOptions(elm)
-    elm.addEventListener('change', clickedPrecisionChanged)
-  }
-  elm = document.createElement('button')
-  georefDiv.appendChild(elm)
-  elm.setAttribute('id', 'clicked-precision-use')
-  elm.innerText = 'Use'
-  elm.addEventListener('click', useClickedGeoref)
-
   // Current
   if (georef === 'osgr') {
     elm = document.createElement('div')
@@ -105,6 +91,33 @@ export function initLocationDetails() {
     elm.innerText = 'Use'
     elm.addEventListener('click', useCurrentGeoref)
   }
+  // Clicked
+  elm = document.createElement('div')
+  georefDiv.appendChild(elm)
+  elm.innerHTML = 'Clicked:'
+  elm.classList.add('georef-label')
+
+  elm = document.createElement('div')
+  georefDiv.appendChild(elm)
+  elm.setAttribute('id', 'clicked-gr')
+
+  if (georef === 'osgr') {
+    elm = document.createElement('select')
+    georefDiv.appendChild(elm)
+    elm.setAttribute('id', 'clicked-precision')
+    setPrecisionOptions(elm)
+    elm.addEventListener('change', clickedPrecisionChanged)
+  }
+  elm = document.createElement('button')
+  georefDiv.appendChild(elm)
+  elm.setAttribute('id', 'clicked-precision-use')
+  elm.innerText = 'Use'
+  elm.addEventListener('click', useClickedGeoref)
+
+  // Nominatim
+  const nominatimDiv = document.createElement('div')
+  ctlsDiv.appendChild(nominatimDiv)
+  nominatimDiv.setAttribute('id', 'nominatim-location')
 
   function setPrecisionOptions(elm) {
     let opt 
@@ -181,16 +194,22 @@ export async function updateMap() {
   } catch(e) {
     console.warn(e)
   }
-  
-
 }
 
-function mapClicked(e) {
+async function mapClicked(e) {
+  const lat = Math.round(e.latlng.lat*1000000)/1000000
+  const lon =  Math.round(e.latlng.lng*1000000)/1000000
   clickedLatLon = {
-    lat: Math.round(e.latlng.lat*1000000)/1000000,
-    lon: Math.round(e.latlng.lng*1000000)/1000000
+    lat: lat,
+    lon: lon
   }
   setMapClickedGR()
+
+  // Nominatim reverse geocoding
+  const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+  const na = await fetch(nominatimUrl).then(data => data.json())
+  console.log('na', na)
+  el('nominatim-location').innerHTML = `${na.display_name} <span style='font-size: 0.8em'>(from Nominatim)</span>`
 }
 
 async function currentPrecisionChanged(e) {

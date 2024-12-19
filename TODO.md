@@ -1,10 +1,4 @@
 # TODO
-- Add mapping details
-  - Add click event to generate new GR/lat-lng plus button to use for selected record.
-  - Add ctrls to change between 10, 8, 6 and 4 fig GR.
-  - Add option to set preferred GR precision.
-- Locations from geoservices? (e.g. nominatim)
-- Adding custom locations
 - Adding custom taxa
 - Adding custom fields (iRecord extra fields) & make gridref/latlong either or both.
   - Will need to revisit CSV export
