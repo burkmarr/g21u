@@ -1,6 +1,5 @@
 # TODO
-- Adding custom taxa
-- Adding custom fields (iRecord extra fields) & make gridref/latlong either or both.
+- Adding custom fields (iRecord extra fields).
   - Will need to revisit CSV export
 - Update checked records from selected record
 - New page for dealing with CSVs

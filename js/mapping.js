@@ -25,6 +25,11 @@ export function initLocationDetails() {
   const mapDiv = document.createElement('div')
   mapDivOuter.appendChild(mapDiv)
   mapDiv.setAttribute('id', 'map-div')
+  // There's no resize event for elements,
+  // so use resize observer.
+  // https://web.dev/articles/resize-observer
+  const ro = new ResizeObserver(() => invalidateSize())
+  ro.observe(mapDiv)
 
   const messageDiv = document.createElement('div')
   mapDivOuter.appendChild(messageDiv)
