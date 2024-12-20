@@ -137,12 +137,13 @@ export function invalidateSize() {
 
 export async function updateMap() {
 
-  const georef = getOpt('georef-format')
+  clearClickedMarkers()
+
   const selectedFile = getSs('selectedFile')
+  if (!selectedFile) return
+  const georef = getOpt('georef-format')
   const json = await getRecordJson(`${selectedFile}.txt`)
 
-  clearClickedMarkers()
-  
   // Ensure header text correct
   const subText = document.querySelector('#head-div .header-note')
   if (selectedFile) {
@@ -207,9 +208,16 @@ async function mapClicked(e) {
 
   // Nominatim reverse geocoding
   const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
-  const na = await fetch(nominatimUrl).then(data => data.json())
-  console.log('na', na)
-  el('nominatim-location').innerHTML = `${na.display_name} <span style='font-size: 0.8em'>(from Nominatim)</span>`
+  const na = await fetch(nominatimUrl)
+    .then(data => data.json())
+    .catch(e => {
+      Promise.resolve(null)
+    })
+  if (na) {
+    el('nominatim-location').innerHTML = `${na.display_name} <span style='font-size: 0.8em'>(from Nominatim)</span>`
+  } else {
+    el('nominatim-location').innerHTML = ''
+  }  
 }
 
 async function currentPrecisionChanged(e) {

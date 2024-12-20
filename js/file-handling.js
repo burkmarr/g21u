@@ -182,6 +182,11 @@ export async function storGetRecs () {
               The folder ${dirHandle.name} could not be read - check that
               it hasn't been deleted. Reset the native folder in the options.
             `)
+          } else if (String(e).includes('NotAllowedError')) {
+            generalMessage(`
+              Permission to access the folder '${dirHandle.name}' has been lost 
+              - try reselecting the folder in the options & granting permission to read and save.
+            `)
           } else {
             generalMessage(`Unexpected error. ${e}`)
           }
