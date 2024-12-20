@@ -1,5 +1,8 @@
 import { el, keyValuePairTable, unorderedList, collapsibleDiv, getSs } from './common.js'
+import { storFileExists, storGetFile, getCSV } from './file-handling.js'
 import { highlightFields } from './record-details.js'
+
+let customTaxaCsv
 
 export async function hideTaxonMatches() {
   el('scientific-name-input-suggestions').classList.add('hide')
@@ -11,18 +14,52 @@ export async function displayTaxonMatches(e) {
   const suggestionId = `${e.target.id}-suggestions`
   const scientific = e.target.id === 'scientific-name-input'
 
+  if (this.value.trim().length === 0) {
+    el(suggestionId).classList.add('hide')
+    return
+  }
   el(suggestionId).classList.remove('hide')
 
+  // Get any matching custom taxa
+  if (!customTaxaCsv) {
+    customTaxaCsv = await getCSV('custom-taxa.csv')
+  }
+  let customTaxa
+  if (customTaxaCsv) {
+    customTaxa = customTaxaCsv.filter(t => {
+      if (scientific) {
+        return t.scientific.toLowerCase().includes(this.value.toLowerCase())
+      } else {
+        return t.common.toLowerCase().includes(this.value.toLowerCase())
+      }
+    }).map(t => {
+      return {
+        name: t.scientific,
+        commonName: t.common
+      }
+    })
+  } else {
+    customTaxa = []
+  }
+  // Get taxa from NBN
   const nbnapi = `https://species-ws.nbnatlas.org/search/auto?q=${this.value}&limit=20`
-  const ret = await fetch(nbnapi).then(data => data.json())
-  const data = ret.autoCompleteList.filter(t => {
-    if (scientific) {
-      return t.scientificNameMatches.length > 0
-    } else {
-      return t.commonNameMatches.length > 0
-    }
-  })
-  const html = data.map(taxon => {
+  const ret = await fetch(nbnapi).then(data => data.json()).catch(e => Promise.resolve(null))
+  let nbnTaxa
+  if (ret) {
+    nbnTaxa = ret.autoCompleteList.filter(t => {
+      if (scientific) {
+        return t.scientificNameMatches.length > 0
+      } else {
+        return t.commonNameMatches.length > 0
+      }
+    })
+  } else {
+    nbnTaxa = []
+  }
+
+  const allTaxa = [...customTaxa, ...nbnTaxa]
+  // Create the HTML
+  const html = allTaxa.map(taxon => {
     const scientificName = taxon.name
     const commonName = taxon.commonName ? taxon.commonName : ''
     return `

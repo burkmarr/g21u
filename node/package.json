@@ -20,6 +20,8 @@
   },
   "dependencies": {
     "brc-atlas-bigr": "^2.4.0",
+    "csv-string": "^4.1.1",
+    "d3-dsv": "^3.0.1",
     "d3-ease": "^3.0.1",
     "d3-selection": "^3.0.0",
     "d3-transition": "^3.0.1",

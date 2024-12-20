@@ -1,5 +1,5 @@
 import { getFieldDefs, getOpt, getDateTime, generalMessage } from './common.js'
-import { mkConfig, generateCsv, asBlob, idb } from './nl.min.js'
+import { mkConfig, generateCsv, asBlob, idb, csvParse } from './nl.min.js'
 
 // Function names that start with 'stor' indicate
 // functions that retrieve or write to storage and
@@ -436,6 +436,15 @@ export async function getRecordJson(filename) {
         json = JSON.parse(await blob.text())
       }
     }
+  }
+  return json
+}
+
+export async function getCSV(filename) {
+  let json
+  if (await storFileExists(filename)) {
+    const blob = await storGetFile(filename)
+    json = csvParse(await blob.text())
   }
   return json
 }

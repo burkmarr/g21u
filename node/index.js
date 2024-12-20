@@ -4,6 +4,7 @@ import { connect } from 'extendable-media-recorder-wav-encoder'
 // export * from 'd3-selection'
 // export * from 'd3-transition'
 // export * from 'd3-ease'
+export * from 'd3-dsv' // Includes csvParse
 export * from 'export-to-csv'
 import { get, set, getMany, delMany, entries, keys } from 'idb-keyval'
 

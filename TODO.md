@@ -15,3 +15,4 @@
   - could play sound and duplicate button go on middle toobar?
   - Or maybe sound should recieve foucus 
   - look at how focus moves on record details - try to make record entry as efficient as possible. Next should get focus when save button used.
+- Need to check how everything works without internet.
