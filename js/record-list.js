@@ -20,7 +20,6 @@ export async function initialiseList() {
     }
   }
   // Now re-fetch storRecs
-  console.log('storGetRecs')
   storRecs = await storGetRecs()
   if (!storRecs.length) {
     document.getElementById('record-list').innerHTML = `<h3>No records to display</h3><p>Make some!</p>`
@@ -44,7 +43,7 @@ export async function initialiseList() {
     }
     return comparison
   })
-  console.log('storRecs', storRecs)
+  //console.log('storRecs', storRecs)
 
   // If the currently selected file indicated by
   // session storage is no longer present, then

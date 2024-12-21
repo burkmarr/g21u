@@ -1,4 +1,5 @@
-import { getOpt, setOpt, keyValuePairTable, generalMessage } from "./common.js"
+import { getOpt, setOpt, keyValuePairTable, generalMessage, el } from "./common.js"
+import { getFieldDefs } from './fields.js'
 import { idb } from './nl.min.js'
 
 export function initialiseGui() {
@@ -15,6 +16,7 @@ export function initialiseGui() {
 
   initFileHandlingOptions()
   initNativeFolder()
+  initFieldOptions()
   storageMetrics()
 }
 
@@ -74,6 +76,20 @@ export function defaultRecorder() {
 
 export function defaultDeterminer() {
   setOpt('default-determiner', document.getElementById("default-determiner").value)
+}
+
+function optionalFieldChanged() {
+  let optFields = ''
+  getFieldDefs().forEach(f => {
+    if (f.optional && el(`cb-${f.jsonId}`).checked) {
+      if (optFields) {
+        optFields = `${optFields} ${f.jsonId}`
+      } else {
+        optFields = f.jsonId
+      }
+    }
+  })
+  setOpt('optional-fields', optFields)
 }
 
 export async function browseNativeFolder() {
@@ -156,4 +172,48 @@ function formatBytes(bytes, decimals = 2) {
   const i = Math.floor(Math.log(bytes) / Math.log(k))
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+}
+
+function initFieldOptions() {
+  getFieldDefs().forEach(f => {
+    const p = document.createElement('p')
+
+    const iRecordText = f.iRecord ? ` Corresponds to the iRecord input field <i>${f.iRecord}</i>.` : 'This field is not imported by iRecord.'
+    const iRecordTerm = f.iRecord && f.inputType.startsWith('term-') ? `
+      You can choose a term from a list 
+      of those accepted by iRecord, or you can enter a term of your
+      own. (Don't enter your own term if planning to import to iRecord).` : ''
+    const mandatory = f.optional ? '' : ' <b>This field must be included</b> - you cannot switch it off.'
+    p.innerHTML = `
+      <b>${f.inputLabel}</b>. ${f.info}${iRecordTerm}${iRecordText}${mandatory}
+    `
+    el('record-fields').appendChild(p)
+
+    const br = document.createElement('br')
+    p.appendChild(br)
+    const toggleLabel = document.createElement('label')
+    toggleLabel.classList.add('switch')
+    const toggle = document.createElement('input')
+    toggle.setAttribute('type', 'checkbox')
+    toggle.setAttribute('id', `cb-${f.jsonId}`)
+    if (!f.optional) {
+      toggle.setAttribute('checked', 'checked')
+      toggle.setAttribute('disabled', 'true')
+    }
+    toggle.addEventListener('change', optionalFieldChanged)
+    toggleLabel.appendChild(toggle)
+    const toggleSpan = document.createElement('span')
+    toggleSpan.classList.add('slider')
+    toggleSpan.classList.add('round')
+    toggleLabel.appendChild(toggleSpan)
+
+    p.appendChild(toggleLabel)
+
+  })
+
+  // <label class="switch">
+  //     <input id="automatic-playback" type="checkbox">
+  //     <span class="slider round"></span>
+  //   </label>
+
 }

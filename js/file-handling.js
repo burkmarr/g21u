@@ -1,4 +1,5 @@
-import { getFieldDefs, getOpt, getDateTime, generalMessage } from './common.js'
+import { getOpt, getDateTime, generalMessage } from './common.js'
+import { getFieldDefs } from './fields.js'
 import { mkConfig, generateCsv, asBlob, idb, csvParse } from './nl.min.js'
 
 // Function names that start with 'stor' indicate

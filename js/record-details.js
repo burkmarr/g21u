@@ -1,5 +1,6 @@
-import { el, getFieldDefs, keyValuePairTable, detailsFromFilename, 
+import { el, keyValuePairTable, detailsFromFilename, 
   collapsibleDiv, unorderedList, setSs, getSs, getOpt } from './common.js'
+import { getFieldDefs, getTermList } from './fields.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { initLocationDetails, invalidateSize, updateMap } from './mapping.js'
 import { setRecordContent, initialiseList, moveSelected } from './record-list.js'
@@ -73,6 +74,20 @@ function initRecordFields() {
           }
         })
       }
+    }
+    // Term lists
+    if (f.inputType.startsWith('term-')) {
+      input.setAttribute('type', 'text')
+      input.setAttribute('list', f.inputType)
+      const datalist = document.createElement('datalist')
+      datalist.setAttribute('id', f.inputType)
+      getTermList(f.inputType).forEach(t => {
+        //console.log(t)
+        const opt = document.createElement('option')
+        opt.setAttribute('value', t)
+        datalist.appendChild(opt)
+      })
+      ctrl.appendChild(datalist)
     }
   })
 
