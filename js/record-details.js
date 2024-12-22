@@ -82,7 +82,6 @@ function initRecordFields() {
       const datalist = document.createElement('datalist')
       datalist.setAttribute('id', f.inputType)
       getTermList(f.inputType).forEach(t => {
-        //console.log(t)
         const opt = document.createElement('option')
         opt.setAttribute('value', t)
         datalist.appendChild(opt)
@@ -191,7 +190,7 @@ async function saveRecord() {
   const json = await getRecordJson(`${selectedFile}.txt`)
   //console.log(json)
 
-  getFieldDefs(selectedFile).forEach(f => {
+  getFieldDefs({filename: selectedFile}).forEach(f => {
     json[f.jsonId] =  el(f.inputId).value
   })
 
@@ -245,7 +244,7 @@ export async function populateRecordFields() {
   }
   //console.log('record', json)
 
-  getFieldDefs(selectedFile ? selectedFile : null).forEach(f => {
+  getFieldDefs({filename: selectedFile}).forEach(f => {
     if (json) {
       el(f.inputId).value = json[f.jsonId]
     // } else if (selectedFile) {
@@ -285,7 +284,7 @@ export async function highlightFields() {
     console.log(json)
   }
   let edited = false
-  getFieldDefs(selectedFile ? selectedFile : null).forEach(f => {
+  getFieldDefs({filename: selectedFile}).forEach(f => {
     const fld = el(f.inputId)
     fld.classList.remove('edited')
     fld.classList.remove('saved')

@@ -6,7 +6,9 @@ let customTaxaCsv
 
 export async function hideTaxonMatches() {
   el('scientific-name-input-suggestions').classList.add('hide')
-  el('common-name-input-suggestions').classList.add('hide')
+  if (el('common-name-input-suggestions')) {
+    el('common-name-input-suggestions').classList.add('hide')
+  }
 }
 
 export async function displayTaxonMatches(e) {

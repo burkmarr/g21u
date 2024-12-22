@@ -350,8 +350,18 @@ export async function recsToCsv(recs) {
     const name = recs[i]
     const json = await getRecordJson(`${name}.txt`)
     // Copy the record json object minus the metadata
+    // Only copy those fields that are being used by
+    // the user.
     const cjson = JSON.parse(JSON.stringify(json))
     delete cjson.metadata
+    const flds = getFieldDefs().map(fd => fd.jsonId)
+    Object.keys(cjson).forEach(jsonId => {
+      if (!flds.includes(jsonId)) {
+        delete cjson[jsonId]
+      }
+    })
+    console.log('Before removal', json)
+    console.log('After removal', cjson)
     csvRecs.push(cjson)
     // Update record metadata
     json.metadata.csvs.push(formattedDateTime)
@@ -391,7 +401,7 @@ export async function getRecordJson(filename) {
     // No json text file with this filename, so create one
     json = {}
     // Add record fields
-    getFieldDefs(filename).forEach(f => {
+    getFieldDefs({filename: filename}).forEach(f => {
       json[f.jsonId] = f.default
     })
     // Add metadata
@@ -410,7 +420,7 @@ export async function getRecordJson(filename) {
     if (json) {
       // Fields
       let missingProperty = false
-      getFieldDefs(filename).forEach(f => {
+      getFieldDefs({filename: filename}).forEach(f => {
         if (!json.hasOwnProperty(f.jsonId)){
           json[f.jsonId] = f.default
           missingProperty = true

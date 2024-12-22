@@ -132,6 +132,7 @@ export function getOpt(id) {
     'file-handling': 'opfs',
     'default-recorder': '',
     'default-determiner': '',
+    'optional-fields': '',
   }
   return localStorage.getItem(id) ? localStorage.getItem(id) : defaultOpts[id]
 }

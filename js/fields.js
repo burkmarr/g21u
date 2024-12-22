@@ -1,6 +1,9 @@
 import { getOpt, dateFromString, grChangePrecision, detailsFromFilename } from './common.js'
 
-export function getFieldDefs(filename) {
+export function getFieldDefs({
+  filename = null,
+  allfields = false
+} = {}) {
   // Filename can be null - only affects default values
   // for some fields.
   const filenameDetails = filename ? detailsFromFilename(filename) : null
@@ -74,6 +77,28 @@ export function getFieldDefs(filename) {
       info: `Common (vernacular) name of the recorded taxon.`
     },
     {
+      inputId: 'certainty-input',
+      inputType: 'term-certainty',
+      inputLabel: 'Certainty',
+      jsonId: 'certaity',
+      iRecord: 'Certainty',
+      default: '',
+      novalue: '',
+      optional: true,
+      info: `Certainty of taxon identification.`
+    },
+    {
+      inputId: 'birdbreed-input',
+      inputType: 'term-birdbreed',
+      inputLabel: 'Breeding evidence (birds)',
+      jsonId: 'birdbreed',
+      iRecord: 'Breeding evidence',
+      default: 'not recorded',
+      novalue: '',
+      optional: true,
+      info: `Stage of recorded taxon.`
+    },
+    {
       inputId: 'stage-input',
       inputType: 'term-stage',
       inputLabel: 'Stage',
@@ -83,6 +108,64 @@ export function getFieldDefs(filename) {
       novalue: '',
       optional: true,
       info: `Stage of recorded taxon.`
+    },
+    {
+      inputId: 'sex-input',
+      inputType: 'term-sex',
+      inputLabel: 'Sex',
+      jsonId: 'sex',
+      iRecord: 'Sex',
+      default: 'not recorded',
+      novalue: '',
+      optional: true,
+      info: `Sex of recorded taxon.`
+    },
+    {
+      inputId: 'obstype-input',
+      inputType: 'term-obstype',
+      inputLabel: 'Observation type',
+      jsonId: 'obstype',
+      iRecord: 'Observation Type',
+      default: '',
+      novalue: '',
+      optional: true,
+      info: `Recording method. If you are planning to import to iRecord
+        and want to use a term that's not in the list, use the <i>Recording method</i>
+        field instead.`
+    },
+    {
+      inputId: 'method-input',
+      inputType: 'text',
+      inputLabel: 'Recording method',
+      jsonId: 'method',
+      iRecord: 'Method (free text)',
+      default: '',
+      novalue: '',
+      optional: true,
+      info: `Free text recording method. If you are planning to import to iRecord
+        it is better to use a term from <i>Observation type</i> if one matches.`
+    },
+    {
+      inputId: 'idtype-input',
+      inputType: 'term-idtype',
+      inputLabel: 'Identification type',
+      jsonId: 'idtype',
+      iRecord: 'Identification type',
+      default: '',
+      novalue: '',
+      optional: true,
+      info: `You can used this to provide information on whether an insect specimen was exmined.`
+    },
+    {
+      inputId: 'specimen-input',
+      inputType: 'term-specimen',
+      inputLabel: 'Specimen retained',
+      jsonId: 'specimen',
+      iRecord: 'Specimen',
+      default: '',
+      novalue: '',
+      optional: true,
+      info: `You can used this to provide information on whether a specimen was retained or not.`
     },
     {
       inputId: 'gridref-input',
@@ -144,21 +227,32 @@ export function getFieldDefs(filename) {
     },
   ]
 
-  return fieldDefs.filter(fd => {
-    let ret = true
-    if (getOpt('georef-format') === 'osgr') {
-      // Grid reference is being used
-      if (fd.inputId === 'lat-input' || fd.inputId === 'lon-input') {
+
+  if (allfields) {
+    return fieldDefs
+  } else {
+    return fieldDefs.filter(fd => {
+      // Filter on georef format
+      let ret = true
+      if (getOpt('georef-format') === 'osgr') {
+        // Grid reference is being used
+        if (fd.inputId === 'lat-input' || fd.inputId === 'lon-input') {
+          ret = false
+        }
+      } else {
+        // Lat long is being used
+        if (fd.inputId === 'gridref-input') {
+          ret = false
+        }
+      }
+      // Filter on optional fields inclusion
+      const optionalIncluded = getOpt('optional-fields').split(' ')
+      if (fd.optional && !getOpt('optional-fields').split(' ').includes(fd.jsonId)) {
         ret = false
       }
-    } else {
-      // Lat long is being used
-      if (fd.inputId === 'gridref-input') {
-        ret = false
-      }
-    }
-    return ret
-  })
+      return ret
+    })
+  }
 }
 
 export function getTermList(term) {
@@ -194,10 +288,73 @@ export function getTermList(term) {
       'Spawn',
       'Tadpole',
       'Teneral',
-      'Vegetative',
+      'Vegetative'
     ],
-
+    sex: [
+      'female',
+      'male',
+      'mixed',
+      'not recorded'
+    ],
+    certainty: [
+      'Certain',
+      'Likely',
+      'Uncertain'
+    ],
+    obstype: [
+      'Actinic moth trap',
+      'Call',
+      'Caught',
+      'Collected',
+      'dung/droppings/frass/pellet, etc.',
+      'Field identification',
+      'Field record',
+      'Field sighting',
+      'Field sign',
+      'Flying',
+      'Fungal gall',
+      'Insect gall',
+      'Leaf mine',
+      'MV light trap',
+      'Nest',
+      'Other',
+      'Other gall',
+      'pitfall trap',
+      'Robinson moth trap',
+      'swept',
+      'trapped in Malaise trap',
+      'trapped in water trap, voucher specimen',
+      'voucher specimen',
+      'voucher specimen, trapped (other)'
+    ],
+    birdbreed: [
+      '00: Migration, Flying or Summering (M/F/U)',
+      '01: Nesting habitat (H)',
+      '02: Singing male (S)',
+      '03: Pair in suitable habitat (P)',
+      '04: Permanent territory (T)',
+      '05: Courtship and display (D)',
+      '06: Visiting probable nest site (N)',
+      '07: Agitated behaviour (7)',
+      '08: Brood patch on incubating adult (I)',
+      '09: Nest building (B)',
+      '10: Distraction display (DD)',
+      '11: Used nest or eggshells (11)',
+      '12: Recently fledged (FL)',
+      '13: Occupied nest (ON)',
+      '14: Faecal sac or food (FF)',
+      '15: Nest with eggs (NE)',
+      '16: Nest with young (NY)',
+      'not recorded'
+    ],
+    idtype: [
+      'Microscope',
+      'Genitalia'
+    ],
+    specimen: [
+      'No',
+      'Yes'
+    ]
   }
-
   return terms[termId]
 }

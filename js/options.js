@@ -80,7 +80,7 @@ export function defaultDeterminer() {
 
 function optionalFieldChanged() {
   let optFields = ''
-  getFieldDefs().forEach(f => {
+  getFieldDefs({allfields: true}).forEach(f => {
     if (f.optional && el(`cb-${f.jsonId}`).checked) {
       if (optFields) {
         optFields = `${optFields} ${f.jsonId}`
@@ -175,7 +175,9 @@ function formatBytes(bytes, decimals = 2) {
 }
 
 function initFieldOptions() {
-  getFieldDefs().forEach(f => {
+  const optionalIncluded = getOpt('optional-fields').split(' ')
+
+  getFieldDefs({allfields: true}).forEach(f => {
     const p = document.createElement('p')
 
     const iRecordText = f.iRecord ? ` Corresponds to the iRecord input field <i>${f.iRecord}</i>.` : 'This field is not imported by iRecord.'
@@ -196,7 +198,11 @@ function initFieldOptions() {
     const toggle = document.createElement('input')
     toggle.setAttribute('type', 'checkbox')
     toggle.setAttribute('id', `cb-${f.jsonId}`)
-    if (!f.optional) {
+    if (f.optional) {
+      if (optionalIncluded.includes(f.jsonId)) {
+        toggle.setAttribute('checked', 'checked')
+      }
+    } else {
       toggle.setAttribute('checked', 'checked')
       toggle.setAttribute('disabled', 'true')
     }
@@ -210,10 +216,4 @@ function initFieldOptions() {
     p.appendChild(toggleLabel)
 
   })
-
-  // <label class="switch">
-  //     <input id="automatic-playback" type="checkbox">
-  //     <span class="slider round"></span>
-  //   </label>
-
 }
