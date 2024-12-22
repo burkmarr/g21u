@@ -172,14 +172,22 @@ export const gps = {
 		S307.2,163.1,256,163.1z M464.3,232.6C453,135.4,376.6,59,279.4,47.7V0h-46.9v47.7C135.4,59,59,135.4,47.7,232.6H0v46.9h47.7
 		C59,376.6,135.4,453,232.6,464.3V512h46.9v-47.7C376.6,453,453,376.6,464.3,279.4H512v-46.9H464.3z M256,419.1
 		c-90.3,0-163.1-72.9-163.1-163.1S165.7,92.9,256,92.9S419.1,165.7,419.1,256S346.3,419.1,256,419.1z"/>`,
-  viewBox:  "0,0,512,512"
+  viewBox: "0,0,512,512"
 }
 
 export const map = {
   svgEls: `<path d="M313.27 124.64L198.73 51.36a32 32 0 00-29.28.35L56.51 127.49A16 16 0 
-0048 141.63v295.8a16 16 0 0023.49 14.14l97.82-63.79a32 32 0 0129.5-.24l111.86 
-73a32 32 0 0029.27-.11l115.43-75.94a16 16 0 008.63-14.2V74.57a16 16 0 
-00-23.49-14.14l-98 63.86a32 32 0 01-29.24.35zM328 128v336M184 48v336" 
-fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>`,
-  viewBox:  "0,0,512,512"
+    0048 141.63v295.8a16 16 0 0023.49 14.14l97.82-63.79a32 32 0 0129.5-.24l111.86 
+    73a32 32 0 0029.27-.11l115.43-75.94a16 16 0 008.63-14.2V74.57a16 16 0 
+    00-23.49-14.14l-98 63.86a32 32 0 01-29.24.35zM328 128v336M184 48v336" 
+    fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>`,
+  viewBox: "0,0,512,512"
+}
+
+export const chevronDown = {
+  svgEls: `<path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64z" 
+    fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" 
+    d="M352 216l-96 96-96-96"/>`,
+  viewBox: "0,0,512,512"
 }

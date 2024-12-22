@@ -3,42 +3,59 @@ import { downloadChecked, shareChecked, deleteChecked, csvChecked,
 import { editNavigation } from './record-details.js'
 import { getSs, setSs } from './common.js'
 import { bin, download, share, csv, checkAll, uncheckAll,
-  edit, beetle, metadata, closeMetadata, delSound, map } from './svg-icons.js'
+  edit, beetle, metadata, closeMetadata, delSound, map, chevronDown } from './svg-icons.js'
+
+let forwardButtonChangeDialog
 
 export function navtop () {
   const listNavs = [
     {
       id: 'delete-selected',
       fn: deleteChecked,
-      icon: bin
+      icon: bin,
+      type: 'edit-record'
     },
     {
       id: 'manage-metadata-selected',
       fn: manageMetadataChecked,
       icon: closeMetadata,
+      type: 'edit-record',
       classes: 'v2'
     },
     {
       id: 'delete-sound-selected',
       fn: deleteSoundChecked,
       icon: delSound,
+      type: 'edit-record',
       classes: 'v2'
     },
     {
       id: 'download-selected',
       fn: downloadChecked,
-      icon: download
+      icon: download,
+      type: 'forward-record',
+      info: 'Download checked records.'
     },
     {
       id: 'share-selected',
       fn: shareChecked,
       icon: share,
+      type: 'forward-record',
+      info: 'Share checked records.'
     },
     {
       id: 'csv-selected',
       fn: csvChecked,
       icon: csv,
+      type: 'forward-record',
+      info: 'Export checked records to CSV.',
       classes: 'v2'
+    },
+    {
+      id: 'forward-button-change',
+      fn: forwardButtonChange,
+      icon: chevronDown,
+      classes: 'v2 button-change'
     },
     {
       id: 'select-all',
@@ -107,6 +124,16 @@ export function navtop () {
     navtopInnerLeft.appendChild(div)
     let classes = 'navbar-icon'
     classes = n.classes ? `${classes} ${n.classes}` : classes
+    if (n.type) {
+      classes = `${classes} ${n.type}`
+    }
+    // TODO comment
+    if (n.type === 'forward-record' ) {
+      const shown = getSs('shown-forward-record') ? getSs('shown-forward-record') : 'share-selected'
+      if (n.id === shown) {
+        classes = `${classes} shown`
+      }
+    }
     div.innerHTML = `<svg id="${n.id}" viewBox="${n.icon.viewBox}" class="${classes}">${n.icon.svgEls}</svg>`
 
     // Add event listerner to remove flash class when animation ends
@@ -142,4 +169,38 @@ export function navtop () {
       editNavigation()
     })
   })
+
+  // Create dialogs for changing buttons
+  forwardButtonChangeDialog = document.createElement('dialog')
+  forwardButtonChangeDialog.setAttribute('id', 'forward-button-change-dialog')
+  document.getElementsByTagName('body')[0].appendChild(forwardButtonChangeDialog)
+
+  listNavs.filter(n => n.type === 'forward-record').forEach(n => {
+    const div = document.createElement('div')
+    div.classList.add('button-change-div')
+    forwardButtonChangeDialog.appendChild(div)
+      
+    let classes = 'navbar-icon'
+    classes = n.classes ? `${classes} ${n.classes}` : classes
+    div.innerHTML = `<svg id="change-${n.id}" data-div="${n.div}" viewBox="${n.icon.viewBox}" class="${classes}">${n.icon.svgEls}</svg>`
+
+    document.getElementById(`change-${n.id}`).addEventListener('click', forwardButtonClicked)
+    const span = document.createElement('span')
+    span.innerHTML = n.info
+    div.appendChild(span)
+  })
+}
+
+function forwardButtonChange() {
+  forwardButtonChangeDialog.showModal()
+}
+
+function forwardButtonClicked(e) {
+  setSs('shown-forward-record', e.target.id.substring(7))
+  const fws = document.getElementsByClassName('forward-record')
+  for (let i = 0; i < fws.length; i++) {
+    fws[i].classList.remove('shown')
+  }
+  document.getElementById(e.target.id.substring(7)).classList.add('shown')
+  forwardButtonChangeDialog.close()
 }

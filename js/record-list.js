@@ -168,7 +168,7 @@ export async function setRecordContent(filename) {
       icons = `${icons}<svg viewBox="${share.viewBox}">${share.svgEls}</svg>`
     }
     if (details.metadata.csvs.length) {
-      icons = `${icons}<svg viewBox="${csv.viewBox}">${csv.svgEls}</svg>`
+      icons = `${icons}<svg style="position: relative; left: 2px" viewBox="${csv.viewBox}">${csv.svgEls}</svg>`
     }
     iconDiv.innerHTML = icons
   }

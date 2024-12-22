@@ -175,3 +175,24 @@ body.emulate-v1 .navtop-inner-container.right {
     stroke: white;
   }
 }
+
+#forward-button-change-dialog {
+  background-color: #333;
+  padding: 5px;
+}
+.button-change-div {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 46px auto;
+  grid-column-gap: 5px;
+  color: white;
+}
+.forward-record {
+  display: none;
+}
+.forward-record.shown {
+  display: inline-block;
+}
+.button-change {
+  border-left: 1px dashed white;
+}
