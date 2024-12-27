@@ -5,112 +5,121 @@ import { getSs, setSs } from './common.js'
 import { bin, download, share, csv, checkAll, uncheckAll,
   edit, beetle, metadata, closeMetadata, delSound, map, chevronDown } from './svg-icons.js'
 
-let forwardButtonChangeDialog
+let groupButtonChangeDialog
 
 export function navtop () {
-  const listNavs = [
+
+  const navs = [
     {
       id: 'delete-selected',
       fn: deleteChecked,
       icon: bin,
-      type: 'edit-record'
+      group: 'edit-record',
+      section: 'left',
+      info: 'Delete checked records'
     },
     {
       id: 'manage-metadata-selected',
       fn: manageMetadataChecked,
       icon: closeMetadata,
-      type: 'edit-record',
-      classes: 'v2'
+      group: 'edit-record',
+      section: 'left',
+      classes: 'v2',
+      info: 'Manage metadata of checked records.'
     },
     {
       id: 'delete-sound-selected',
       fn: deleteSoundChecked,
       icon: delSound,
-      type: 'edit-record',
-      classes: 'v2'
+      group: 'edit-record',
+      section: 'left',
+      classes: 'v2',
+      info: 'Delete sound files associated with checked records.'
     },
     {
       id: 'download-selected',
       fn: downloadChecked,
       icon: download,
-      type: 'forward-record',
+      group: 'forward-record',
+      section: 'left',
       info: 'Download checked records.'
     },
     {
       id: 'share-selected',
       fn: shareChecked,
       icon: share,
-      type: 'forward-record',
+      group: 'forward-record',
+      section: 'left',
       info: 'Share checked records.'
     },
     {
       id: 'csv-selected',
       fn: csvChecked,
       icon: csv,
-      type: 'forward-record',
+      group: 'forward-record',
+      section: 'left',
       info: 'Export checked records to CSV.',
       classes: 'v2'
     },
     {
-      id: 'forward-button-change',
-      fn: forwardButtonChange,
-      icon: chevronDown,
-      classes: 'v2 button-change'
-    },
-    {
       id: 'select-all',
       fn: checkAllRecs,
-      icon: checkAll
+      icon: checkAll,
+      section: 'left'
     },
     {
       id: 'deselect-all',
       fn: uncheckAllRecs,
-      icon: uncheckAll
+      icon: uncheckAll,
+      section: 'left'
     },
-  ]
-
-  const editNavs = [
     {
       id: 'edit-record',
       div: 'record-details',
-      icon: edit
+      icon: edit,
+      section: 'right'
     },
     {
       id: 'edit-location',
       div: 'location-details',
-      icon: map
+      icon: map,
+      section: 'right'
     },
     {
       id: 'edit-taxa',
       div: 'taxa-details',
-      icon: beetle
+      icon: beetle,
+      section: 'right'
     },
-     {
+    {
       id: 'edit-metadata',
       div: 'metadata-details',
-      icon: metadata
+      icon: metadata,
+      section: 'right'
     }
   ]
 
-  // Note length of paths above screws up VB colouring
-
   const navtop = document.getElementById('navtop')
   let navContainer
-  
+
+  // Create the three potential navbar groups within
+  // the main top navbar for the three sections of the
+  // display on full screens
+  // Left
   navContainer = document.createElement('div')
   navContainer.setAttribute('class', 'navtop-inner-container left')
   navtop.appendChild(navContainer)
   const navtopInnerLeft = document.createElement('div')
   navtopInnerLeft.setAttribute('id', 'navtop-inner-left')
   navContainer.appendChild(navtopInnerLeft)
-
+  // Middle
   navContainer = document.createElement('div')
   navContainer.setAttribute('class', 'navtop-inner-container middle')
   navtop.appendChild(navContainer)
   const navtopInnerMiddle = document.createElement('div')
   navtopInnerMiddle.setAttribute('id', 'navtop-inner-middle')
   navContainer.appendChild(navtopInnerMiddle)
-
+  // Right
   navContainer = document.createElement('div')
   navContainer.setAttribute('class', 'navtop-inner-container right')
   navtop.appendChild(navContainer)
@@ -118,31 +127,49 @@ export function navtop () {
   navtopInnerRight.setAttribute('id', 'navtop-inner-right')
   navContainer.appendChild(navtopInnerRight)
 
-  listNavs.forEach(n => {
-    const div = document.createElement('div')
-    div.addEventListener('click', n.fn)
-    navtopInnerLeft.appendChild(div)
-    let classes = 'navbar-icon'
-    classes = n.classes ? `${classes} ${n.classes}` : classes
-    if (n.type) {
-      classes = `${classes} ${n.type}`
+  // Create the left section navigation buttons 
+  const buttonGroupsLeft =  navs.reduce((g, n) => {
+    if(n.section === 'left' && !g.includes(n.group)) {
+      g.push(n.group)
     }
-    // TODO comment
-    if (n.type === 'forward-record' ) {
-      const shown = getSs('shown-forward-record') ? getSs('shown-forward-record') : 'share-selected'
-      if (n.id === shown) {
-        classes = `${classes} shown`
+    return g
+  }, [])
+  buttonGroupsLeft.forEach(g => {
+    navs.filter(n => n.section === 'left' && n.group === g).forEach(n => {
+      const div = document.createElement('div')
+      div.addEventListener('click', n.fn)
+      navtopInnerLeft.appendChild(div)
+      let classes = 'navbar-icon'
+      classes = n.classes ? `${classes} ${n.classes}` : classes
+      // If this button is part of a group, then hide it unless
+      // it is the currently 'selected' button of the group.
+      // Also add group name as a class.
+      if (g) {
+        classes = `${classes} ${g}`
+        const shown = getSs(`shown-${g}`)
+        if (n.id !== shown) {
+          classes = `${classes} hide`
+        }
       }
-    }
-    div.innerHTML = `<svg id="${n.id}" viewBox="${n.icon.viewBox}" class="${classes}">${n.icon.svgEls}</svg>`
-
-    // Add event listerner to remove flash class when animation ends
-    document.getElementById(n.id).addEventListener("animationend", () => {
-      document.getElementById(n.id).classList.remove("flash")
+      // Create the button
+      div.innerHTML = `<svg id="${n.id}" viewBox="${n.icon.viewBox}" class="${classes}">${n.icon.svgEls}</svg>`
+      // Add event listerner to remove flash class when animation ends
+      document.getElementById(n.id).addEventListener("animationend", () => {
+        document.getElementById(n.id).classList.remove("flash")
+      })
     })
+    // If the button is part of a group (g is not undefined)
+    // then create the group switch button
+    if (g){
+      const div = document.createElement('div')
+      navtopInnerLeft.appendChild(div)
+      div.innerHTML = `<svg id="${g}-button-change" viewBox="${chevronDown.viewBox}" class="navbar-icon button-change">${chevronDown.svgEls}</svg>`
+      document.getElementById(`${g}-button-change`).addEventListener('click', groupButtonChange)
+    }
   })
 
-  editNavs.forEach(n => {
+  // Create the right section navigation buttons
+  navs.filter(n => n.section === 'right').forEach(n => {
     const div = document.createElement('div')
     div.classList.add('edit-nav')
     if(n.id === getSs('topNav')) {
@@ -170,37 +197,60 @@ export function navtop () {
     })
   })
 
-  // Create dialogs for changing buttons
-  forwardButtonChangeDialog = document.createElement('dialog')
-  forwardButtonChangeDialog.setAttribute('id', 'forward-button-change-dialog')
-  document.getElementsByTagName('body')[0].appendChild(forwardButtonChangeDialog)
+  // Create dialogs for changing buttons in button groups
+  groupButtonChangeDialog = document.createElement('dialog')
+  groupButtonChangeDialog.setAttribute('id', 'group-button-change-dialog')
+  document.getElementsByTagName('body')[0].appendChild(groupButtonChangeDialog)
 
-  listNavs.filter(n => n.type === 'forward-record').forEach(n => {
-    const div = document.createElement('div')
-    div.classList.add('button-change-div')
-    forwardButtonChangeDialog.appendChild(div)
-      
-    let classes = 'navbar-icon'
-    classes = n.classes ? `${classes} ${n.classes}` : classes
-    div.innerHTML = `<svg id="change-${n.id}" data-div="${n.div}" viewBox="${n.icon.viewBox}" class="${classes}">${n.icon.svgEls}</svg>`
-
-    document.getElementById(`change-${n.id}`).addEventListener('click', forwardButtonClicked)
-    const span = document.createElement('span')
-    span.innerHTML = n.info
-    div.appendChild(span)
+  buttonGroupsLeft.filter(g => g).forEach(g => {
+    navs.filter(n => n.section === 'left').filter(n => n.group === g).forEach(n => {
+      const div = document.createElement('div')
+      div.setAttribute('id', `change-${n.id}`)
+      div.setAttribute('data-group', g)
+      div.classList.add('button-change-div')
+      div.classList.add(`button-group-${g}`)
+      div.addEventListener('click', groupButtonSelected)
+      groupButtonChangeDialog.appendChild(div)
+        
+      let classes = `navbar-icon`
+      classes = n.classes ? `${classes} ${n.classes}` : classes
+      div.innerHTML = `<svg viewBox="${n.icon.viewBox}" class="${classes}">${n.icon.svgEls}</svg>`
+  
+      const span = document.createElement('span')
+      span.innerHTML = n.info
+      div.appendChild(span)
+    })
   })
 }
 
-function forwardButtonChange() {
-  forwardButtonChangeDialog.showModal()
+function groupButtonChange(e) {
+  // Remove the '-button-change' suffix from target id to
+  // get group name.
+  const group = e.target.id.substring(0, e.target.id.length - 14)
+
+  const allDivs = document.getElementsByClassName('button-change-div')
+  for (let i=0; i<allDivs.length; i++) {
+    allDivs[i].classList.add('hide')
+  }
+  const groupDivs = document.getElementsByClassName(`button-group-${group}`)
+  for (let i=0; i<groupDivs.length; i++) {
+    groupDivs[i].classList.remove('hide')
+  }
+  groupButtonChangeDialog.showModal()
 }
 
-function forwardButtonClicked(e) {
-  setSs('shown-forward-record', e.target.id.substring(7))
-  const fws = document.getElementsByClassName('forward-record')
-  for (let i = 0; i < fws.length; i++) {
-    fws[i].classList.remove('shown')
+function groupButtonSelected(e) {
+  // Remove the 'change-' prefix from target id to
+  // get the name of the chosen button.
+  const chosen = e.target.id.substring(7)
+  const group = e.target.getAttribute('data-group')
+  setSs(`shown-${group}`, chosen)
+
+  const grpButtons = document.getElementsByClassName(group)
+  for (let i = 0; i < grpButtons.length; i++) {
+    grpButtons[i].classList.add('hide')
   }
-  document.getElementById(e.target.id.substring(7)).classList.add('shown')
-  forwardButtonChangeDialog.close()
+  document.getElementById(chosen).classList.remove('hide')
+
+  groupButtonChangeDialog.close()
 }

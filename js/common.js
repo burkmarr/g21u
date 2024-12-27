@@ -148,6 +148,8 @@ export function setSs(id, value) {
 export function getSs(id) {
   const defaults = {
     mainNav: 'navbot-link-record',
+    'shown-edit-record': 'delete-selected',
+    'shown-forward-record': 'share-selected',
     topNav: () => {
       if (window.matchMedia("(max-width: 1024px)").matches) {
         return 'edit-record'
