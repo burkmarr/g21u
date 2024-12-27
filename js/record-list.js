@@ -304,6 +304,11 @@ export async function metadataRemoveYesNo(e) {
   populateRecordFields()
 }
 
+export function copyValuesChecked(e) {
+  flash(e.target.id)
+  console.log('copyValuesChecked')
+}
+
 export async function shareChecked(e) {
   flash(e.target.id)
 

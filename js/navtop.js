@@ -1,9 +1,9 @@
 import { downloadChecked, shareChecked, deleteChecked, csvChecked, 
-  uncheckAllRecs, checkAllRecs, manageMetadataChecked, deleteSoundChecked } from './record-list.js'
+  uncheckAllRecs, checkAllRecs, manageMetadataChecked, deleteSoundChecked, copyValuesChecked } from './record-list.js'
 import { editNavigation } from './record-details.js'
 import { getSs, setSs } from './common.js'
 import { bin, download, share, csv, checkAll, uncheckAll,
-  edit, beetle, metadata, closeMetadata, delSound, map, chevronDown } from './svg-icons.js'
+  edit, beetle, metadata, closeMetadata, delSound, map, chevronDown, copy } from './svg-icons.js'
 
 let groupButtonChangeDialog
 
@@ -35,6 +35,15 @@ export function navtop () {
       section: 'left',
       classes: 'v2',
       info: 'Delete sound files associated with checked records.'
+    },
+    {
+      id: 'copy-values-selected',
+      fn: copyValuesChecked,
+      icon: copy,
+      group: 'edit-record',
+      section: 'left',
+      classes: 'v2',
+      info: 'Copy field values from selected record to checked records.'
     },
     {
       id: 'download-selected',

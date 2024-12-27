@@ -119,39 +119,39 @@ body.emulate-v1 .navtop-inner-container.right {
 .navbar-icon.hide {
   display: none;
 }
-.navbar-icon path, .navbar-icon circle {
+.navbar-icon path, .navbar-icon circle, .navbar-icon rect {
   pointer-events: none;
 }
-.navbar-icon path[fill="none"], .navbar-icon circle[fill="none"],
-.navbar-icon path:not([fill]), .navbar-icon circle:not([fill]) {
+.navbar-icon path[fill="none"], .navbar-icon circle[fill="none"], .navbar-icon rect[fill="none"],
+.navbar-icon path:not([fill]), .navbar-icon circle:not([fill]), .navbar-icon rect:not([fill]) {
   fill: none;
   stroke: white;
 }
-.navbar-icon path[stroke="none"], .navbar-icon circle[stroke="none"],
-.navbar-icon path:not([stroke]), .navbar-icon circle:not([stroke]) {
+.navbar-icon path[stroke="none"], .navbar-icon circle[stroke="none"], .navbar-icon rect[stroke="none"],
+.navbar-icon path:not([stroke]), .navbar-icon circle:not([stroke]), .navbar-icon rect:not([stroke]) {
   fill: white;
   stroke: none;
 }
 /* Selected navigation buttons */
-.selected-nav .navbar-icon path[fill="none"], .selected-nav .navbar-icon circle[fill="none"],
-.selected-nav .navbar-icon path:not([fill]), .selected-nav .navbar-icon circle:not([fill]) {
+.selected-nav .navbar-icon path[fill="none"], .selected-nav .navbar-icon circle[fill="none"], .selected-nav .navbar-icon rect[fill="none"],
+.selected-nav .navbar-icon path:not([fill]), .selected-nav .navbar-icon circle:not([fill]), .selected-nav .navbar-icon rect:not([fill]) {
   fill: none;
   stroke: rgb(12, 237, 12);
 }
-.selected-nav .navbar-icon path[stroke="none"], .selected-nav .navbar-icon circle[stroke="none"],
-.selected-nav .navbar-icon path:not([stroke]), .selected-nav .navbar-icon circle:not([stroke]) {
+.selected-nav .navbar-icon path[stroke="none"], .selected-nav .navbar-icon circle[stroke="none"], .selected-nav .navbar-icon rect[stroke="none"],
+.selected-nav .navbar-icon path:not([stroke]), .selected-nav .navbar-icon circle:not([stroke]), .selected-nav .navbar-icon rect:not([stroke]) {
   fill: rgb(12, 237, 12);
   stroke: none;
 }
 /* Flash animation for list toolbar icons */
-.flash.navbar-icon path[fill="none"], .flash.navbar-icon circle[fill="none"],
-.flash.navbar-icon path:not([fill]), .flash.navbar-icon circle:not([fill]) {
+.flash.navbar-icon path[fill="none"], .flash.navbar-icon circle[fill="none"], .flash.navbar-icon rect[fill="none"],
+.flash.navbar-icon path:not([fill]), .flash.navbar-icon circle:not([fill]), .flash.navbar-icon rect:not([fill]) {
   animation-name: flashStroke;
   animation-duration: 0.6s;
   animation-iteration-count: 1;
 }
-.flash.navbar-icon path[stroke="none"], .flash.navbar-icon circle[stroke="none"],
-.flash.navbar-icon path:not([stroke]), .flash.navbar-icon circle:not([stroke]) {
+.flash.navbar-icon path[stroke="none"], .flash.navbar-icon circle[stroke="none"], .flash.navbar-icon rect[stroke="none"],
+.flash.navbar-icon path:not([stroke]), .flash.navbar-icon circle:not([stroke]), .flash.navbar-icon rect:not([stroke]) {
   animation-name: flashFill;
   animation-duration: 0.6s;
   animation-iteration-count: 1;
@@ -186,7 +186,7 @@ body.emulate-v1 .navtop-inner-container.right {
 .button-change-div {
   display: grid;
   align-items: center;
-  grid-template-columns: 46px auto;
+  grid-template-columns: 60px auto;
   grid-column-gap: 5px;
   color: white;
   cursor: pointer;
