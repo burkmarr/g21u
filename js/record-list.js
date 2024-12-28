@@ -1,6 +1,7 @@
 import { storGetRecs, storDeleteFiles, storSaveFile, downloadFile, 
   storFileExists, storGetFile, getRecordJson, shareRecs, recsToCsv
 } from './file-handling.js'
+import { getFieldDefs } from './fields.js'
 import { getOpt, detailsFromFilename, getSs, setSs, generalMessage } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
@@ -184,32 +185,6 @@ export async function deleteChecked(e) {
   }
 }
 
-export async function manageMetadataChecked(e) {
-  flash(e.target.id)
-  // Reset radio buttons
-  document.querySelector('[name=radio-download][value=none]').checked = true;
-  document.querySelector('[name=radio-share][value=none]').checked = true;
-  document.querySelector('[name=radio-csv][value=none]').checked = true;
-  // Show modal if at least one record checked
-  let checked = false
-  for (let i=0; i<storRecs.length; i++) {
-    checked = document.getElementById(`record-checkbox-${i}`).checked ? true : checked
-  }
-  if (checked) {
-    document.getElementById('metadata-dialog').showModal()
-  }
-}
-
-export async function deleteSoundChecked(e) {
-  flash(e.target.id)
-  const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
-  if (n) {
-    document.getElementById('sound-file-num').innerText = n
-    document.getElementById('sound-file-text').innerText = n === 1 ? 'record' : 'records'
-    document.getElementById('delete-sound-confirm-dialog').showModal()
-  }
-}
-
 export async function deleteYesNo(e) {
   document.getElementById('delete-confirm-dialog').close()
   if (e.target.getAttribute('id') === 'delete-confirm') {
@@ -235,21 +210,19 @@ export async function deleteYesNo(e) {
   }
 }
 
-export async function deleteSoundYesNo(e) {
-  document.getElementById('delete-sound-confirm-dialog').close()
-  if (e.target.getAttribute('id') === 'delete-sound-confirm') {
-    const files = []
-    for (let i=0; i<storRecs.length; i++) {
-      const name = storRecs[i].filename
-      if (document.getElementById(`record-checkbox-${i}`).checked) {
-        if (await storFileExists(`${name}.wav`)) {
-          files.push(`${name}.wav`)
-        }
-      }
-    }
-    await storDeleteFiles(files)
-    await initialiseList()
-    populateRecordFields()
+export async function manageMetadataChecked(e) {
+  flash(e.target.id)
+  // Reset radio buttons
+  document.querySelector('[name=radio-download][value=none]').checked = true;
+  document.querySelector('[name=radio-share][value=none]').checked = true;
+  document.querySelector('[name=radio-csv][value=none]').checked = true;
+  // Show modal if at least one record checked
+  let checked = false
+  for (let i=0; i<storRecs.length; i++) {
+    checked = document.getElementById(`record-checkbox-${i}`).checked ? true : checked
+  }
+  if (checked) {
+    document.getElementById('metadata-dialog').showModal()
   }
 }
 
@@ -304,9 +277,98 @@ export async function metadataRemoveYesNo(e) {
   populateRecordFields()
 }
 
+export async function deleteSoundChecked(e) {
+  flash(e.target.id)
+  const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  if (n) {
+    document.getElementById('sound-file-num').innerText = n
+    document.getElementById('sound-file-text').innerText = n === 1 ? 'record' : 'records'
+    document.getElementById('delete-sound-confirm-dialog').showModal()
+  }
+}
+
+export async function deleteSoundYesNo(e) {
+  document.getElementById('delete-sound-confirm-dialog').close()
+  if (e.target.getAttribute('id') === 'delete-sound-confirm') {
+    const files = []
+    for (let i=0; i<storRecs.length; i++) {
+      const name = storRecs[i].filename
+      if (document.getElementById(`record-checkbox-${i}`).checked) {
+        if (await storFileExists(`${name}.wav`)) {
+          files.push(`${name}.wav`)
+        }
+      }
+    }
+    await storDeleteFiles(files)
+    await initialiseList()
+    populateRecordFields()
+  }
+}
+
 export function copyValuesChecked(e) {
   flash(e.target.id)
-  console.log('copyValuesChecked')
+  document.getElementById("copy-field-selected-record").innerHTML =  document.querySelector(".record-selected .record-div-text").innerHTML
+  const parent = document.getElementById("copy-field-dialog-checkboxes")
+  parent.innerHTML = ''
+  getFieldDefs().forEach(f => {
+    const cb = document.createElement('input')
+    cb.setAttribute('type', 'checkbox')
+    cb.setAttribute('data-jsonid', f.jsonId)
+    cb.classList.add('copy-field-checkbox')
+    parent.appendChild(cb)
+
+    const span = document.createElement('span')
+    span.innerText = f.inputLabel
+    parent.appendChild(span)
+  })
+  const dialog = document.getElementById("copy-fields-dialog")
+  dialog.showModal()
+}
+
+export async function copyValuesConfirmCancel(e) {
+
+  const dialog = document.getElementById("copy-fields-dialog")
+  dialog.close()
+
+  if (e.target.getAttribute('id') === 'copy-confirm') {
+    // Get json of the currently selected record
+    let jsonSelected
+    const selectedFile = getSs('selectedFile')
+    if (selectedFile) {
+      // Get corresponding record JSON if it exists
+      jsonSelected = await getRecordJson(`${selectedFile}.txt`)
+    }
+
+    // Get the checkboxes from dialog
+    const cbs = document.getElementsByClassName('copy-field-checkbox')
+
+    // Loop through all records
+    for (let i=0; i<storRecs.length; i++) {
+      const name = storRecs[i].filename
+      if (document.getElementById(`record-checkbox-${i}`).checked) {
+        // Record needs to be updated for checked fields from
+        // selected record.
+        if (await storFileExists(`${name}.txt`)) {
+          const jsonChecked = await getRecordJson(`${name}.txt`)
+          // Loop through all dialog checkboxes
+          for (let i=0; i<cbs.length; i++) {
+            const cb = cbs[i]
+            if (cb.checked) {
+              // If field checked, update field of checked record with
+              // the value of the field from the selected record.
+              const jsonId = cb.getAttribute('data-jsonid')
+              jsonChecked[jsonId] = jsonSelected[jsonId]
+            }
+          }
+          // Update record
+          console.log('updating record')
+          const jsonString = JSON.stringify(jsonChecked)
+          await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${name}.txt`)
+        }   
+      }
+    }
+    initialiseList()
+  }
 }
 
 export async function shareChecked(e) {

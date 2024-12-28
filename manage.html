@@ -64,6 +64,18 @@
     </div>
   </dialog>
 
+  <dialog id="copy-fields-dialog">
+    <div id="copy-field-selected-record"></div>
+    <p>Check all those fields that you wish to update on the checked records 
+      from the values in the selected record indicated above. <b><i>Take care that
+      you have selected the right record - this bulk update cannot be easily undone</i></b>.</p>
+    <div id="copy-field-dialog-checkboxes"></div>
+    <div class="dialog-buttons">
+      <button id="copy-confirm">Confirm</button>
+      <button id="copy-cancel">Cancel</button>
+    </div>
+  </dialog>
+
   <div id="navtop" style="display: flex"></div>
   </div>
   <div id="manage-div" style="display: flex">
@@ -83,7 +95,7 @@
   <script type="module" defer>
     import { navbot } from './js/navbot.js'
     import { navtop } from './js/navtop.js'
-    import { deleteYesNo, deleteSoundYesNo, initialiseList, metadataRemoveYesNo } from './js/record-list.js'
+    import { deleteYesNo, deleteSoundYesNo, initialiseList, metadataRemoveYesNo, copyValuesConfirmCancel } from './js/record-list.js'
     import { initRecordDetails, populateRecordFields, editNavigation } from './js/record-details.js'
     import { getOpt, getSs, setSs } from './js/common.js'
 
@@ -103,6 +115,8 @@
     document.getElementById('delete-sound-confirm').addEventListener('click', deleteSoundYesNo)
     document.getElementById('metadata-remove-cancel').addEventListener('click', metadataRemoveYesNo)
     document.getElementById('metadata-remove-confirm').addEventListener('click', metadataRemoveYesNo)
+    document.getElementById('copy-confirm').addEventListener('click', copyValuesConfirmCancel)
+    document.getElementById('copy-cancel').addEventListener('click', copyValuesConfirmCancel)
 
     // Top navigation
     navtop()

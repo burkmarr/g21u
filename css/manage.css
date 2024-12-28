@@ -39,9 +39,14 @@ h3 {
   min-width: 250px;
   padding-right: 72px;
 }
-.record-div.record-selected {
-  background-image: linear-gradient(to bottom, white, rgb(238, 238, 120));
+.record-div.record-selected, #copy-field-selected-record {
+  background-image: linear-gradient(to bottom, white, rgb(240, 240, 18));
+  border: 1px dashed black;
 }
+#copy-field-selected-record {
+  padding: 0.5em;
+}
+
 .record-play-image {
   width: 50px;
   /* cursor:pointer required on iOS browsers otherwise click event not recognised */
@@ -198,4 +203,16 @@ body:not(.small-edit) #record-details {
 }
 #record-details-playback-image {
   width: 50px;
+}
+
+#copy-field-dialog-checkboxes {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 25px auto;
+  grid-auto-rows: 35px;
+  grid-column-gap: 5px;
+}
+#copy-field-dialog-checkboxes input {
+  transform: scale(2);
+  margin-right: 10px;
 }
