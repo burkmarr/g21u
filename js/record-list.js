@@ -133,7 +133,9 @@ export async function setRecordContent(filename) {
     details = await getRecordJson(`${filename}.txt`)
   }
   let html = details.date
-  html = buildText(html, details.time.substring(0, 5), ' ')
+  if (details.time) {
+    html = buildText(html, details.time.substring(0, 5), ' ')
+  }
   if (getOpt('georef-format') === 'osgr') {
     html = buildText(html, details.gridref, '<br/>')
   } else {
@@ -385,9 +387,11 @@ export async function shareChecked(e) {
       populateRecordFields()
     } else if (share.startsWith('error')) {
       if (!share.includes('AbortError')) {
+        // For browsers that can detect when user aborts share
         generalMessage(`
           <p>The share failed. The most likely reason is that you exceeded the 
-          limit allowed for this browser. Try sharing in smaller batches.</p>
+          number of files that can be shared at once by your browser. 
+          Try sharing in smaller batches.</p>
           <p style="font-size: 0.8em">(Reported error was: ${share})</p>.
         `)
       }   

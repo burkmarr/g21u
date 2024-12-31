@@ -394,6 +394,19 @@ export async function shareRecs(recs) {
   return share
 }
 
+export async function shareCsvs(csvs) {
+  const files = []
+  for (let i=0; i<csvs.length; i++) {
+    if (await storFileExists(csvs[i])) {
+      const csv = await storGetFile(csvs[i])
+      files.push(csv)
+    }
+  }
+  // Attempt the share
+  const share = await shareApi(files)
+  return share
+}
+
 async function shareApi(files) {
 // Check browser support
   if (navigator.share) {
@@ -411,6 +424,33 @@ async function shareApi(files) {
     return ("Your browser does not support the WebShare API.")
   }
 }
+
+export async function mergeCsvs(files) {
+
+  //const csvs = files.map(f => getCSV(f))
+  let csvRecs = []
+  for (let i=0; i<files.length; i++) {
+    const csv = await getCSV(files[i])
+    csvRecs = [...csvRecs, ...csv]
+  }
+
+  const columnHeaders = getFieldDefs({allfields: true}).filter(f => {
+    const fld = f.iRecord ? f.iRecord : f.inputLabel
+    const include = csvRecs.some(r => r[fld])
+    return include
+  }).map(f => {
+    return f.iRecord ? f.iRecord : f.inputLabel
+  })
+
+  const csvConfig = mkConfig({ 
+    columnHeaders: columnHeaders
+  })
+  const csv = generateCsv(csvConfig)(csvRecs)
+  const blob = asBlob(csvConfig)(csv)
+  // The new CSV file is given a name based on the current timestamp
+  await storSaveFile(blob, `g21-recs-${getDateTime()}.csv`)
+}
+
 
 export async function recsToCsv(recs) {
   const csvRecs = []

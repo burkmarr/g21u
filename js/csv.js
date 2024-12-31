@@ -1,5 +1,5 @@
-import { storGetCsvs, storFileExists, storDeleteFiles, getCSV } from './file-handling.js'
-import { el, getSs, setSs, keyValuePairTable } from './common.js'
+import { storGetCsvs, storFileExists, storDeleteFiles, getCSV, shareCsvs, mergeCsvs } from './file-handling.js'
+import { el, getSs, setSs, keyValuePairTable, generalMessage } from './common.js'
 import { getFieldDefs } from './fields.js'
 import { csv } from './svg-icons.js'
 
@@ -117,6 +117,9 @@ export async function csvDetails () {
 
   const earliest = selectedCsvRecs.reduce((a,r) => {return a ? r.Date < a ? r.Date : a : r.Date}, null)
   const latest = selectedCsvRecs.reduce((a,r) => {return a ? r.Date > a ? r.Date : a : r.Date}, null)
+  const osgr = selectedCsvRecs.some(r => r['Grid ref'])
+  const latlon = selectedCsvRecs.some(r => r['Latitude'])
+  const georef = osgr && latlon ? 'Mixed (OSGR & Lat/Lon)' : osgr ? 'OSGR' : 'Lat/Lon'
 
   const summary = document.createElement('div')
   summary.setAttribute('id', 'csv-summary')
@@ -124,6 +127,7 @@ export async function csvDetails () {
     <b>Records</b>: ${selectedCsvRecs.length}<br/>
     <b>Earliest</b>: ${earliest}<br/>
     <b>Latest</b>: ${latest}<br/>
+    <b>Georef</b>: ${georef}
   `
   parent.appendChild(summary)
 
@@ -236,8 +240,8 @@ export function deleteCheckedCsv (e) {
   flash(e.target.id)
   const n =  storCsvs.reduce((a,r,i) => document.getElementById(`csv-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
-    document.getElementById('file-num').innerText = n
-    document.getElementById('plural').innerText = n === 1 ? '' : 's'
+    document.getElementById('delete-file-num').innerText = n
+    document.getElementById('delete-plural').innerText = n === 1 ? '' : 's'
     document.getElementById('delete-csv-confirm-dialog').showModal()
   }
 }
@@ -257,22 +261,77 @@ export async function deleteCsvYesNo (e) {
         document.getElementById(`csv-checkbox-${i}`).checked = false
       }
     }
-    console.log('delete', files)
     await storDeleteFiles(files)
     initialiseCsvList()
   }
 } 
 
-export function mergeCheckedCsv () {
-  console.log('mergeCheckedCsv')
+export function mergeCheckedCsv (e) {
+  flash(e.target.id)
+
+  const n =  storCsvs.reduce((a,r,i) => document.getElementById(`csv-checkbox-${i}`).checked ? a+1 : a, 0)
+  if (n > 1) {
+    document.getElementById('merge-file-num').innerText = n
+    document.getElementById('merge-csv-confirm-dialog').showModal()
+  }
 }
 
-export function mergeCsvYesNo () {
-  console.log('mergeCsvYesNo')
+export async function mergeCsvYesNo (e) {
+  document.getElementById('merge-csv-confirm-dialog').close()
+  if (e.target.getAttribute('id') === 'merge-confirm') {
+    const files = []
+    for (let i=0; i<storCsvs.length; i++) {
+      const name = storCsvs[i].name
+      if (document.getElementById(`csv-checkbox-${i}`).checked) {
+        if (await storFileExists(name)) {
+          files.push(name)
+        }
+        // Uncheck all checkboxes when deleting otherwise wrong items
+        // reselected.
+        document.getElementById(`csv-checkbox-${i}`).checked = false
+      }
+    }
+    await mergeCsvs(files)
+    await storDeleteFiles(files)
+    initialiseCsvList()
+  }
 } 
 
-export function shareCheckedCsv () {
-  console.log('shareCheckedCsv')
+export async function shareCheckedCsv (e) {
+  flash(e.target.id)
+  
+  const n =  storCsvs.reduce((a,r,i) => document.getElementById(`csv-checkbox-${i}`).checked ? a+1 : a, 0)
+  if (n) {
+    const csvs = []
+    for (let i=0; i<storCsvs.length; i++) {
+      const name = storCsvs[i].name
+      if (document.getElementById(`csv-checkbox-${i}`).checked) { 
+        csvs.push(name)
+      }
+    }
+    const share = await shareCsvs(csvs)
+    console.log(share)
+    if (share === 'success') {
+      // Do nothing
+    } else if (share.startsWith('error')) {
+      if (!share.includes('AbortError')) {
+        // For browsers that can detect when user aborts share
+        generalMessage(`
+          <p>The share failed. The most likely reason is that you exceeded the 
+          number of files that can be shared at once by your browser. 
+          Try sharing in smaller batches.</p>
+          <p style="font-size: 0.8em">(Reported error was: ${share})</p>.
+        `)  
+        }
+    } else {
+      // Share not supported by browser
+      generalMessage(`
+        <p>This browser does not support the web share API. 
+        Consider using a browser that does, e.g. Chrome.</p>
+        <p style="font-size: 0.8em">(Reported browser is: ${navigator.userAgent})</p>.
+      `)
+    }
+  }
 }
 
 export function checkAllCsvs (e) {
