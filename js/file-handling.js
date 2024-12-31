@@ -227,6 +227,76 @@ export async function storGetRecs () {
   return recs
 }
 
+export async function storGetCsvs() {
+  let csvs = []
+  switch(getOpt('file-handling')) {
+    case 'opfs':
+      const storRoot = await navigator.storage.getDirectory()
+      const ofpsEntries = storRoot.values()
+      for await (const entry of ofpsEntries) {
+        const ext = entry.name.substring(entry.name.length - 4)
+        if (ext === '.csv' && !entry.name.startsWith('custom-')) {
+          const file = await storGetFile(entry.name)
+          csvs.push(file)
+        }
+      }
+      break
+    case 'idb':
+      const idbKeys = await idb.keys()
+      for (const key of idbKeys) {
+        const ext = key.substring(key.length - 4)
+        if (ext === '.csv' && !key.startsWith('custom-')) {
+          const file = await storGetFile(key)
+          recs.push(file)
+        }
+      }
+      break
+    case 'native':
+      const dirHandle = await idb.get('native-folder')
+      if (!dirHandle) {
+        generalMessage(`
+          Native file system selected but folder is not set in options.
+          Specify a folder into which to save files.
+        `)
+      } else {
+        let checkDir = true
+        const nativeEntries = dirHandle.values()
+        try {
+          for await (const entry of nativeEntries) {}
+        } catch (e) {
+          checkDir = false
+          if (String(e).includes('directory could not be found')) {
+            generalMessage(`
+              The folder ${dirHandle.name} could not be read - check that
+              it hasn't been deleted. Reset the native folder in the options.
+            `)
+          } else if (String(e).includes('NotAllowedError')) {
+            generalMessage(`
+              Permission to access the folder '${dirHandle.name}' has been lost 
+              - try reselecting the folder in the options & granting permission to read and save.
+            `)
+          } else {
+            generalMessage(`Unexpected error. ${e}`)
+          }
+        }
+        if (checkDir) {
+          const nativeEntries = dirHandle.values()
+          for await (const entry of nativeEntries) {
+            const ext = entry.name.substring(entry.name.length - 4)
+            if (ext === '.csv' && !entry.name.startsWith('custom-') ) {
+              const file = await storGetFile(entry.name)
+              csvs.push(file)
+            }
+          }
+        } 
+      }
+      break
+    default:
+      // No default handler
+  }
+  return csvs
+}
+
 export async function storGetFile (filename) {
   let file
   switch(getOpt('file-handling')) {
@@ -352,16 +422,14 @@ export async function recsToCsv(recs) {
     // Copy the record json object minus the metadata
     // Only copy those fields that are being used by
     // the user.
-    const cjson = JSON.parse(JSON.stringify(json))
-    delete cjson.metadata
-    const flds = getFieldDefs().map(fd => fd.jsonId)
-    Object.keys(cjson).forEach(jsonId => {
-      if (!flds.includes(jsonId)) {
-        delete cjson[jsonId]
-      }
+    // Replace the field names (property keys) with the iRecord
+    // name if it exists, otherwise the caption name.
+    const cjson = {}
+    getFieldDefs().forEach(f => {
+      const fldName = f.iRecord ? f.iRecord : f.inputLabel
+      cjson[fldName] = json[f.jsonId] ? json[f.jsonId] : ''
     })
-    console.log('Before removal', json)
-    console.log('After removal', cjson)
+    // Push the new json into array that will make the CSV
     csvRecs.push(cjson)
     // Update record metadata
     json.metadata.csvs.push(formattedDateTime)
@@ -452,12 +520,12 @@ export async function getRecordJson(filename) {
 }
 
 export async function getCSV(filename) {
-  let json
+  let csv
   if (await storFileExists(filename)) {
     const blob = await storGetFile(filename)
-    json = csvParse(await blob.text())
+    csv = csvParse(await blob.text())
   }
-  return json
+  return csv
 }
 
 export async function copyRecord(originalName, newName) {

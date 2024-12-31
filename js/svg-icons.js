@@ -199,3 +199,9 @@ export const chevronDown = {
     d="M352 216l-96 96-96-96"/>`,
   viewBox: "0,0,512,512"
 }
+
+export const chevronCollapse = {
+  svgEls: `<path d="M136 104l120 104 120-104M136 408l120-104 120 104" 
+    fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>`,
+  viewBox: "0,0,512,512"
+}

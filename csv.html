@@ -1,0 +1,70 @@
+<!doctype  html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>G21v2 CSV</title>
+  <link rel="stylesheet" href="css/general.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/csv.css">
+  <link rel="manifest" href="manifest.json" />
+</head>
+
+<body>
+
+  <dialog id="delete-csv-confirm-dialog">
+    <p>Are you sure that you want to delete <span id="file-num"></span> CSV<span id="plural"></span>?</p>
+    <div class="dialog-buttons">
+      <button id="delete-confirm">Yes</button>
+      <button id="delete-reject">No</button>
+    </div>
+  </dialog>
+
+  <dialog id="merge-csv-confirm-dialog">
+    <p>Are you sure that you want to merge <span id="file-num"></span> CSVs into one new CSV and delete the originals?</p>
+    <div class="dialog-buttons">
+      <button id="merge-confirm">Yes</button>
+      <button id="merge-reject">No</button>
+    </div>
+  </dialog>
+
+  <div id="navtop" style="display: flex"></div>
+  <div id="csv-div" style="display: flex">
+    <div id="csv-list" class="csv-panel-div"></div>
+    <div id="csv-details" class="csv-panel-div"></div>
+    <div id="record-details" class="csv-panel-div"></div>
+  </div>
+  <div id="navbot"></div>
+
+  <script type="module" defer>
+    import { navbot } from './js/navbot.js'
+    import { navtop } from './js/navtop.js'
+    import { deleteCsvYesNo, mergeCsvYesNo, initialiseCsvList } from './js/csv.js'
+    import { getOpt, getSs, setSs } from './js/common.js'
+
+    // Add class to body if small screen edit page
+    if (getSs('mainNav') === 'navbot-link-edit') { 
+      document.body.classList.add('small-edit')
+    }
+ 
+    // Add event handlers for dialogs
+    document.getElementById('delete-reject').addEventListener('click', deleteCsvYesNo)
+    document.getElementById('delete-confirm').addEventListener('click', deleteCsvYesNo)
+    document.getElementById('merge-reject').addEventListener('click', mergeCsvYesNo)
+    document.getElementById('merge-confirm').addEventListener('click', mergeCsvYesNo)
+
+    // Top navigation
+    navtop('csv')
+    // Main navigation (bottom)
+    navbot()
+
+    // CSV list
+    await initialiseCsvList()
+
+    // Record fields
+    // initRecordDetails()
+    // await populateRecordFields()
+  </script>
+</body>
+</html>

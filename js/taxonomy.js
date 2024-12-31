@@ -1,5 +1,5 @@
 import { el, keyValuePairTable, unorderedList, collapsibleDiv, getSs } from './common.js'
-import { storFileExists, storGetFile, getCSV } from './file-handling.js'
+import { getCSV } from './file-handling.js'
 import { highlightFields } from './record-details.js'
 
 let customTaxaCsv

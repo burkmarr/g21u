@@ -107,7 +107,7 @@
     if (getSs('mainNav') === 'navbot-link-edit') { 
       document.body.classList.add('small-edit')
     }
- 
+
     // Add event handlers for dialogs
     document.getElementById('delete-reject').addEventListener('click', deleteYesNo)
     document.getElementById('delete-confirm').addEventListener('click', deleteYesNo)
@@ -119,7 +119,7 @@
     document.getElementById('copy-cancel').addEventListener('click', copyValuesConfirmCancel)
 
     // Top navigation
-    navtop()
+    navtop('manage')
     // Main navigation (bottom)
     navbot()
 
@@ -135,6 +135,7 @@
     smallScreen.addEventListener("change", function() {
       screenLayout()
     })
+
     function screenLayout () {
       // On screen size change
       if (getSs('mainNav') === 'navbot-link-edit' && !smallScreen.matches) {

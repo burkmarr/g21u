@@ -1,5 +1,5 @@
 import { getSs, setSs } from './common.js'
-import { microphone, list, details, options } from './svg-icons.js'
+import { microphone, list, details, options, csv } from './svg-icons.js'
 
 export function navbot () {
 
@@ -18,6 +18,11 @@ export function navbot () {
       id: 'navbot-link-edit',
       href: 'manage.html',
       icon: details
+    },
+    {
+      id: 'navbot-link-csv',
+      href: 'csv.html',
+      icon: csv
     },
     {
       id: 'navbot-link-options',

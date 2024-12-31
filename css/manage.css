@@ -136,9 +136,9 @@ body.emulate-v1 .record-logo {
   height: calc(100vh - 2 * var(--but-size) - 2 * var(--body-margin));
 }
 
-.details-div {
+/* .details-div {
   width: 100%;
-}
+} */
 
 /* Details div visibility in response to button selections */
 .details-div.hide {

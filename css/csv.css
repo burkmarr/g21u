@@ -1,0 +1,70 @@
+body {
+  padding-top: var(--but-size); 
+}
+
+#csv-details, #record-details {
+  margin-left: 1em;
+}
+
+h3 {
+  margin-top: 0;
+}
+.header-note {
+ font-size: 0.8em;
+ font-weight: normal;
+}
+.csv-panel-div {
+  width: 100%;
+  overflow-y: auto; 
+  overflow-x: hidden; 
+  height: calc(100vh - 2 * var(--but-size) - 2 * var(--body-margin));
+}
+
+/* Representation of csvs in list */
+.csv-div {
+  background-image: linear-gradient(to bottom,  #ffffff 0%,#EFEFEF 100%);
+  height: 75px;
+  display: flex;
+  align-items: center; 
+  position: relative;
+  min-width: 250px;
+  padding-right: 72px;
+}
+.csv-div.csv-selected, .csv-rec-div.csv-rec-selected {
+  background-image: linear-gradient(to bottom, white, rgb(240, 240, 18));
+  border: 1px dashed black;
+}
+.csv-list-icon {
+  width: var(--but-width);
+  pointer-events: none;
+  padding: var(--but-padding);
+}
+.csv-list-icon path {
+  fill: black;
+}
+.csv-div-text {
+  pointer-events: none;
+}
+.csv-checkbox {
+  position: absolute;
+  right: 15px;
+  transform: scale(2);
+}
+
+/* Representation of records in list */
+.csv-rec-div {
+  background-image: linear-gradient(to bottom,  #ffffff 0%,#EFEFEF 100%);
+  height: 85px;
+  display: flex;
+  align-items: center; 
+  position: relative;
+  min-width: 250px;
+  padding-right: 72px;
+}
+.csv-rec-div-text {
+  margin-left: 0.5em;
+  pointer-events: none;
+}
+#csv-summary {
+  margin-bottom: 0.5em;
+}

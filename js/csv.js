@@ -1,0 +1,296 @@
+import { storGetCsvs, storFileExists, storDeleteFiles, getCSV } from './file-handling.js'
+import { el, getSs, setSs, keyValuePairTable } from './common.js'
+import { getFieldDefs } from './fields.js'
+import { csv } from './svg-icons.js'
+
+let storCsvs, selectedCsvRecs
+
+export async function initialiseCsvList () {
+
+  // Get the currently checked items in order to re-check them
+  const currentlyChecked = []
+  if (storCsvs) {
+    for (let i=0; i<storCsvs.length; i++) {
+      if (el(`csv-checkbox-${i}`).checked) {
+        currentlyChecked.push(i)
+      }
+    }
+  }
+  // Now re-fetch storCsvs
+  storCsvs = await storGetCsvs()
+  //console.log('storCsvs', storCsvs)
+  if (!storCsvs.length) {
+    el('csv-list').innerHTML = `<h3>No CSVs to display</h3>`
+    setSs('selectedCsv', '')
+    selectedCsvRecs = null
+    csvDetails()
+    csvRecDetails()
+    return
+  }
+  // storCsvs = storCsvs.sort((a,b) => {
+  //   // Sort on date first and then time
+  //   let comparison = 0
+  //   if (a.date > b.date) {
+  //     comparison = -1
+  //   } else if (a.date < b.date) {
+  //     comparison = 1
+  //   }
+  //   if (comparison === 0) {
+  //     if (a.time > b.time) {
+  //       comparison = -1
+  //     } else if (a.time < b.time) {
+  //       comparison = 1
+  //     } 
+  //   }
+  //   return comparison
+  // })
+
+  // If the currently selected csv indicated by
+  // session storage is no longer present, then
+  // reset it to the first record.
+  if (!storCsvs.find(f => f.name === getSs('selectedCsv'))) {
+    setSs('selectedCsv', storCsvs[0].name)
+  }
+
+  // Populate with files from storage
+  el('csv-list').innerHTML = ''
+
+  for (let i=0; i<storCsvs.length; i++) {
+    const name = storCsvs[i].name
+    // Create div
+    const csvDiv = document.createElement('div')
+    csvDiv.setAttribute('id', `csv-div-${i}`)
+    csvDiv.setAttribute('data-csv-name', name) 
+    csvDiv.classList.add('csv-div')
+    csvDiv.addEventListener('click', csvSelected)
+    if (name === getSs('selectedCsv')) {
+      csvDiv.classList.add('csv-selected')
+    }
+    // Logo
+    const logoDiv = document.createElement('div')
+    logoDiv.innerHTML = `<svg viewBox="${csv.viewBox}" class="csv-list-icon">${csv.svgEls}</svg>`
+    csvDiv.appendChild(logoDiv)
+    
+    // Text
+    const textDiv = document.createElement('div')
+    textDiv.setAttribute('id', `csv-text-${name}`)
+    textDiv.classList.add('csv-div-text')
+    textDiv.innerHTML = name
+    csvDiv.appendChild(textDiv)
+
+    // Select checkbox
+    const check = document.createElement('input')
+    check.setAttribute('type', 'checkbox')
+    check.setAttribute('id', `csv-checkbox-${i}`)
+    if (currentlyChecked.includes(i)) {
+      check.setAttribute('checked', 'checked')
+    }
+    check.classList.add('csv-checkbox')
+    check.addEventListener('click', csvChecked)
+    csvDiv.appendChild(check)
+
+    el('csv-list').appendChild(csvDiv)
+  }
+
+  csvDetails()
+  csvRecDetails()
+}
+
+export async function csvDetails () {
+  const selectedCsv = getSs('selectedCsv')
+
+  const parent = el('csv-details')
+  parent.innerHTML = ''
+
+  const title = document.createElement('h3')
+  parent.appendChild(title)
+
+  if (!selectedCsv) {
+    title.innerHTML = 'CSV details <span class="header-note">- no CSV selected</span>'
+    return
+  } else {
+    title.innerHTML = 'CSV details <span class="header-note">for selected CSV</span>'
+  }
+
+  // Get the selected file and parse it
+  selectedCsvRecs = await getCSV(selectedCsv)
+
+  const earliest = selectedCsvRecs.reduce((a,r) => {return a ? r.Date < a ? r.Date : a : r.Date}, null)
+  const latest = selectedCsvRecs.reduce((a,r) => {return a ? r.Date > a ? r.Date : a : r.Date}, null)
+
+  const summary = document.createElement('div')
+  summary.setAttribute('id', 'csv-summary')
+  summary.innerHTML = `
+    <b>Records</b>: ${selectedCsvRecs.length}<br/>
+    <b>Earliest</b>: ${earliest}<br/>
+    <b>Latest</b>: ${latest}<br/>
+  `
+  parent.appendChild(summary)
+
+  //console.log(selectedCsvRecs)
+  selectedCsvRecs.forEach((r,i) => {
+    const rec =  document.createElement('div')
+
+    // Create div
+    const csvRecDiv = document.createElement('div')
+    csvRecDiv.setAttribute('id', `csv-rec-div-${i}`)
+    csvRecDiv.setAttribute('data-index', i) 
+    csvRecDiv.classList.add('csv-rec-div')
+    csvRecDiv.addEventListener('click', csvRecSelected)
+    // Text
+    let txt = addText('', r['Species'])
+    if (r['Grid ref']) {
+      txt = addText(txt, r['Grid ref'])
+    } else {
+      txt = addText(txt, `${r['Latitude']}/${r['Longitude']}`)
+    }
+    txt = addText(txt, r['Site name'])
+    txt = addText(txt, r['Date'])
+    const textDiv = document.createElement('div')
+    textDiv.setAttribute('id', `csv-rec-text-${i}`)
+    textDiv.classList.add('csv-rec-div-text')
+    textDiv.innerHTML = txt
+    csvRecDiv.appendChild(textDiv)
+    parent.appendChild(csvRecDiv)
+  })
+
+  csvRecDetails()
+
+  function addText(txt, val) {
+    if (!val) {
+      return txt
+    } else if (txt) {
+      return `${txt}<br/>${val}`
+    } else {
+      return val
+    }
+  }
+}
+
+function csvRecDetails() {
+ 
+  let selectedCsvRec = document.getElementsByClassName("csv-rec-selected")
+  if(selectedCsvRec.length) {
+    selectedCsvRec = selectedCsvRec[0]
+  } else {
+    selectedCsvRec = null
+  }
+
+  const parent = el('record-details')
+  parent.innerHTML = ''
+
+  const title = document.createElement('h3')
+  parent.appendChild(title)
+
+  if (!selectedCsvRec) {
+    title.innerHTML = 'Record details <span class="header-note">- no record selected</span>'
+    return
+  } else {
+    title.innerHTML = 'Record details <span class="header-note">for selected record</span>'
+  }
+
+  const recIndex = Number(selectedCsvRec.getAttribute('data-index'))
+  const record = selectedCsvRecs[recIndex]
+
+  const rows = []
+  const flds = getFieldDefs({allfields: true})
+  flds.forEach(f => {
+    const fld = f.iRecord ? f.iRecord : f.inputLabel
+    if (record.hasOwnProperty(fld)) {
+      rows.push({
+        caption: fld,
+        value: record[fld]
+      })
+    }
+  })
+  keyValuePairTable('rec-details', rows, parent)
+}
+
+function csvSelected(e) {
+  const currentSelected = document.getElementsByClassName("csv-selected")
+  if(currentSelected[0].getAttribute('data-csv-name') !== e.target.getAttribute('data-csv-name')) {
+    currentSelected[0].classList.remove("csv-selected")
+    e.target.classList.add("csv-selected")
+    setSs( 'selectedCsv', e.target.getAttribute('data-csv-name'))
+
+    csvDetails()
+  }
+}
+
+function csvRecSelected(e) {
+  const currentSelected = document.getElementsByClassName("csv-rec-selected")
+  if(!currentSelected.length || currentSelected[0].getAttribute('data-index') !== e.target.getAttribute('data-index')) {
+    if (currentSelected.length) {
+      currentSelected[0].classList.remove("csv-rec-selected")
+    }
+    e.target.classList.add("csv-rec-selected")
+    csvRecDetails()
+  }
+}
+
+function csvChecked(e) {
+  e.stopPropagation()
+}
+
+export function deleteCheckedCsv (e) {
+  flash(e.target.id)
+  const n =  storCsvs.reduce((a,r,i) => document.getElementById(`csv-checkbox-${i}`).checked ? a+1 : a, 0)
+  if (n) {
+    document.getElementById('file-num').innerText = n
+    document.getElementById('plural').innerText = n === 1 ? '' : 's'
+    document.getElementById('delete-csv-confirm-dialog').showModal()
+  }
+}
+
+export async function deleteCsvYesNo (e) {
+  document.getElementById('delete-csv-confirm-dialog').close()
+  if (e.target.getAttribute('id') === 'delete-confirm') {
+    const files = []
+    for (let i=0; i<storCsvs.length; i++) {
+      const name = storCsvs[i].name
+      if (document.getElementById(`csv-checkbox-${i}`).checked) {
+        if (await storFileExists(name)) {
+          files.push(name)
+        }
+        // Uncheck all checkboxes when deleting otherwise wrong items
+        // reselected.
+        document.getElementById(`csv-checkbox-${i}`).checked = false
+      }
+    }
+    console.log('delete', files)
+    await storDeleteFiles(files)
+    initialiseCsvList()
+  }
+} 
+
+export function mergeCheckedCsv () {
+  console.log('mergeCheckedCsv')
+}
+
+export function mergeCsvYesNo () {
+  console.log('mergeCsvYesNo')
+} 
+
+export function shareCheckedCsv () {
+  console.log('shareCheckedCsv')
+}
+
+export function checkAllCsvs (e) {
+  flash(e.target.id)
+  const checkboxes = document.getElementsByClassName('csv-checkbox')
+  for(let i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = true
+  }
+}
+
+export function uncheckAllCsvs (e) {
+  flash(e.target.id)
+  const checkboxes = document.getElementsByClassName('csv-checkbox')
+  for(let i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = false
+  }
+}
+
+function flash(id) {
+  document.getElementById(id).classList.add('flash')
+}

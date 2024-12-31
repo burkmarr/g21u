@@ -1,5 +1,5 @@
-const VERSION = "v1.0.0"
-const BUILD = 45
+const VERSION = "v1.1.0"
+const BUILD = 0
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -7,6 +7,7 @@ const APP_STATIC_RESOURCES = [
   "index.html",
   "options.html",
   "manage.html",
+  "csv.html",
   "css/general.css",
   "css/options.css",
   "css/record.css",
@@ -14,6 +15,7 @@ const APP_STATIC_RESOURCES = [
   "css/taxon-select.css",
   "css/mapping.css",
   "css/navigation.css",
+  "css/csv.css",
   "js/taxonomy.js",
   "js/mapping.js",
   "js/location.js",
@@ -26,6 +28,7 @@ const APP_STATIC_RESOURCES = [
   "js/record-list.js",
   "js/record-details.js",
   "js/play.js",
+  "js/csv.js",
   "js/fields.js",
   "js/svg-icons.js",
   "js/nl.min.js",

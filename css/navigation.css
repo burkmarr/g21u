@@ -24,11 +24,15 @@
 .navtop-inner-container {
   width: 100%
 }
-#navtop-inner-left {
+#navtop-inner-left.manage {
   width: calc(var(--but-size) * 6);
   margin: 0 auto;
 }
-body.emulate-v1 #navtop-inner-left {
+body.emulate-v1 #navtop-inner-left.manage {
+  width: calc(var(--but-size) * 5);
+  margin: 0 auto;
+}
+#navtop-inner-left.csv {
   width: calc(var(--but-size) * 5);
   margin: 0 auto;
 }
@@ -80,10 +84,13 @@ body.emulate-v1 .navtop-inner-container.right {
 }
 #navbot-inner {
   margin: 0 auto;
-  width: calc(var(--but-size) * 3);
+  width: calc(var(--but-size) * 4);
 }
 #navbot svg#navbot-link-edit { /* CSS selector needs to be more specific than below */
   display: none; /* Edit link is hidden by default */
+}
+body.emulate-v1 #navbot svg#navbot-link-csv {
+  display: none;
 }
 /* Change the width of the navar-inner div
  * which is centered in the main navbot div
@@ -100,7 +107,7 @@ body.emulate-v1 .navtop-inner-container.right {
     width: calc(var(--but-size) * 3);
   }
   #navbot-inner {
-    width: calc(var(--but-size) * 4);
+    width: calc(var(--but-size) * 5);
   }
   #navbot svg#navbot-link-edit { 
     display: block;

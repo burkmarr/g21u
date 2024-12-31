@@ -48,16 +48,12 @@ export async function initialiseList() {
 
   // If the currently selected file indicated by
   // session storage is no longer present, then
-  // reset it to the first record if there are any.
+  // reset it to the first record.
   if (!storRecs.find(r => r.filename === getSs('selectedFile'))) {
-    if (storRecs.length) {
-      setSs('selectedFile', storRecs[0].filename)
-    } else {
-      setSs('selectedFile', '')
-    }
+    setSs('selectedFile', storRecs[0].filename)
   }
 
-  // Populate with files from storage (large devices)
+  // Populate with files from storage
   document.getElementById('record-list').innerHTML = ''
 
   for (let i=0; i<storRecs.length; i++) {
@@ -94,7 +90,7 @@ export async function initialiseList() {
     logoImage.setAttribute('src', 'images/gilbert.png')
     logoImage.classList.add('record-logo')
     fileDiv.appendChild(logoImage)
-    Text
+    // Text
     const textDiv = document.createElement('div')
     textDiv.setAttribute('id', `rec-text-${name}`)
     textDiv.classList.add('record-div-text')
