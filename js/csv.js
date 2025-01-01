@@ -1,5 +1,5 @@
 import { storGetCsvs, storFileExists, storDeleteFiles, getCSV, shareCsvs, mergeCsvs, downloadFile, storRenameFile } from './file-handling.js'
-import { el, getSs, setSs, keyValuePairTable, generalMessage } from './common.js'
+import { el, getSs, setSs, keyValuePairTable, generalMessage, getDateTime } from './common.js'
 import { getFieldDefs } from './fields.js'
 import { csv } from './svg-icons.js'
 
@@ -284,6 +284,16 @@ export function mergeCheckedCsv (e) {
 
   const n =  storCsvs.reduce((a,r,i) => document.getElementById(`csv-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n > 1) {
+    let sel = el('radio-merge-name-select')
+    sel.innerHTML='<option value="new">Auto-generate new name</option>'
+    storCsvs.forEach((f,i) => {
+      if (document.getElementById(`csv-checkbox-${i}`).checked) {
+        const opt = document.createElement('option')
+        opt.setAttribute('value', f.name)
+        opt.innerText = f.name
+        sel.appendChild(opt)
+      }
+    })
     document.getElementById('merge-file-num').innerText = n
     document.getElementById('merge-csv-confirm-dialog').showModal()
   }
@@ -304,8 +314,12 @@ export async function mergeCsvYesNo (e) {
         document.getElementById(`csv-checkbox-${i}`).checked = false
       }
     }
-    await mergeCsvs(files)
+    let filename = `g21-recs-${getDateTime()}.csv`
+    await mergeCsvs(files, filename)
     await storDeleteFiles(files)
+    if (el('radio-merge-name-select').value !== 'new') {
+      storRenameFile(filename, el('radio-merge-name-select').value)
+    }
     initialiseCsvList()
   }
 } 

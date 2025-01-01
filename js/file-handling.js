@@ -448,7 +448,7 @@ async function shareApi(files) {
   }
 }
 
-export async function mergeCsvs(files) {
+export async function mergeCsvs(files, name) {
 
   //const csvs = files.map(f => getCSV(f))
   let csvRecs = []
@@ -470,8 +470,7 @@ export async function mergeCsvs(files) {
   })
   const csv = generateCsv(csvConfig)(csvRecs)
   const blob = asBlob(csvConfig)(csv)
-  // The new CSV file is given a name based on the current timestamp
-  await storSaveFile(blob, `g21-recs-${getDateTime()}.csv`)
+  await storSaveFile(blob, name)
 }
 
 export async function recsToCsv(recs) {

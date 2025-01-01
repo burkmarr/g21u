@@ -23,9 +23,12 @@
 
   <dialog id="merge-csv-confirm-dialog">
     <p>Are you sure that you want to merge <span id="merge-file-num"></span> CSVs into one new CSV and delete the originals?</p>
+    <p>Choose whether or not to use the name of one of the original files for the merged file.</p>
+    <select id="radio-merge-name-select">
+    </select>
     <div class="dialog-buttons">
-      <button id="merge-confirm">Yes</button>
-      <button id="merge-reject">No</button>
+      <button id="merge-confirm">Merge</button>
+      <button id="merge-reject">Cancel</button>
     </div>
   </dialog>
 

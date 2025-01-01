@@ -83,3 +83,14 @@ h3 {
   font-size: 0.8em;
   color: red;
 }
+
+#radio-merge-name-div {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 25px auto;
+  grid-auto-rows: 35px;
+  grid-column-gap: 15px;
+}
+#radio-merge-name-div input {
+  scale: 2;
+}

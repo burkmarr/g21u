@@ -33,7 +33,7 @@ body.emulate-v1 #navtop-inner-left.manage {
   margin: 0 auto;
 }
 #navtop-inner-left.csv {
-  width: calc(var(--but-size) * 5);
+  width: calc(var(--but-size) * 6);
   margin: 0 auto;
 }
 body.emulate-v1 .navbar-icon.v2 {
