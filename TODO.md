@@ -1,13 +1,18 @@
 # TODO
-- New page for dealing with CSVs
-  - delete CSV
-  - download CSV
-  - share CSV
-  - combine CSVs
-- For native file system have folder options for deleted sound files and deleted records. If set, deleting sound file or record just moves the associated files to those folders (i.e. archives them) instead of deleting completely (same for CSV)
-- When all is done, rethink buttons
-  - could play sound and duplicate button go on middle toobar?
-  - Or maybe sound should recieve foucus 
-  - look at how focus moves on record details - try to make record entry as efficient as possible. Next should get focus when save button used.
-- Need to check how everything works without internet.
-- Revisit map resizeing - very hard to get the resize handle on mobile.
+- CSVs
+  - Download CSV
+  - Responsive on mobile
+  - Rename CSV
+- Archive for native file system
+  - Add options for name archive folder on native file system
+  - Dialogs for delete record, delete sound, delete CSV and merge CSV should have checkbox if archive folder valid to indicate whether to move or delete files
+- GUI considerations
+  - Could/should play sound and duplicate button go on middle toobar?
+  - Or maybe sound should recieve foucus?
+  - Look at how focus moves on record details -  make record entry as efficient as possible. 
+  - Next should get focus when save button used.
+- Testing
+  - Need to check how everything works without internet.
+  - Need to test that everything works with the different file handling options.
+  - Revisit map resizing - very hard to get the resize handle on mobile.
+  - Need to test on iPhone.

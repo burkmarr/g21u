@@ -451,7 +451,6 @@ export async function mergeCsvs(files) {
   await storSaveFile(blob, `g21-recs-${getDateTime()}.csv`)
 }
 
-
 export async function recsToCsv(recs) {
   const csvRecs = []
   const formattedDateTime = getDateTime(true)

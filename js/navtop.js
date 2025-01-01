@@ -1,7 +1,7 @@
 import { downloadChecked, shareChecked, deleteChecked, csvChecked, 
   uncheckAllRecs, checkAllRecs, manageMetadataChecked, deleteSoundChecked, copyValuesChecked } from './record-list.js'
 import { editNavigation } from './record-details.js'
-import { deleteCheckedCsv, shareCheckedCsv, mergeCheckedCsv, checkAllCsvs, uncheckAllCsvs } from './csv.js'
+import { deleteCheckedCsv, shareCheckedCsv, mergeCheckedCsv, checkAllCsvs, uncheckAllCsvs, downloadCsvChecked } from './csv.js'
 import { getSs, setSs, getOpt } from './common.js'
 import { bin, download, share, csv, checkAll, uncheckAll,
   edit, beetle, metadata, closeMetadata, delSound, map, chevronDown, 
@@ -141,6 +141,14 @@ export function navtop (page) {
       icon: chevronCollapse,
       page: 'csv',
       section: 'left'
+    },
+    {
+      id: 'download-csv-selected',
+      fn: downloadCsvChecked,
+      icon: download,
+      page: 'csv',
+      section: 'left',
+      info: 'Download checked CSVs.'
     },
     {
       id: 'select-all-csv',

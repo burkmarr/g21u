@@ -1,4 +1,4 @@
-import { storGetCsvs, storFileExists, storDeleteFiles, getCSV, shareCsvs, mergeCsvs } from './file-handling.js'
+import { storGetCsvs, storFileExists, storDeleteFiles, getCSV, shareCsvs, mergeCsvs, downloadFile } from './file-handling.js'
 import { el, getSs, setSs, keyValuePairTable, generalMessage } from './common.js'
 import { getFieldDefs } from './fields.js'
 import { csv } from './svg-icons.js'
@@ -331,6 +331,24 @@ export async function shareCheckedCsv (e) {
         <p style="font-size: 0.8em">(Reported browser is: ${navigator.userAgent})</p>.
       `)
     }
+  }
+}
+
+export async function downloadCsvChecked(e) {
+  flash(e.target.id)
+  const n =  storCsvs.reduce((a,r,i) => document.getElementById(`csv-checkbox-${i}`).checked ? a+1 : a, 0)
+  if (n) {
+    const promises = []
+    for (let i=0; i<storCsvs.length; i++) {
+      const name = storCsvs[i].name
+      if (document.getElementById(`csv-checkbox-${i}`).checked) {
+        // Download CSV if it exists
+        if (await storFileExists(name)) {
+          promises.push(downloadFile(name))
+        }
+      }
+    }
+    await Promise.all(promises)
   }
 }
 
