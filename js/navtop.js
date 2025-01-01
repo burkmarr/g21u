@@ -136,19 +136,18 @@ export function navtop (page) {
       section: 'left'
     },
     {
+      id: 'download-csv-selected',
+      fn: downloadCsvChecked,
+      icon: download,
+      page: 'csv',
+      section: 'left'
+    },
+    {
       id: 'merge-csv-selected',
       fn: mergeCheckedCsv,
       icon: chevronCollapse,
       page: 'csv',
       section: 'left'
-    },
-    {
-      id: 'download-csv-selected',
-      fn: downloadCsvChecked,
-      icon: download,
-      page: 'csv',
-      section: 'left',
-      info: 'Download checked CSVs.'
     },
     {
       id: 'select-all-csv',

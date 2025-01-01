@@ -1,8 +1,7 @@
 # TODO
 - CSVs
-  - Download CSV
-  - Responsive on mobile
   - Rename CSV
+  - Responsive on mobile
 - Archive for native file system
   - Add options for name archive folder on native file system
   - Dialogs for delete record, delete sound, delete CSV and merge CSV should have checkbox if archive folder valid to indicate whether to move or delete files

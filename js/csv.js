@@ -1,4 +1,4 @@
-import { storGetCsvs, storFileExists, storDeleteFiles, getCSV, shareCsvs, mergeCsvs, downloadFile } from './file-handling.js'
+import { storGetCsvs, storFileExists, storDeleteFiles, getCSV, shareCsvs, mergeCsvs, downloadFile, storRenameFile } from './file-handling.js'
 import { el, getSs, setSs, keyValuePairTable, generalMessage } from './common.js'
 import { getFieldDefs } from './fields.js'
 import { csv } from './svg-icons.js'
@@ -115,6 +115,18 @@ export async function csvDetails () {
   // Get the selected file and parse it
   selectedCsvRecs = await getCSV(selectedCsv)
 
+  // Rename CSV file input
+  parent.innerHTML = `${parent.innerHTML}
+    <div id ="csv-details-rename-div">
+      <input type="text" id="csv-details-rename-input">
+      <button id="csv-details-rename-button">Rename</button>
+    </div>
+    <p id="csv-details-rename-warning"></p>
+  `
+  el('csv-details-rename-button').addEventListener('click', renameCsv)
+  el('csv-details-rename-input').value = selectedCsv
+
+  // CSV summary info
   const earliest = selectedCsvRecs.reduce((a,r) => {return a ? r.Date < a ? r.Date : a : r.Date}, null)
   const latest = selectedCsvRecs.reduce((a,r) => {return a ? r.Date > a ? r.Date : a : r.Date}, null)
   const osgr = selectedCsvRecs.some(r => r['Grid ref'])
@@ -130,6 +142,7 @@ export async function csvDetails () {
     <b>Georef</b>: ${georef}
   `
   parent.appendChild(summary)
+
 
   //console.log(selectedCsvRecs)
   selectedCsvRecs.forEach((r,i) => {
@@ -365,6 +378,20 @@ export function uncheckAllCsvs (e) {
   const checkboxes = document.getElementsByClassName('csv-checkbox')
   for(let i=0, n=checkboxes.length;i<n;i++) {
     checkboxes[i].checked = false
+  }
+}
+
+async function renameCsv() {
+  const selectedCsv = getSs('selectedCsv')
+  const newName = el("csv-details-rename-input").value
+
+  if (await storFileExists(newName)) {
+    el("csv-details-rename-warning").innerText = `A file with the name "${newName}" already exists.`
+  } else {
+    el("csv-details-rename-warning").innerText = ''
+    await storRenameFile(selectedCsv, newName)
+    setSs('selectedCsv', newName)
+    initialiseCsvList()
   }
 }
 

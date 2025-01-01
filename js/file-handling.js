@@ -88,6 +88,29 @@ export async function storSaveFile(blob, name) {
   }
 }
 
+export async function storRenameFile(oldName, newName) {
+  switch(getOpt('file-handling')) {
+    case 'opfs':
+      const storRoot = await navigator.storage.getDirectory()
+      const opfsHandle = await storRoot.getFileHandle(oldName, {create: false})
+      await opfsHandle.move(newName)
+      break
+    case 'idb':
+      const file = await idb.get(oldName)
+      const newFile = new File([file], newName, { type: file.type })
+      await idb.set(newName, newFile)
+      await idb.del(oldName)
+      break
+    case 'native':
+      const dirHandle = await idb.get('native-folder')
+      const nativeHandle = await dirHandle.getFileHandle(oldName, { create: false })
+      await nativeHandle.move(newName)
+      break
+    default:
+      // No default handler
+  }
+}
+
 export async function storDeleteFiles(files) {
   switch(getOpt('file-handling')) {
     case 'opfs':
@@ -247,7 +270,7 @@ export async function storGetCsvs() {
         const ext = key.substring(key.length - 4)
         if (ext === '.csv' && !key.startsWith('custom-')) {
           const file = await storGetFile(key)
-          recs.push(file)
+          csvs.push(file)
         }
       }
       break

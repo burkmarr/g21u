@@ -68,3 +68,18 @@ h3 {
 #csv-summary {
   margin-bottom: 0.5em;
 }
+
+#csv-details-rename-div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1em;
+}
+#csv-details-rename-div button {
+  margin: 0 10px;
+  font-size: 1em;
+  padding: 0.4em;
+}
+#csv-details-rename-warning {
+  font-size: 0.8em;
+  color: red;
+}
