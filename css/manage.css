@@ -103,6 +103,9 @@ body.emulate-v1 .record-logo {
 #record-details input.edited, #record-details textarea.edited, #record-save-cancel.edited button {
   background-color: #efe6cd;
 }
+#record-save-cancel.edited button {
+  border-width: 1px;
+}
 #record-details input.saved, #record-details textarea.saved {
   background-color: #c8ebcf;
 }
@@ -196,13 +199,23 @@ body:not(.small-edit) #record-details {
 #record-details-playback-div {
   display: flex;
   align-items: center;
+  margin: 0.5em 0;
 }
-#record-details-playback-div button {
+
+#record-duplicate {
   margin-left: 10px;
+  height: 38px;
   font-size: 1em;
 }
+
 #record-details-playback-image {
+  height: 30px;
+  pointer-events: none;
+}
+#record-details-playback-button {
   width: 50px;
+  height: 38px;
+  font-size: 1em;
 }
 
 #copy-field-dialog-checkboxes {
@@ -221,3 +234,4 @@ body:not(.small-edit) #record-details {
   scale: 2;
   margin-right: 1em;
 }
+

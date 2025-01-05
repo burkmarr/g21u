@@ -1,9 +1,5 @@
 # TODO
-- GUI considerations
-  - Could/should play sound and duplicate button go on middle toobar?
-  - Or maybe sound should recieve focus?
-  - Look at how focus moves on record details -  make record entry as efficient as possible. 
-  - Next should get focus when save button used.
+- Quantity field!!
 - Testing
   - Need to check how everything works without internet.
   - Need to test that everything works with the different file handling options.

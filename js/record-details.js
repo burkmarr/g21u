@@ -31,13 +31,15 @@ export function initRecordDetails() {
 function initRecordFields() {
 
   const parent = el('record-details')
+
   parent.innerHTML = `<h3 id="record-details-title"></h3>
     <div id ="record-details-playback-div">
-      <img id="record-details-playback-image">
+      <button id="record-details-playback-button"><img id="record-details-playback-image"></button>
       <button id="record-duplicate">Duplicate</button>
     </div>
   `
-  document.getElementById('record-duplicate').addEventListener('click', duplicateRecord)
+  
+  el('record-duplicate').addEventListener('click', duplicateRecord)
 
   // Generate the input fields
   getFieldDefs().forEach(f => {
@@ -109,9 +111,47 @@ function initRecordFields() {
   cancel.addEventListener('click', cancelRecord)
   ctrl.appendChild(cancel)
   const save = document.createElement('button')
+  save.setAttribute('id', 'record-save-button')
   save.innerText = 'Save'
   save.addEventListener('click', saveRecord)
   ctrl.appendChild(save)
+
+  // Handling form focus on tab press
+  document.addEventListener('keyup', function (e) {
+    if (e.code === 'Enter' && e.target.id === 'record-save-button') {
+      // User has saved record shift focus to next record button
+      el('next-record').focus()
+    } 
+  })
+  document.addEventListener('keydown', function (e) {
+    if (e.code === 'Tab') {
+      // Tab key pressed
+      e.preventDefault()
+      e.stopPropagation()
+
+      const fieldDefs = getFieldDefs()
+      const currentInputIndex = fieldDefs.findIndex(f => f.inputId === e.target.id)
+
+      // Move focus to an input control
+      let focussed = false
+      for (let i = currentInputIndex+1; i<fieldDefs.length; i++) {
+        const inputId = fieldDefs[i].inputId
+        const value = el(inputId).value
+        const edited = el(inputId).classList.contains('edited')
+        console.log(inputId, value)
+        if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
+          el(inputId).focus()
+          focussed = true
+          break
+        }
+      }
+      if (!focussed) {
+        // No more fields to focus on
+        // shift to save button
+        el('record-save-button').focus()
+      }
+    }
+  }, false)
 }
 
 export async function getMetadata() {
@@ -218,20 +258,21 @@ export async function populateRecordFields() {
   //console.log('selectedFile', selectedFile)
 
   if (!selectedFile) {
-    document.getElementById('record-details-title').innerHTML = 'Record details <span class="header-note">- no record selected</span>'
-    document.getElementById('record-details-playback-image').setAttribute('src', 'images/playback-grey.png')
+    el('record-details-title').innerHTML = 'Record details <span class="header-note">- no record selected</span>'
+    el('record-details-playback-image').setAttribute('src', 'images/playback-grey.png')
   } else {
-    document.getElementById('record-details-title').innerHTML = 'Record details <span class="header-note">for selected record</span>'
+    el('record-details-title').innerHTML = 'Record details <span class="header-note">for selected record</span>'
     // Interrupt any current playing
     audioPlayer.pause()
     audioPlayer.currentTime = 0
-    const img = document.getElementById('record-details-playback-image')
-    img.removeEventListener('click', playRecordWav)
-    img.removeEventListener('click', stopPlaybackWav)
+    const but = el('record-details-playback-button')
+    const img = el('record-details-playback-image')
+    but.removeEventListener('click', playRecordWav)
+    but.removeEventListener('click', stopPlaybackWav)
     // Set up listerners and playing image
     if (await storFileExists(`${selectedFile}.wav`)) {
       img.setAttribute('src', 'images/playback-green.png')
-      img.addEventListener('click', playRecordWav)
+      but.addEventListener('click', playRecordWav)
     } else {
       img.setAttribute('src', 'images/playback-grey.png')
     }
@@ -272,6 +313,9 @@ export async function populateRecordFields() {
   } else {
     el('record-details').classList.add('disable') 
   }
+
+  // Set initial focus to sound play button
+  el('record-details-playback-button').focus()
 }
 
 export async function highlightFields() {
@@ -322,12 +366,12 @@ export function rightNavManage(e) {
   }
 
   // Show the current contents div
-  if (document.getElementById(divId)) {
-    document.getElementById(divId).classList.remove('hide')
+  if (el(divId)) {
+    el(divId).classList.remove('hide')
   } else {
     // Default
-    document.getElementById('record-details').classList.remove('hide')
-    document.getElementById('edit-record').parentElement.classList.add('selected-nav')
+    el('record-details').classList.remove('hide')
+    el('edit-record').parentElement.classList.add('selected-nav')
   }
 
   if (divId === 'location-details') {
@@ -338,36 +382,38 @@ export function rightNavManage(e) {
 async function playRecordWav(e) {
   e.stopPropagation()
 
-  const img = document.getElementById('record-details-playback-image')
+  const but = el('record-details-playback-button')
+  const img = el('record-details-playback-image')
 
-  img.removeEventListener('click', playRecordWav)
+  but.removeEventListener('click', playRecordWav)
   img.src = "images/playback-red.png"
   img.classList.add("flashing")
-  img.addEventListener('click', stopPlaybackWav)
+  but.addEventListener('click', stopPlaybackWav)
 
   audioPlayer = new Audio()
   const audioFile = await storGetFile(`${getSs('selectedFile')}.wav`)
   await playBlob(audioPlayer, audioFile, getOpt('playback-volume'))
 
-  img.removeEventListener('click', stopPlaybackWav)
+  but.removeEventListener('click', stopPlaybackWav)
   img.src = "images/playback-green.png"
   img.classList.remove("flashing")
-  img.addEventListener('click', playRecordWav)
+  but.addEventListener('click', playRecordWav)
 }
 
 function stopPlaybackWav(e) {
 
   e.stopPropagation()
 
-  const img = document.getElementById('record-details-playback-image')
+  const but = el('record-details-playback-button')
+  const img = el('record-details-playback-image')
 
   audioPlayer.pause()
   audioPlayer.currentTime = 0
 
-  img.removeEventListener('click', stopPlaybackWav)
+  but.removeEventListener('click', stopPlaybackWav)
   img.src = "images/playback-green.png"
   img.classList.remove("flashing")
-  img.addEventListener('click', playRecordWav)
+  but.addEventListener('click', playRecordWav)
 }
 
 export async function duplicateRecord(e) {
