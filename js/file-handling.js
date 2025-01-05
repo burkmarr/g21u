@@ -6,6 +6,25 @@ import { mkConfig, generateCsv, asBlob, idb, csvParse } from './nl.min.js'
 // functions that retrieve or write to storage and
 // are all responsive to the type of storage selected.
 
+export async function storArchiveFiles(files) {
+  // Should only ever be called if file-handling is set
+  // to native
+  if (getOpt('file-handling') !== 'native') {
+    console.error("storArchiveFiles shouln't have been called on non-native file system option")
+    return
+  }
+  for (const file of files) {
+    const blob = await storGetFile(file)
+    const dirArchiveHandle = await idb.get('archive-native-folder')
+    const nativeHandle = await dirArchiveHandle.getFileHandle(file, { create: true })
+    const nativeWritable = await nativeHandle.createWritable()
+    await nativeWritable.write(blob)
+    await nativeWritable.close()
+    const dirMainHandle = await idb.get('main-native-folder')
+    await dirMainHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}`))
+  }
+}
+
 export async function storFileExists(filename) {
   let file
   //console.log('storeFileExists', filename)
@@ -20,7 +39,7 @@ export async function storFileExists(filename) {
       return typeof file !== 'undefined'
     case 'native':
       //console.log('storFileExists', filename)
-      const dirHandle = await idb.get('native-folder')
+      const dirHandle = await idb.get('main-native-folder')
       //console.log('dirHandle', dirHandle)
       const nativeHandle = await dirHandle.getFileHandle(filename, { create: false })
         .catch( e => {Promise.resolve()})
@@ -69,7 +88,7 @@ export async function storSaveFile(blob, name) {
       await idb.set(name, file)
       break
     case 'native':
-      const dirHandle = await idb.get('native-folder')
+      const dirHandle = await idb.get('main-native-folder')
       if (!dirHandle) {
         generalMessage(`
           Native file system selected but folder is not set in options.
@@ -102,7 +121,7 @@ export async function storRenameFile(oldName, newName) {
       await idb.del(oldName)
       break
     case 'native':
-      const dirHandle = await idb.get('native-folder')
+      const dirHandle = await idb.get('main-native-folder')
       const nativeHandle = await dirHandle.getFileHandle(oldName, { create: false })
       await nativeHandle.move(newName)
       break
@@ -123,9 +142,8 @@ export async function storDeleteFiles(files) {
       await idb.delMany(files)
       break
     case 'native':
-      const dirHandle = await idb.get('native-folder')
+      const dirHandle = await idb.get('main-native-folder')
       for (const file of files) {
-        console.log('deleting', file)
         await dirHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}`))
       }
       break
@@ -188,7 +206,7 @@ export async function storGetRecs () {
       }
       break
     case 'native':
-      const dirHandle = await idb.get('native-folder')
+      const dirHandle = await idb.get('main-native-folder')
       if (!dirHandle) {
         generalMessage(`
           Native file system selected but folder is not set in options.
@@ -275,7 +293,7 @@ export async function storGetCsvs() {
       }
       break
     case 'native':
-      const dirHandle = await idb.get('native-folder')
+      const dirHandle = await idb.get('main-native-folder')
       if (!dirHandle) {
         generalMessage(`
           Native file system selected but folder is not set in options.
@@ -332,7 +350,7 @@ export async function storGetFile (filename) {
       file = await idb.get(filename)
       break
     case 'native':
-      const dirHandle = await idb.get('native-folder')
+      const dirHandle = await idb.get('main-native-folder')
       const nativeHandle = await dirHandle.getFileHandle(filename, { create: false })
       file = await nativeHandle.getFile()
       break
@@ -595,12 +613,43 @@ export async function copyRecord(originalName, newName) {
     const oWavFile = await storGetFile(`${originalName}.wav`)
     await storSaveFile(oWavFile, `${newName}.wav`)
   }
-  const json = await getRecordJson(`${originalName}.txt`) 
-  json['scientific-name'] = ''
-  json['common-name'] = ''
+  const json = await getRecordJson(`${originalName}.txt`)
+  // Reset any fields which are not for duplication
+  getFieldDefs().filter(f => !f.forDuplication).forEach(f => {
+    json[f.jsonId] = ''
+  })
+  // Clear metadata
   json.metadata.downloads = []
   json.metadata.shares = []
   json.metadata.csvs = []
   const jsonString = JSON.stringify(json)
   await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${newName}.txt`)
+}
+
+export async function browseNativeFolder() {
+  try {
+    const directoryHandle = await window.showDirectoryPicker()
+
+    let granted = false
+    if (await directoryHandle.queryPermission({mode: 'readwrite'}) === 'granted') {
+      granted =  true
+    }
+    if (!granted) {
+      // Request permission
+      if (await directoryHandle.requestPermission({mode: 'readwrite'}) === 'granted') {
+        granted =  true
+      }
+      if (!granted) {
+        generalMessage(`You must grant read & write access to the folder you select.`)
+      }
+    }
+    if (granted) {
+      return directoryHandle
+    } else {
+      return null
+    }
+  } catch (error) {
+    // Will get here if the open folder dialog is cancelled by user, so do nothing
+    return null
+  }
 }

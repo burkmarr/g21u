@@ -1,5 +1,5 @@
 import { el, keyValuePairTable, detailsFromFilename, 
-  collapsibleDiv, unorderedList, setSs, getSs, getOpt } from './common.js'
+  collapsibleDiv, unorderedList, setSs, getSs, getOpt, flash } from './common.js'
 import { getFieldDefs, getTermList } from './fields.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { initLocationDetails, invalidateSize, updateMap } from './mapping.js'
@@ -60,7 +60,8 @@ function initRecordFields() {
     if (f.inputType === 'taxon') {
       input.setAttribute('type', 'text')
       input.addEventListener('input', displayTaxonMatches)
-      el('manage').addEventListener('click', hideTaxonMatches)
+      //el('manage').addEventListener('click', hideTaxonMatches)
+      document.getElementsByTagName('body')[0].addEventListener('click', hideTaxonMatches)
   
       const ul =  document.createElement('div')
       ul.setAttribute('id', `${f.inputId}-suggestions`)
@@ -311,7 +312,7 @@ export async function highlightFields() {
   }
 }
 
-export function editNavigation(e) {
+export function rightNavManage(e) {
   const divId = `${getSs('topNav').substring(5)}-details`
 
   // Get all elements with class="details-div" and hide them
@@ -319,8 +320,15 @@ export function editNavigation(e) {
   for (let i = 0; i < detailsDiv.length; i++) {
     detailsDiv[i].classList.add('hide')
   }
+
   // Show the current contents div
-  document.getElementById(divId).classList.remove('hide')
+  if (document.getElementById(divId)) {
+    document.getElementById(divId).classList.remove('hide')
+  } else {
+    // Default
+    document.getElementById('record-details').classList.remove('hide')
+    document.getElementById('edit-record').parentElement.classList.add('selected-nav')
+  }
 
   if (divId === 'location-details') {
     invalidateSize()
@@ -362,7 +370,10 @@ function stopPlaybackWav(e) {
   img.addEventListener('click', playRecordWav)
 }
 
-async function duplicateRecord() {
+export async function duplicateRecord(e) {
+
+  flash(e.target.id)
+
   let originalName = getSs('selectedFile')
   if (!originalName) {
     return

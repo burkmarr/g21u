@@ -1,8 +1,8 @@
-import { storGetRecs, storDeleteFiles, storSaveFile, downloadFile, 
+import { storGetRecs, storDeleteFiles, storArchiveFiles, storSaveFile, downloadFile, 
   storFileExists, storGetFile, getRecordJson, shareRecs, recsToCsv
 } from './file-handling.js'
 import { getFieldDefs } from './fields.js'
-import { getOpt, detailsFromFilename, getSs, setSs, generalMessage } from './common.js'
+import { el, getOpt, detailsFromFilename, getSs, setSs, generalMessage, deleteConfirm, flash } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 import { download, share, csv } from './svg-icons.js'
@@ -15,7 +15,7 @@ export async function initialiseList() {
   const currentlyChecked = []
   if (storRecs) {
     for (let i=0; i<storRecs.length; i++) {
-      if (document.getElementById(`record-checkbox-${i}`).checked) {
+      if (el(`record-checkbox-${i}`).checked) {
         currentlyChecked.push(i)
       }
     }
@@ -23,7 +23,7 @@ export async function initialiseList() {
   // Now re-fetch storRecs
   storRecs = await storGetRecs()
   if (!storRecs.length) {
-    document.getElementById('record-list').innerHTML = `<h3>No records to display</h3><p>Make some!</p>`
+    el('record-list').innerHTML = `<h3>No records to display</h3><p>Make some!</p>`
     setSs('selectedFile', '')
     return
   }
@@ -54,7 +54,7 @@ export async function initialiseList() {
   }
 
   // Populate with files from storage
-  document.getElementById('record-list').innerHTML = ''
+  el('record-list').innerHTML = ''
 
   for (let i=0; i<storRecs.length; i++) {
     const name = storRecs[i].filename
@@ -111,7 +111,7 @@ export async function initialiseList() {
     check.addEventListener('click', recordChecked)
     fileDiv.appendChild(check)
 
-    document.getElementById('record-list').appendChild(fileDiv)
+    el('record-list').appendChild(fileDiv)
 
     // If I set the text immediately after fileDiv.appendChild(textDiv)
     // it fails (for v1) because element appears not yet created,
@@ -144,7 +144,7 @@ export async function setRecordContent(filename) {
   if (getOpt('emulate-v1') !== 'true') {
     html = buildText(html, `<i>${details['scientific-name']}</i>`, '<br/>')
   }
-  document.getElementById(`rec-text-${filename}`).innerHTML = html
+  el(`rec-text-${filename}`).innerHTML = html
 
   function buildText(txt1, txt2, sep) {
     if (txt1 && txt2) {
@@ -158,7 +158,7 @@ export async function setRecordContent(filename) {
 
   // Metadata icons
   if (getOpt('emulate-v1') !== 'true') {
-    const iconDiv = document.getElementById(`rec-icons-${filename}`)
+    const iconDiv = el(`rec-icons-${filename}`)
     let icons = ''
     if (details.metadata.downloads.length) {
       icons = `<svg viewBox="${download.viewBox}">${download.svgEls}</svg>`
@@ -175,36 +175,46 @@ export async function setRecordContent(filename) {
 
 export async function deleteChecked(e) {
   flash(e.target.id)
-  const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  storRecs.reduce((a,r,i) => el(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
-    document.getElementById('file-num').innerText = n
-    document.getElementById('file-text').innerText = n === 1 ? 'record' : 'records'
-    document.getElementById('delete-confirm-dialog').showModal()
-  }
-}
-
-export async function deleteYesNo(e) {
-  document.getElementById('delete-confirm-dialog').close()
-  if (e.target.getAttribute('id') === 'delete-confirm') {
-    const files = []
-    for (let i=0; i<storRecs.length; i++) {
-      const name = storRecs[i].filename
-      if (document.getElementById(`record-checkbox-${i}`).checked) {
-        if (await storFileExists(`${name}.wav`)) {
-          files.push(`${name}.wav`)
+    deleteConfirm({
+      confirmButText: 'Yes',
+      cancelButText: 'No',
+      confirmMsgHtml: `Are you sure that you want to <i><span id="delete-archive-records">archive</span></i> the files for ${n} record${n>1 ? 's' : ''}?`,
+      archiveNotPossible: () => {
+        el('delete-archive-records').innerText = 'delete'
+      },
+      checkBoxClickFn: (e) => {
+        el('delete-archive-records').innerText = e.target.checked ? 'delete' : 'archive'
+      },
+      confirmRejectFn: async (e) => {
+        if (e.target.getAttribute('id') === 'delete-confirm') {
+          const files = []
+          for (let i=0; i<storRecs.length; i++) {
+            const name = storRecs[i].filename
+            if (el(`record-checkbox-${i}`).checked) {
+              if (await storFileExists(`${name}.wav`)) {
+                files.push(`${name}.wav`)
+              }
+              if (await storFileExists(`${name}.txt`)) {
+                files.push(`${name}.txt`)
+              }
+              // Uncheck all checkboxes when deleting otherwise wrong items reselected.
+              el(`record-checkbox-${i}`).checked = false
+            }
+          }
+          console.log('delete', files)
+          if (el('delete-confirm-checkbox').checked) {
+            await storDeleteFiles(files)
+          } else {
+            await storArchiveFiles(files)
+          }
+          
+          await initialiseList()
+          populateRecordFields()
         }
-        if (await storFileExists(`${name}.txt`)) {
-          files.push(`${name}.txt`)
-        }
-        // Uncheck all checkboxes when deleting otherwise wrong items
-        // reselected.
-        document.getElementById(`record-checkbox-${i}`).checked = false
-      }
-    }
-    console.log('delete', files)
-    await storDeleteFiles(files)
-    await initialiseList()
-    populateRecordFields()
+      },
+    })
   }
 }
 
@@ -217,15 +227,15 @@ export async function manageMetadataChecked(e) {
   // Show modal if at least one record checked
   let checked = false
   for (let i=0; i<storRecs.length; i++) {
-    checked = document.getElementById(`record-checkbox-${i}`).checked ? true : checked
+    checked = el(`record-checkbox-${i}`).checked ? true : checked
   }
   if (checked) {
-    document.getElementById('metadata-dialog').showModal()
+    el('metadata-dialog').showModal()
   }
 }
 
 export async function metadataRemoveYesNo(e) {
-  document.getElementById('metadata-dialog').close()
+  el('metadata-dialog').close()
   if (e.target.getAttribute('id') === 'metadata-remove-confirm') {
     const radsDownload = document.getElementsByName('radio-download')
     const radsShare = document.getElementsByName('radio-share')
@@ -246,7 +256,7 @@ export async function metadataRemoveYesNo(e) {
     if (valDownload !== 'none' || valShare !== 'none' || valCsv !== 'none') {
       for (let i=0; i<storRecs.length; i++) {
         const name = storRecs[i].filename
-        if (document.getElementById(`record-checkbox-${i}`).checked) {
+        if (el(`record-checkbox-${i}`).checked) {
           if (await storFileExists(`${name}.txt`)) {
             const json = await getRecordJson(`${name}.txt`)
             if (valDownload === 'all') {
@@ -277,36 +287,46 @@ export async function metadataRemoveYesNo(e) {
 
 export async function deleteSoundChecked(e) {
   flash(e.target.id)
-  const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  storRecs.reduce((a,r,i) => el(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
-    document.getElementById('sound-file-num').innerText = n
-    document.getElementById('sound-file-text').innerText = n === 1 ? 'record' : 'records'
-    document.getElementById('delete-sound-confirm-dialog').showModal()
-  }
-}
-
-export async function deleteSoundYesNo(e) {
-  document.getElementById('delete-sound-confirm-dialog').close()
-  if (e.target.getAttribute('id') === 'delete-sound-confirm') {
-    const files = []
-    for (let i=0; i<storRecs.length; i++) {
-      const name = storRecs[i].filename
-      if (document.getElementById(`record-checkbox-${i}`).checked) {
-        if (await storFileExists(`${name}.wav`)) {
-          files.push(`${name}.wav`)
+    deleteConfirm({
+      confirmButText: 'Yes',
+      cancelButText: 'No',
+      confirmMsgHtml: `Are you sure that you want to <span id="delete-archive-sounds">archive<span> the sound files for ${n} record${n>1 ? 's' : ''}?`,
+      archiveNotPossible: () => {
+        el('delete-archive-sounds').innerText = 'delete'
+      },
+      checkBoxClickFn: (e) => {
+        el('delete-archive-sounds').innerText = e.target.checked ? 'delete' : 'archive'
+      },
+      confirmRejectFn: async (e) => {
+        if (e.target.getAttribute('id') === 'delete-confirm') {
+          const files = []
+          for (let i=0; i<storRecs.length; i++) {
+            const name = storRecs[i].filename
+            if (el(`record-checkbox-${i}`).checked) {
+              if (await storFileExists(`${name}.wav`)) {
+                files.push(`${name}.wav`)
+              }
+            }
+          }
+          if (el('delete-confirm-checkbox').checked) {
+            await storDeleteFiles(files)
+          } else {
+            await storArchiveFiles(files)
+          }
+          await initialiseList()
+          populateRecordFields()
         }
-      }
-    }
-    await storDeleteFiles(files)
-    await initialiseList()
-    populateRecordFields()
+      },
+    })
   }
 }
 
 export function copyValuesChecked(e) {
   flash(e.target.id)
-  document.getElementById("copy-field-selected-record").innerHTML =  document.querySelector(".record-selected .record-div-text").innerHTML
-  const parent = document.getElementById("copy-field-dialog-checkboxes")
+  el("copy-field-selected-record").innerHTML =  document.querySelector(".record-selected .record-div-text").innerHTML
+  const parent = el("copy-field-dialog-checkboxes")
   parent.innerHTML = ''
   getFieldDefs().forEach(f => {
     const cb = document.createElement('input')
@@ -319,13 +339,13 @@ export function copyValuesChecked(e) {
     span.innerText = f.inputLabel
     parent.appendChild(span)
   })
-  const dialog = document.getElementById("copy-fields-dialog")
+  const dialog = el("copy-fields-dialog")
   dialog.showModal()
 }
 
 export async function copyValuesConfirmCancel(e) {
 
-  const dialog = document.getElementById("copy-fields-dialog")
+  const dialog = el("copy-fields-dialog")
   dialog.close()
 
   if (e.target.getAttribute('id') === 'copy-confirm') {
@@ -343,7 +363,7 @@ export async function copyValuesConfirmCancel(e) {
     // Loop through all records
     for (let i=0; i<storRecs.length; i++) {
       const name = storRecs[i].filename
-      if (document.getElementById(`record-checkbox-${i}`).checked) {
+      if (el(`record-checkbox-${i}`).checked) {
         // Record needs to be updated for checked fields from
         // selected record.
         if (await storFileExists(`${name}.txt`)) {
@@ -372,12 +392,12 @@ export async function copyValuesConfirmCancel(e) {
 export async function shareChecked(e) {
   flash(e.target.id)
 
-  const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  storRecs.reduce((a,r,i) => el(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const recs = []
     for (let i=0; i<storRecs.length; i++) {
       const name = storRecs[i].filename
-      if (document.getElementById(`record-checkbox-${i}`).checked) { 
+      if (el(`record-checkbox-${i}`).checked) { 
         recs.push(name)
       }
     }
@@ -409,12 +429,12 @@ export async function shareChecked(e) {
 export async function downloadChecked(e) {
   //console.log('e', e)
   flash(e.target.id)
-  const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  storRecs.reduce((a,r,i) => el(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const promises = []
     for (let i=0; i<storRecs.length; i++) {
       const name = storRecs[i].filename
-      if (document.getElementById(`record-checkbox-${i}`).checked) {
+      if (el(`record-checkbox-${i}`).checked) {
         // Download WAV if it exists
         if (await storFileExists(`${name}.wav`)) {
           promises.push(downloadFile(`${name}.wav`))
@@ -433,9 +453,9 @@ export async function downloadChecked(e) {
 
 export async function csvChecked(e) {
   flash(e.target.id)
-  const n =  storRecs.reduce((a,r,i) => document.getElementById(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  storRecs.reduce((a,r,i) => el(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
-    const recs = storRecs.filter((sr,i) => document.getElementById(`record-checkbox-${i}`).checked).map(sr => sr.filename)
+    const recs = storRecs.filter((sr,i) => el(`record-checkbox-${i}`).checked).map(sr => sr.filename)
     await recsToCsv(recs)
     await initialiseList()
     generalMessage('The CSV was created successfully!')
@@ -458,10 +478,6 @@ export function checkAllRecs(e) {
   }
 }
 
-function flash(id) {
-  document.getElementById(id).classList.add('flash')
-}
-
 function recordChecked(e) {
   e.stopPropagation()
 }
@@ -482,7 +498,7 @@ async function playRecording(e) {
   e.stopPropagation()
 
   const i = Number(e.target.getAttribute('data-index'))
-  const playbackImage = document.getElementById(`record-play-image-${i}`)
+  const playbackImage = el(`record-play-image-${i}`)
 
   playbackImage.removeEventListener('click', playRecording)
   playbackImage.src = "images/playback-red.png"
@@ -504,7 +520,7 @@ function stopPlayback(e) {
   e.stopPropagation()
 
   const i = Number(e.target.getAttribute('data-index'))
-  const playbackImage = document.getElementById(`record-play-image-${i}`)
+  const playbackImage = el(`record-play-image-${i}`)
 
   audioPlayers[i].pause()
   audioPlayers[i].currentTime = 0
@@ -527,13 +543,25 @@ export async function moveSelected(backward) {
         iNext = i === storRecs.length-1 ? i : i+1
       }
       if (iNext !== i) {
-        document.getElementById(`file-div-${i}`).classList.remove('record-selected')
-        document.getElementById(`file-div-${iNext}`).classList.add('record-selected')
-        document.getElementById(`file-div-${iNext}`).scrollIntoView({ behavior: "smooth", block: "nearest" })
+        el(`file-div-${i}`).classList.remove('record-selected')
+        el(`file-div-${iNext}`).classList.add('record-selected')
+        el(`file-div-${iNext}`).scrollIntoView({ behavior: "smooth", block: "nearest" })
         setSs('selectedFile', storRecs[iNext].filename)
         populateRecordFields()
       }
       break
     }
   }
+}
+
+export function deleteConfirmCheckboxInit () {
+ 
+  console.log(e.target.checked)
+  el('delete-archive-records').innerText = e.target.checked ? 'delete' : 'archive'
+}
+
+export function deleteConfirmCheckboxChanged (e) {
+ 
+  console.log(e.target.checked)
+  el('delete-archive-records').innerText = e.target.checked ? 'delete' : 'archive'
 }

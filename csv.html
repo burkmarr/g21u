@@ -13,14 +13,6 @@
 
 <body>
 
-  <dialog id="delete-csv-confirm-dialog">
-    <p>Are you sure that you want to delete <span id="delete-file-num"></span> CSV<span id="delete-plural"></span>?</p>
-    <div class="dialog-buttons">
-      <button id="delete-confirm">Yes</button>
-      <button id="delete-reject">No</button>
-    </div>
-  </dialog>
-
   <dialog id="merge-csv-confirm-dialog">
     <p>Are you sure that you want to merge <span id="merge-file-num"></span> CSVs into one new CSV and delete the originals?</p>
     <p>Choose whether or not to use the name of one of the original files for the merged file.</p>
@@ -43,31 +35,28 @@
   <script type="module" defer>
     import { navbot } from './js/navbot.js'
     import { navtop } from './js/navtop.js'
-    import { deleteCsvYesNo, mergeCsvYesNo, initialiseCsvList } from './js/csv.js'
+    import { mergeCsvYesNo, initialiseCsvList, rightNavCsv } from './js/csv.js'
     import { getOpt, getSs, setSs } from './js/common.js'
-
-    // Add class to body if small screen edit page
-    if (getSs('mainNav') === 'navbot-link-edit') { 
-      document.body.classList.add('small-edit')
-    }
- 
-    // Add event handlers for dialogs
-    document.getElementById('delete-reject').addEventListener('click', deleteCsvYesNo)
-    document.getElementById('delete-confirm').addEventListener('click', deleteCsvYesNo)
-    document.getElementById('merge-reject').addEventListener('click', mergeCsvYesNo)
-    document.getElementById('merge-confirm').addEventListener('click', mergeCsvYesNo)
 
     // Top navigation
     navtop('csv')
     // Main navigation (bottom)
     navbot()
 
+    // Add class to body if small screen edit page
+    if (getSs('mainNav') === 'navbot-link-edit') { 
+      document.body.classList.add('small-edit')
+      // Initialise edit view
+      rightNavCsv()
+    }
+ 
+    // Add event handlers for dialogs
+    document.getElementById('merge-reject').addEventListener('click', mergeCsvYesNo)
+    document.getElementById('merge-confirm').addEventListener('click', mergeCsvYesNo)
+
     // CSV list
     await initialiseCsvList()
 
-    // Record fields
-    // initRecordDetails()
-    // await populateRecordFields()
   </script>
 </body>
 </html>

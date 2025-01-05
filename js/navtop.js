@@ -1,11 +1,11 @@
-import { downloadChecked, shareChecked, deleteChecked, csvChecked, 
+import { downloadChecked, shareChecked, deleteChecked, csvChecked,
   uncheckAllRecs, checkAllRecs, manageMetadataChecked, deleteSoundChecked, copyValuesChecked } from './record-list.js'
-import { editNavigation } from './record-details.js'
-import { deleteCheckedCsv, shareCheckedCsv, mergeCheckedCsv, checkAllCsvs, uncheckAllCsvs, downloadCsvChecked } from './csv.js'
+import { rightNavManage, duplicateRecord } from './record-details.js'
+import { deleteCheckedCsv, shareCheckedCsv, mergeCheckedCsv, checkAllCsvs, uncheckAllCsvs, downloadCsvChecked, rightNavCsv } from './csv.js'
 import { getSs, setSs, getOpt } from './common.js'
 import { bin, download, share, csv, checkAll, uncheckAll,
   edit, beetle, metadata, closeMetadata, delSound, map, chevronDown, 
-  copy, chevronCollapse } from './svg-icons.js'
+  copy, chevronCollapse, infoCircle, listCircle, duplicate} from './svg-icons.js'
 
 let groupButtonChangeDialog
 
@@ -86,6 +86,13 @@ export function navtop (page) {
       page: 'manage',
       section: 'left'
     },
+    // {
+    //   id: 'duplicate',
+    //   fn: duplicateRecord,
+    //   icon: duplicate,
+    //   page: 'manage',
+    //   section: 'middle'
+    // },
     {
       id: 'deselect-all',
       fn: uncheckAllRecs,
@@ -163,6 +170,20 @@ export function navtop (page) {
       page: 'csv',
       section: 'left'
     },
+    {
+      id: 'csv-csv-details',
+      div: 'csv-details',
+      icon: listCircle,
+      page: 'csv',
+      section: 'right'
+    },
+    {
+      id: 'csv-record-details',
+      div: 'record-details',
+      icon: infoCircle,
+      page: 'csv',
+      section: 'right'
+    },
 
   ]
 
@@ -186,6 +207,7 @@ export function navtop (page) {
   navtop.appendChild(navContainer)
   const navtopInnerMiddle = document.createElement('div')
   navtopInnerMiddle.setAttribute('id', 'navtop-inner-middle')
+  navtopInnerMiddle.classList.add(page)
   navContainer.appendChild(navtopInnerMiddle)
   // Right
   navContainer = document.createElement('div')
@@ -193,6 +215,7 @@ export function navtop (page) {
   navtop.appendChild(navContainer)
   const navtopInnerRight = document.createElement('div')
   navtopInnerRight.setAttribute('id', 'navtop-inner-right')
+  navtopInnerRight.classList.add(page)
   navContainer.appendChild(navtopInnerRight)
 
   // Create the left section navigation buttons 
@@ -240,6 +263,22 @@ export function navtop (page) {
     }
   })
 
+  // Create the middle section navigation buttons
+  navs.filter(n => n.page === page).filter(n => n.section === 'middle').forEach(n => {
+    const div = document.createElement('div')
+    div.addEventListener('click', n.fn)
+    navtopInnerMiddle.appendChild(div)
+    let classes = 'navbar-icon'
+    classes = n.classes ? `${classes} ${n.classes}` : classes
+
+    // Create the button
+    div.innerHTML = `<svg id="${n.id}" viewBox="${n.icon.viewBox}" class="${classes}">${n.icon.svgEls}</svg>`
+    // Add event listerner to remove flash class when animation ends
+    document.getElementById(n.id).addEventListener("animationend", () => {
+      document.getElementById(n.id).classList.remove("flash")
+    })
+  })
+
   // Create the right section navigation buttons
   navs.filter(n => n.page === page).filter(n => n.section === 'right').forEach(n => {
     const div = document.createElement('div')
@@ -265,7 +304,11 @@ export function navtop (page) {
       // Add selected class to the clicked div
       div.classList.add('selected-nav')
 
-      editNavigation()
+      if (page === 'manage') {
+        rightNavManage()
+      } else if (page === 'csv') {
+        rightNavCsv()
+      }
     })
   })
 

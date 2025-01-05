@@ -1,4 +1,4 @@
-import { getCent, getGr } from './nl.min.js'
+import { getCent, getGr, idb } from './nl.min.js'
 
 export const precisions = [
   {caption: '10 figure (1m)', value: 1, regexp: /^[a-zA-Z]{1,2}[0-9]{10}$/}, 
@@ -9,6 +9,10 @@ export const precisions = [
   {caption: 'Quadrant (5km)', value: 5000, regexp: /^[a-zA-Z]{1,2}[0-9]{2}[SsNn][WwEe]$/},
   {caption: 'Hectad (10km)', value: 10000, regexp: /^[a-zA-Z]{1,2}[0-9]{2}$/}
 ]
+
+export function flash(id) {
+  document.getElementById(id).classList.add('flash')
+}
 
 export function generalMessage(msg) {
   if (!document.getElementById('general-message')) {
@@ -35,6 +39,61 @@ export function generalMessage(msg) {
   }
   document.getElementById('general-message-text').innerHTML = msg
   document.getElementById('general-message').showModal()
+}
+
+export async function deleteConfirm({
+  confirmMsgHtml = 'Continue with deletion?',
+  confirmButText = 'Yes',
+  cancelButText = 'No',
+  archiveNotPossible = () => console.log('Archive not possible'),
+  checkBoxClickFn = (e) => console.log('checkBoxClickFn', e.target.checked),
+  confirmRejectFn = (e) => console.log(e.target.id, 'clicked'),
+} = {}) {
+
+  let dlg = el('delete-confirm-dialog')
+  if (!dlg) {
+    const bdy = document.getElementsByTagName('body')[0]
+    dlg = document.createElement('dialog')
+    bdy.appendChild(dlg)
+  } 
+
+  dlg.innerHTML = `
+    <div id="archive-delete-selection">
+      <p>
+        You have specified an archive folder in the options. If you leave the <i>delete files</i>
+        checkbox unchecked, files will be moved to the archive folder. If you would
+        rather delete them, check the box.
+      </p>
+      <label>
+        <input type="checkbox" id="delete-confirm-checkbox">
+        Delete files
+      </label>
+    </div>
+    <p id="delete-confirm-msg">${confirmMsgHtml}</p>
+    <div class="dialog-buttons">
+      <button id="delete-confirm">${confirmButText}</button>
+      <button id="delete-reject">${cancelButText}</button>
+    </div>
+  `
+
+  const dirArchiveHandle = await idb.get('archive-native-folder')
+  const isArchivePossible = getOpt('file-handling') === 'native' && dirArchiveHandle !== null
+  
+  if (!isArchivePossible) {
+    el('archive-delete-selection').classList.add('hide')
+    el('delete-confirm-checkbox').setAttribute('checked', 'checked')
+    archiveNotPossible()
+  }
+
+  dlg.setAttribute('id', 'delete-confirm-dialog')
+  el('delete-confirm-checkbox').addEventListener('click', checkBoxClickFn)
+  const removeDialog = () => dlg.close()
+  el('delete-confirm').addEventListener('click', removeDialog)
+  el('delete-reject').addEventListener('click', removeDialog)
+  el('delete-confirm').addEventListener('click', confirmRejectFn)
+  el('delete-reject').addEventListener('click', confirmRejectFn)
+
+  dlg.showModal()
 }
 
 export function detailsFromFilename(filename) {

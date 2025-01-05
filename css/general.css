@@ -48,7 +48,6 @@ textarea {
   font-size: 16px;
 }
 
-
 .key-value-pair-table .caption{
   text-align: right;
 }
@@ -81,4 +80,8 @@ dialog {
   padding: 8px;
   width: 100px;
   height: 40px;
+}
+
+#archive-delete-selection.hide {
+  display: none;
 }

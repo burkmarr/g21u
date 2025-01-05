@@ -54,8 +54,10 @@
       <option value="opfs">Private origin file system</option>
       <option value="native">Native file system</option>
     </select>
-    <div class="opts-label"><b>Folder:</b> for native file systems select a folder for g21u files.</div>
-    <button id="native-browse-folder-button" class="opts-button">Browse folder</button><div id="native-folder"></div>
+    <div class="opts-label"><b>Main folder:</b> for native file systems select a folder for g21u files.</div>
+    <button id="main-browse-folder-button" class="opts-button">Browse folder</button><div id="main-native-folder"></div>
+    <div class="opts-label"><b>Archive folder:</b> for native file systems you can select a folder where g21u files can be archived instead of deleted.</div>
+    <button id="archive-browse-folder-button" class="opts-button">Browse folder</button><div id="archive-native-folder"></div>
     <div class="opts-category">Sound</div>
     <hr/>
     <div class="opts-label"><b>Automatic playback:</b> indicate whether or not to automatically playback at end of recording.</div>
@@ -100,7 +102,7 @@
     import { navbot } from './js/navbot.js'
     import { georefFormat, georefPrecision, automaticPlayback, playbackVolume, beepVolume, 
       fileHandling, defaultRecorder, defaultDeterminer, useMode, initialiseGui ,
-      browseNativeFolder
+      browseMainFolder, browseArchiveFolder
     } from './js/options.js'
 
     // Add class to body if emulating v1
@@ -118,7 +120,8 @@
     document.getElementById('file-handling').addEventListener('change', fileHandling)
     document.getElementById('default-recorder').addEventListener('change', defaultRecorder)
     document.getElementById('default-determiner').addEventListener('change', defaultDeterminer)
-    document.getElementById('native-browse-folder-button').addEventListener('click', browseNativeFolder)
+    document.getElementById('main-browse-folder-button').addEventListener('click', browseMainFolder)
+    document.getElementById('archive-browse-folder-button').addEventListener('click', browseArchiveFolder)
 
     // Initialise the gui
     initialiseGui()

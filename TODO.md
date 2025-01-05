@@ -1,13 +1,7 @@
 # TODO
-- CSVs
-  - Rename CSV
-  - Responsive on mobile
-- Archive for native file system
-  - Add options for name archive folder on native file system
-  - Dialogs for delete record, delete sound, delete CSV and merge CSV should have checkbox if archive folder valid to indicate whether to move or delete files
 - GUI considerations
   - Could/should play sound and duplicate button go on middle toobar?
-  - Or maybe sound should recieve foucus?
+  - Or maybe sound should recieve focus?
   - Look at how focus moves on record details -  make record entry as efficient as possible. 
   - Next should get focus when save button used.
 - Testing

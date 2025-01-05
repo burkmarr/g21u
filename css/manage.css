@@ -1,4 +1,4 @@
-body#manage {
+body {
   padding-top: var(--but-size); 
 }
 
@@ -215,4 +215,9 @@ body:not(.small-edit) #record-details {
 #copy-field-dialog-checkboxes input {
   transform: scale(2);
   margin-right: 10px;
+}
+
+#delete-confirm-checkbox {
+  scale: 2;
+  margin-right: 1em;
 }

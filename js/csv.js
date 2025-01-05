@@ -1,5 +1,5 @@
-import { storGetCsvs, storFileExists, storDeleteFiles, getCSV, shareCsvs, mergeCsvs, downloadFile, storRenameFile } from './file-handling.js'
-import { el, getSs, setSs, keyValuePairTable, generalMessage, getDateTime } from './common.js'
+import { storGetCsvs, storFileExists, storDeleteFiles, storArchiveFiles, getCSV, shareCsvs, mergeCsvs, downloadFile, storRenameFile } from './file-handling.js'
+import { el, getSs, setSs, keyValuePairTable, generalMessage, getDateTime, flash, deleteConfirm } from './common.js'
 import { getFieldDefs } from './fields.js'
 import { csv } from './svg-icons.js'
 
@@ -249,35 +249,44 @@ function csvChecked(e) {
   e.stopPropagation()
 }
 
-export function deleteCheckedCsv (e) {
+export async function deleteCheckedCsv(e) {
   flash(e.target.id)
-  const n =  storCsvs.reduce((a,r,i) => document.getElementById(`csv-checkbox-${i}`).checked ? a+1 : a, 0)
+  const n =  storCsvs.reduce((a,r,i) => el(`csv-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
-    document.getElementById('delete-file-num').innerText = n
-    document.getElementById('delete-plural').innerText = n === 1 ? '' : 's'
-    document.getElementById('delete-csv-confirm-dialog').showModal()
+    deleteConfirm({
+      confirmButText: 'Yes',
+      cancelButText: 'No',
+      confirmMsgHtml: `Are you sure that you want to <i><span id="delete-archive-csvs">archive<span></i> ${n} CSV file${n>1 ? 's' : ''}?`,
+      archiveNotPossible: () => {
+        el('delete-archive-csvs').innerText = 'delete'
+      },
+      checkBoxClickFn: (e) => {
+        el('delete-archive-csvs').innerText = e.target.checked ? 'delete' : 'archive'
+      },
+      confirmRejectFn: async (e) => {
+        if (e.target.getAttribute('id') === 'delete-confirm') {
+          const files = []
+          for (let i=0; i<storCsvs.length; i++) {
+            const name = storCsvs[i].name
+            if (document.getElementById(`csv-checkbox-${i}`).checked) {
+              if (await storFileExists(name)) {
+                files.push(name)
+              }
+              // Uncheck all checkboxes when deleting otherwise wrong items reselected.
+              document.getElementById(`csv-checkbox-${i}`).checked = false
+            }
+          }
+          if (el('delete-confirm-checkbox').checked) {
+            await storDeleteFiles(files)
+          } else {
+            await storArchiveFiles(files)
+          }
+          await initialiseCsvList()
+        }
+      },
+    })
   }
 }
-
-export async function deleteCsvYesNo (e) {
-  document.getElementById('delete-csv-confirm-dialog').close()
-  if (e.target.getAttribute('id') === 'delete-confirm') {
-    const files = []
-    for (let i=0; i<storCsvs.length; i++) {
-      const name = storCsvs[i].name
-      if (document.getElementById(`csv-checkbox-${i}`).checked) {
-        if (await storFileExists(name)) {
-          files.push(name)
-        }
-        // Uncheck all checkboxes when deleting otherwise wrong items
-        // reselected.
-        document.getElementById(`csv-checkbox-${i}`).checked = false
-      }
-    }
-    await storDeleteFiles(files)
-    initialiseCsvList()
-  }
-} 
 
 export function mergeCheckedCsv (e) {
   flash(e.target.id)
@@ -409,6 +418,20 @@ async function renameCsv() {
   }
 }
 
-function flash(id) {
-  document.getElementById(id).classList.add('flash')
+export function rightNavCsv() {
+  const divId = `${getSs('topNav').substring(4)}`
+
+  // Get all elements with class="details-div" and hide them
+  const detailsDiv = document.getElementsByClassName("csv-panel-div")
+  for (let i = 0; i < detailsDiv.length; i++) {
+    detailsDiv[i].classList.add('hide')
+  }
+  // Show the current contents div
+  if (document.getElementById(divId)) {
+    document.getElementById(divId).classList.remove('hide')
+  } else {
+    // Default
+    document.getElementById('csv-details').classList.remove('hide')
+    document.getElementById('csv-csv-details').parentElement.classList.add('selected-nav')
+  }
 }

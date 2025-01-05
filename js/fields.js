@@ -19,6 +19,7 @@ export function getFieldDefs({
       default: getOpt('default-recorder'),
       novalue: '',
       optional: false,
+      forDuplication: true,
       info: `Name of the person that made the record.`
     },
     {
@@ -30,6 +31,7 @@ export function getFieldDefs({
       default: getOpt('default-determiner'),
       novalue: '',
       optional: true,
+      forDuplication: true,
       info: `Name of the person who identified the taxon.`
     },
     {
@@ -41,6 +43,7 @@ export function getFieldDefs({
       default: filenameDetails ? dateFromString(filenameDetails.date) : '',
       novalue: '',
       optional: false,
+      forDuplication: true,
       info: `Date on which the record was made.`
     },
     {
@@ -52,6 +55,7 @@ export function getFieldDefs({
       default: filenameDetails ? filenameDetails.time.substring(0,5) : '00:00',
       novalue: '00:00',
       optional: true,
+      forDuplication: true,
       info: `Time at which the record was made.`
     },
     {
@@ -176,6 +180,7 @@ export function getFieldDefs({
       default: filenameDetails ? grChangePrecision(filenameDetails.gridref, Number(getOpt('georef-precision'))) : '',
       novalue: '',
       optional: false,
+      forDuplication: true,
       info: `OSGB grid reference for record location. Either grid reference or lat/lon is required. Which is used depends
         upon your selection in the <i>File & geolocation handling</i> section.`
     },
@@ -188,6 +193,7 @@ export function getFieldDefs({
       default: filenameDetails ? filenameDetails.latitude : '',
       novalue: '',
       optional: false,
+      forDuplication: true,
       info: `Latitude for record location. Either grid reference or lat/lon is required. Which is used depends
         upon your selection in the <i>File & geolocation handling</i> section.`
     },
@@ -200,6 +206,7 @@ export function getFieldDefs({
       default: filenameDetails ? filenameDetails.longitude : '',
       novalue: '',
       optional: false,
+      forDuplication: true,
       info: `Longitude for record location. Either grid reference or lat/lon is required. Which is used depends
         upon your selection in the <i>File & geolocation handling</i> section.`
     },
@@ -212,6 +219,7 @@ export function getFieldDefs({
       default: '',
       novalue: '',
       optional: false,
+      forDuplication: true,
       info: `Location name for record.`
     },
     {
@@ -223,6 +231,7 @@ export function getFieldDefs({
       default: '',
       novalue: '',
       optional: true,
+      forDuplication: true,
       info: `Free form comment for record.`
     },
   ]

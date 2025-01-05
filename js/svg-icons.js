@@ -205,3 +205,34 @@ export const chevronCollapse = {
     fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>`,
   viewBox: "0,0,512,512"
 }
+
+export const listCircle = {
+  svgEls: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" 
+    d="M224 184h128M224 256h128M224 327h128"/><path d="M448 258c0-106-86-192-192-192S64 152 64 
+    258s86 192 192 192 192-86 192-192z" 
+    fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+    <circle cx="168" cy="184" r="8" fill="none" stroke="currentColor" stroke-linecap="round" 
+    stroke-linejoin="round" stroke-width="32"/>
+    <circle cx="168" cy="257" r="8" fill="none" stroke="currentColor" stroke-linecap="round" 
+    stroke-linejoin="round" stroke-width="32"/>
+    <circle cx="168" cy="328" r="8" fill="none" stroke="currentColor" stroke-linecap="round" 
+    stroke-linejoin="round" stroke-width="32"/>`,
+  viewBox: "0,0,512,512"
+}
+
+export const infoCircle = {
+  svgEls: `<path d="M248 64C146.39 64 64 146.39 64 248s82.39 184 184 184 184-82.39 184-184S349.61 64 248 64z" 
+    fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/><path fill="none" 
+    stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M220 220h32v116"/>
+    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M208 340h88"/>
+    <path d="M248 130a26 26 0 1026 26 26 26 0 00-26-26z"/>`,
+  viewBox: "0,0,512,512"
+}
+
+export const duplicate = {
+  svgEls: `<rect x="128" y="128" width="336" height="336" rx="57" ry="57" fill="none" stroke="currentColor" 
+    stroke-linejoin="round" stroke-width="32"/><path d="M383.5 128l.5-24a56.16 56.16 0 00-56-56H112a64.19 64.19 
+    0 00-64 64v216a56.16 56.16 0 0056 56h24M296 216v160M376 296H216" 
+    fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>`,
+  viewBox: "0,0,512,512"
+}

@@ -16,7 +16,7 @@
   <link rel="manifest" href="manifest.json" />
 </head>
 
-<body id="manage">
+<body>
 
   <dialog id="metadata-dialog">
     <div>What metadata do you want to remove?</div>
@@ -45,14 +45,6 @@
     <div class="dialog-buttons">
       <button id="metadata-remove-confirm">Confirm</button>
       <button id="metadata-remove-cancel">Cancel</button>
-    </div>
-  </dialog>
-
-  <dialog id="delete-confirm-dialog">
-    <p>Are you sure that you want to delete the files for <span id="file-num"></span> <span id="file-text"></span>?</p>
-    <div class="dialog-buttons">
-      <button id="delete-confirm">Yes</button>
-      <button id="delete-reject">No</button>
     </div>
   </dialog>
 
@@ -95,8 +87,9 @@
   <script type="module" defer>
     import { navbot } from './js/navbot.js'
     import { navtop } from './js/navtop.js'
-    import { deleteYesNo, deleteSoundYesNo, initialiseList, metadataRemoveYesNo, copyValuesConfirmCancel } from './js/record-list.js'
-    import { initRecordDetails, populateRecordFields, editNavigation } from './js/record-details.js'
+    import { deleteSoundYesNo, initialiseList, metadataRemoveYesNo, 
+      copyValuesConfirmCancel } from './js/record-list.js'
+    import { initRecordDetails, populateRecordFields, rightNavManage } from './js/record-details.js'
     import { getOpt, getSs, setSs } from './js/common.js'
 
     // Add class to body if emulating v1
@@ -109,8 +102,6 @@
     }
 
     // Add event handlers for dialogs
-    document.getElementById('delete-reject').addEventListener('click', deleteYesNo)
-    document.getElementById('delete-confirm').addEventListener('click', deleteYesNo)
     document.getElementById('delete-sound-reject').addEventListener('click', deleteSoundYesNo)
     document.getElementById('delete-sound-confirm').addEventListener('click', deleteSoundYesNo)
     document.getElementById('metadata-remove-cancel').addEventListener('click', metadataRemoveYesNo)
@@ -158,7 +149,7 @@
       }
     }
 
-    editNavigation()
+    rightNavManage()
 
     // Request persistent storage
     // Some diagnostics on options page indicate 

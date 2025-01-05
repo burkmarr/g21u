@@ -6,6 +6,30 @@ body {
   margin-left: 1em;
 }
 
+/* Details div visibility in response to button selections */
+.csv-panel-div.hide {
+  display: none;
+}
+
+.small-edit #csv-list {
+  /* Small screen and reached via small edit button */
+  /* hide the csv-list */
+  display: none;
+}
+.small-edit #csv-details, .small-edit #record-details{
+  margin-left: 0;
+}
+@media only screen and (max-width: 1024px) {
+  /* Small screen and not reached via small edit button */
+  /* show only the csv list */
+  body:not(.small-edit) #csv-details { 
+    display: none;
+  }
+  body:not(.small-edit) #record-details { 
+    display: none;
+  }
+}
+
 h3 {
   margin-top: 0;
 }
