@@ -48,14 +48,6 @@
     </div>
   </dialog>
 
-  <dialog id="delete-sound-confirm-dialog">
-    <p>Are you sure that you want to delete the sound files for <span id="sound-file-num"></span> <span id="sound-file-text"></span>?</p>
-    <div class="dialog-buttons">
-      <button id="delete-sound-confirm">Yes</button>
-      <button id="delete-sound-reject">No</button>
-    </div>
-  </dialog>
-
   <dialog id="copy-fields-dialog">
     <div id="copy-field-selected-record"></div>
     <p>Check all those fields that you wish to update on the checked records 
@@ -87,7 +79,7 @@
   <script type="module" defer>
     import { navbot } from './js/navbot.js'
     import { navtop } from './js/navtop.js'
-    import { deleteSoundYesNo, initialiseList, metadataRemoveYesNo, 
+    import { initialiseList, metadataRemoveYesNo, 
       copyValuesConfirmCancel } from './js/record-list.js'
     import { initRecordDetails, populateRecordFields, rightNavManage } from './js/record-details.js'
     import { getOpt, getSs, setSs } from './js/common.js'
@@ -102,8 +94,6 @@
     }
 
     // Add event handlers for dialogs
-    document.getElementById('delete-sound-reject').addEventListener('click', deleteSoundYesNo)
-    document.getElementById('delete-sound-confirm').addEventListener('click', deleteSoundYesNo)
     document.getElementById('metadata-remove-cancel').addEventListener('click', metadataRemoveYesNo)
     document.getElementById('metadata-remove-confirm').addEventListener('click', metadataRemoveYesNo)
     document.getElementById('copy-confirm').addEventListener('click', copyValuesConfirmCancel)
