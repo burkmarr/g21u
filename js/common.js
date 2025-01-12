@@ -98,7 +98,9 @@ export async function deleteConfirm({
 
 export function detailsFromFilename(filename) {
   if (!filename) return ''
-  const name = filename.indexOf('.') > -1 ? filename.substring(0,filename.length-4) : filename
+
+  const withExtension = filename.endsWith('.txt') || filename.endsWith('.wav')
+  const name = withExtension ? filename.substring(0,filename.length-4) : filename
   const sName = name.split('_')
   const date = `${sName[0].substring(8,10)}/${sName[0].substring(5,7)}/${sName[0].substring(0,4)}`
   const time = sName[1].replace(/-/g, ':')
@@ -136,6 +138,8 @@ export function detailsFromFilename(filename) {
   if (sAltitude.length > 1) {
     altitude = sAltitude[0]
   }
+
+  console.log('return')
   return {
     filename: name,
     date: date,

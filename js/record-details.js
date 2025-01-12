@@ -284,8 +284,7 @@ export async function populateRecordFields() {
     // Get corresponding record JSON if it exists
     json = await getRecordJson(`${selectedFile}.txt`)
   }
-  //console.log('record', json)
-
+  
   getFieldDefs({filename: selectedFile}).forEach(f => {
     if (json) {
       el(f.inputId).value = json[f.jsonId]
