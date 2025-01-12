@@ -92,6 +92,17 @@ export function getFieldDefs({
       info: `Certainty of taxon identification.`
     },
     {
+      inputId: 'idref-input',
+      inputType: 'text',
+      inputLabel: 'ID reference',
+      jsonId: 'idref',
+      iRecord: 'Identification reference',
+      default: '',
+      novalue: '',
+      optional: true,
+      info: `You can use this field to indicate a reference to any identification sources used.`
+    },
+    {
       inputId: 'birdbreed-input',
       inputType: 'term-birdbreed',
       inputLabel: 'Breeding evidence (birds)',
@@ -124,6 +135,20 @@ export function getFieldDefs({
       optional: true,
       info: `Sex of recorded taxon.`
     },
+
+    {
+      inputId: 'quantity-input',
+      inputType: 'text',
+      inputLabel: 'Quantity',
+      jsonId: 'quantity',
+      iRecord: 'Quantity',
+      default: '',
+      novalue: '',
+      optional: true,
+      info: `The quantity of the recorded taxon. This could be a number or some other
+        quantity specification such as used in the DAFOR scale, or free text.`
+    },
+    
     {
       inputId: 'obstype-input',
       inputType: 'term-obstype',
@@ -172,6 +197,18 @@ export function getFieldDefs({
       info: `You can used this to provide information on whether a specimen was retained or not.`
     },
     {
+      inputId: 'habitat-input',
+      inputType: 'text',
+      inputLabel: 'Habitat',
+      jsonId: 'habitat',
+      iRecord: 'Habitat',
+      default: '',
+      novalue: '',
+      optional: true,
+      forDuplication: true,
+      info: `Habitat in which record was made.`
+    },
+    {
       inputId: 'gridref-input',
       inputType: 'text',
       inputLabel: 'Grid reference',
@@ -189,7 +226,7 @@ export function getFieldDefs({
       inputType: 'text',
       inputLabel: 'Latitude',
       jsonId: 'latitude',
-      iRecord: null,
+      iRecord: 'Latitude',
       default: filenameDetails ? filenameDetails.latitude : '',
       novalue: '',
       optional: false,
@@ -202,7 +239,7 @@ export function getFieldDefs({
       inputType: 'text',
       inputLabel: 'Longitude',
       jsonId: 'longitude',
-      iRecord: null,
+      iRecord: 'Longitude',
       default: filenameDetails ? filenameDetails.longitude : '',
       novalue: '',
       optional: false,

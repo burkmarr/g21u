@@ -221,5 +221,5 @@ body.emulate-v1 #navbot svg#navbot-link-csv {
   pointer-events: none;
 }
 .button-change path {
-  stroke: #aaa !important;
+  stroke: yellow !important;
 }
