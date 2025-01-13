@@ -1,4 +1,6 @@
-import { getOpt, getDateTime, generalMessage } from './common.js'
+import { getOpt, getDateTime, generalMessage,
+  createProgressBar, updateProgressBar, closeProgressBar
+ } from './common.js'
 import { getFieldDefs } from './fields.js'
 import { mkConfig, generateCsv, asBlob, idb, csvParse } from './nl.min.js'
 
@@ -155,11 +157,22 @@ export async function storDeleteFiles(files) {
 export async function storGetRecs () {
   let recs = []
   const v1 = getOpt('emulate-v1') === 'true'
+  let iCount = 0
   switch(getOpt('file-handling')) {
     case 'opfs':
       const storRoot = await navigator.storage.getDirectory()
-      const ofpsEntries = storRoot.values()
+      let ofpsEntries = storRoot.values()
       for await (const entry of ofpsEntries) {
+        // No length property on interator so
+        // have to iterate it to find the length
+        // in order to set progress bar.
+        ++iCount
+      }
+      createProgressBar(iCount, "Getting/upating record details...")
+      ofpsEntries = storRoot.values()
+      iCount=0
+      for await (const entry of ofpsEntries) {
+        updateProgressBar(++iCount)
         const ext = entry.name.substring(entry.name.length - 4)
         const name = entry.name.substring(0, entry.name.length - 4)
         if (ext === '.wav') {
@@ -180,10 +193,13 @@ export async function storGetRecs () {
           }
         }
       }
+      closeProgressBar()
       break
     case 'idb':
       const idbKeys = await idb.keys()
+      createProgressBar(idbKeys.length, "Getting/upating record details...")
       for (const key of idbKeys) {
+        updateProgressBar(++iCount)
         const ext = key.substring(key.length - 4)
         const name = key.substring(0, key.length - 4)
         if (ext === '.wav') {
@@ -204,6 +220,7 @@ export async function storGetRecs () {
           }
         }
       }
+      closeProgressBar()
       break
     case 'native':
       const dirHandle = await idb.get('main-native-folder')
@@ -234,8 +251,19 @@ export async function storGetRecs () {
           }
         }
         if (checkDir) {
-          const nativeEntries = dirHandle.values()
+          let nativeEntries = dirHandle.values()
           for await (const entry of nativeEntries) {
+            // No length property on interator so
+            // have to iterate it to find the length
+            // in order to set progress bar.
+            ++iCount
+          }
+          createProgressBar(iCount, "Getting/upating record details...")
+          nativeEntries = dirHandle.values()
+          iCount=0
+          for await (const entry of nativeEntries) {
+            //console.log(iCount)
+            updateProgressBar(++iCount)
             const ext = entry.name.substring(entry.name.length - 4)
             const name = entry.name.substring(0, entry.name.length - 4)
             if (ext === '.wav') {
@@ -258,6 +286,7 @@ export async function storGetRecs () {
               }
             }
           }
+          closeProgressBar()
         } 
       }
       break

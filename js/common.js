@@ -10,6 +10,33 @@ export const precisions = [
   {caption: 'Hectad (10km)', value: 10000, regexp: /^[a-zA-Z]{1,2}[0-9]{2}$/}
 ]
 
+export function createProgressBar(max, msg) {
+  if (!document.getElementById('general-progress')) {
+    const dialog = document.createElement('dialog')
+    dialog.setAttribute('id', 'general-progress')
+    document.getElementsByTagName('body')[0].appendChild(dialog)
+
+    const text = document.createElement('p')
+    text.innerHTML = msg
+    dialog.appendChild(text)
+
+    const progress = document.createElement('progress')
+    progress.setAttribute('max', max)
+    progress.setAttribute('value', 0)
+    dialog.appendChild(progress)
+  }
+  document.getElementById('general-progress').showModal()
+}
+
+export function closeProgressBar() {
+  document.getElementById('general-progress').close()
+}
+
+export function updateProgressBar(value) {
+  const progress = document.querySelector('#general-progress progress')
+  progress.setAttribute('value', value)
+}
+
 export function flash(id) {
   document.getElementById(id).classList.add('flash')
 }
@@ -139,7 +166,6 @@ export function detailsFromFilename(filename) {
     altitude = sAltitude[0]
   }
 
-  console.log('return')
   return {
     filename: name,
     date: date,

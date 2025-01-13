@@ -2,7 +2,8 @@ import { storGetRecs, storDeleteFiles, storArchiveFiles, storSaveFile, downloadF
   storFileExists, storGetFile, getRecordJson, shareRecs, recsToCsv
 } from './file-handling.js'
 import { getFieldDefs } from './fields.js'
-import { el, getOpt, detailsFromFilename, getSs, setSs, generalMessage, deleteConfirm, flash } from './common.js'
+import { el, getOpt, detailsFromFilename, getSs, setSs, generalMessage, deleteConfirm, flash, 
+  createProgressBar, closeProgressBar, updateProgressBar } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 import { download, share, csv } from './svg-icons.js'
@@ -44,7 +45,6 @@ export async function initialiseList() {
     }
     return comparison
   })
-  //console.log('storRecs', storRecs)
 
   // If the currently selected file indicated by
   // session storage is no longer present, then
