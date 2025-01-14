@@ -254,7 +254,9 @@ export async function metadataRemoveYesNo(e) {
     }
 
     if (valDownload !== 'none' || valShare !== 'none' || valCsv !== 'none') {
+      createProgressBar(storRecs.length, "Updating record metadata...")
       for (let i=0; i<storRecs.length; i++) {
+        updateProgressBar(i+1)
         const name = storRecs[i].filename
         if (el(`record-checkbox-${i}`).checked) {
           if (await storFileExists(`${name}.txt`)) {
@@ -279,6 +281,7 @@ export async function metadataRemoveYesNo(e) {
           }   
         }
       }
+      closeProgressBar()
     }
   }
   await initialiseList()
@@ -292,7 +295,7 @@ export async function deleteSoundChecked(e) {
     deleteConfirm({
       confirmButText: 'Yes',
       cancelButText: 'No',
-      confirmMsgHtml: `Are you sure that you want to <span id="delete-archive-sounds">archive<span> the sound files for ${n} record${n>1 ? 's' : ''}?`,
+      confirmMsgHtml: `Are you sure that you want to <i><span id="delete-archive-sounds">archive</span></i> the sound files for ${n} record${n>1 ? 's' : ''}?`,
       archiveNotPossible: () => {
         el('delete-archive-sounds').innerText = 'delete'
       },
@@ -361,7 +364,9 @@ export async function copyValuesConfirmCancel(e) {
     const cbs = document.getElementsByClassName('copy-field-checkbox')
 
     // Loop through all records
+    createProgressBar(storRecs.length, 'Copying data from selected record to checked records...')
     for (let i=0; i<storRecs.length; i++) {
+      updateProgressBar(i+1)
       const name = storRecs[i].filename
       if (el(`record-checkbox-${i}`).checked) {
         // Record needs to be updated for checked fields from
@@ -379,12 +384,12 @@ export async function copyValuesConfirmCancel(e) {
             }
           }
           // Update record
-          console.log('updating record')
           const jsonString = JSON.stringify(jsonChecked)
           await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${name}.txt`)
         }   
       }
     }
+    closeProgressBar()
     initialiseList()
   }
 }

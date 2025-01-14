@@ -510,6 +510,7 @@ async function shareApi(files) {
 
 export async function mergeCsvs(files, name) {
 
+  createProgressBar(null, 'Merging CSV files...')
   //const csvs = files.map(f => getCSV(f))
   let csvRecs = []
   for (let i=0; i<files.length; i++) {
@@ -531,6 +532,7 @@ export async function mergeCsvs(files, name) {
   const csv = generateCsv(csvConfig)(csvRecs)
   const blob = asBlob(csvConfig)(csv)
   await storSaveFile(blob, name)
+  closeProgressBar()
 }
 
 export async function recsToCsv(recs) {
