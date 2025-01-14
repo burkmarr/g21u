@@ -203,7 +203,7 @@ export async function deleteChecked(e) {
               el(`record-checkbox-${i}`).checked = false
             }
           }
-          console.log('delete', files)
+          //console.log('delete', files)
           if (el('delete-confirm-checkbox').checked) {
             await storDeleteFiles(files)
           } else {

@@ -17,14 +17,25 @@ export function createProgressBar(max, msg) {
     document.getElementsByTagName('body')[0].appendChild(dialog)
 
     const text = document.createElement('p')
-    text.innerHTML = msg
+    text.setAttribute('id', 'general-progress-message')
     dialog.appendChild(text)
 
     const progress = document.createElement('progress')
-    progress.setAttribute('max', max)
-    progress.setAttribute('value', 0)
+    progress.setAttribute('id', 'general-progress-bar')
     dialog.appendChild(progress)
   }
+
+  if (max === null) {
+    // If we cannot update the progress bar, remove the max and value attributes
+    // which causes a default progress bar animation.
+    document.getElementById('general-progress-bar').removeAttribute('max')
+    document.getElementById('general-progress-bar').removeAttribute('value')
+  } else {
+    document.getElementById('general-progress-bar').setAttribute('max', max)
+    document.getElementById('general-progress-bar').setAttribute('value', 0)
+  }
+  
+  document.getElementById('general-progress-message').innerHTML = msg
   document.getElementById('general-progress').showModal()
 }
 
@@ -33,8 +44,7 @@ export function closeProgressBar() {
 }
 
 export function updateProgressBar(value) {
-  const progress = document.querySelector('#general-progress progress')
-  progress.setAttribute('value', value)
+  document.getElementById('general-progress-bar').setAttribute('value', value)
 }
 
 export function flash(id) {

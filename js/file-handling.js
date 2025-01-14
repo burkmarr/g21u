@@ -15,7 +15,10 @@ export async function storArchiveFiles(files) {
     console.error("storArchiveFiles shouln't have been called on non-native file system option")
     return
   }
+  createProgressBar(files.length, "Archiving files...")
+  let iCount = 0
   for (const file of files) {
+    updateProgressBar(++iCount)
     const blob = await storGetFile(file)
     const dirArchiveHandle = await idb.get('archive-native-folder')
     const nativeHandle = await dirArchiveHandle.getFileHandle(file, { create: true })
@@ -25,6 +28,7 @@ export async function storArchiveFiles(files) {
     const dirMainHandle = await idb.get('main-native-folder')
     await dirMainHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}`))
   }
+  closeProgressBar()
 }
 
 export async function storFileExists(filename) {
@@ -133,25 +137,34 @@ export async function storRenameFile(oldName, newName) {
 }
 
 export async function storDeleteFiles(files) {
+
+  let iCount = 0
+
   switch(getOpt('file-handling')) {
     case 'opfs':
+      createProgressBar(files.length, "Deleting files...")
       const storRoot = await navigator.storage.getDirectory()
       for (const file of files) {
+        updateProgressBar(++iCount)
         await storRoot.removeEntry(file).catch(e => console.warn(`Could not delete ${file}`))
       }
       break
     case 'idb':
+      createProgressBar(null, "Deleting files...")
       await idb.delMany(files)
       break
     case 'native':
+      createProgressBar(files.length, "Deleting files...")
       const dirHandle = await idb.get('main-native-folder')
       for (const file of files) {
+        updateProgressBar(++iCount)
         await dirHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}`))
       }
       break
     default:
       // No default handler
   }
+  closeProgressBar()
 }
 
 export async function storGetRecs () {
@@ -521,10 +534,14 @@ export async function mergeCsvs(files, name) {
 }
 
 export async function recsToCsv(recs) {
+
+  createProgressBar(recs.length, "Creating CSV from records...")
+
   const csvRecs = []
   const formattedDateTime = getDateTime(true)
   const unformattedDateTime = getDateTime()
   for (let i=0; i<recs.length; i++) {
+    updateProgressBar(i+1)
     const name = recs[i]
     const json = await getRecordJson(`${name}.txt`)
     // Copy the record json object minus the metadata
@@ -551,6 +568,8 @@ export async function recsToCsv(recs) {
   const blob = asBlob(csvConfig)(csv)
   // The CSV file is given a name based on the current timestamp
   await storSaveFile(blob, `g21-recs-${unformattedDateTime}.csv`)
+
+  closeProgressBar()
 }
 
 export async function getRecordJson(filename) {
