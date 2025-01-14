@@ -132,6 +132,7 @@ function initRecordFields() {
       const fieldDefs = getFieldDefs()
       const currentInputIndex = fieldDefs.findIndex(f => f.inputId === e.target.id)
 
+      
       // Move focus to an input control
       let focussed = false
       for (let i = currentInputIndex+1; i<fieldDefs.length; i++) {
@@ -139,12 +140,31 @@ function initRecordFields() {
         const value = el(inputId).value
         const edited = el(inputId).classList.contains('edited')
         console.log(inputId, value)
+
+        if (e.shiftKey) {
+          // If shift and tab pressed, then just go to next input control
+          el(inputId).focus()
+          focussed = true
+          break
+        } else {
+          // If only tab pressed, do special behaviour
+          if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
+            el(inputId).focus()
+            focussed = true
+            if (value.toLowerCase() === 'not recorded') {
+              el(inputId).select()
+            }
+            break
+          } 
+        }
+
         if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
           el(inputId).focus()
           focussed = true
           break
         }
       }
+
       if (!focussed) {
         // No more fields to focus on
         // shift to save button
