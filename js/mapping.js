@@ -123,7 +123,7 @@ export function initLocationDetails() {
   const bingNote = document.createElement('div')
   ctlsDiv.appendChild(bingNote)
   bingNote.setAttribute('id', 'bing-note')
-  bingNote.innerHTML = 'To see location on an OS map, display it on the Bing Maps website using the georeference link above.'
+  bingNote.innerHTML = `To see location on an OS map, display it on the Bing Maps website using the georeference link above (doesn't appear to work on mobile).`
 
   // Nominatim
   const nominatimDiv = document.createElement('div')
