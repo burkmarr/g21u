@@ -119,6 +119,12 @@ export function initLocationDetails() {
   elm.innerText = 'Use'
   elm.addEventListener('click', useClickedGeoref)
 
+  // Bing maps note
+  const bingNote = document.createElement('div')
+  ctlsDiv.appendChild(bingNote)
+  bingNote.setAttribute('id', 'bing-note')
+  bingNote.innerHTML = 'To see location on an OS map, display it on the Bing Maps website using the georeference link above.'
+
   // Nominatim
   const nominatimDiv = document.createElement('div')
   ctlsDiv.appendChild(nominatimDiv)
@@ -157,16 +163,6 @@ export async function updateMap() {
     subText.innerHTML = 'no record selected'
   }
 
-  // Initialise current GR
-  if (georef === 'osgr') {
-    el('current-gr').innerHTML = json.gridref //el('gridref-input').value
-    if (json.gridref) {
-      el('current-precision').value = String(precisionFromGr(json.gridref))
-    } else {
-      el('current-precision').value = getOpt('georef-precision')
-    }
-  }
-  
   // Move map to location of selected record and plot marker
   let lat, lon
   if (georef === 'osgr') {
@@ -199,6 +195,16 @@ export async function updateMap() {
     map.panTo(L.latLng(lat, lon))
   } catch(e) {
     console.warn(e)
+  }
+
+  // Initialise current GR
+  if (georef === 'osgr') {
+    el('current-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?cp=${lat}~${lon}&style=s&lvl=15.1'>${json.gridref}</a>`
+    if (json.gridref) {
+      el('current-precision').value = String(precisionFromGr(json.gridref))
+    } else {
+      el('current-precision').value = getOpt('georef-precision')
+    }
   }
 }
 
@@ -250,7 +256,10 @@ async function currentPrecisionChanged(e) {
     lon = ll.centroid[0]
   }
   grs = getGr(lon, lat, 'wg', 'gb', [Number(e.target.value)]) 
-  el('current-gr').innerHTML = grs[`p${e.target.value}`]
+  //el('current-gr').innerHTML = grs[`p${e.target.value}`]
+  const currentGr = grs[`p${e.target.value}`]
+  el('current-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?cp=${lat}~${lon}&style=s&lvl=15.1'>${currentGr}</a>`
+    
   const grJson = getSquare(grs[`p${e.target.value}`])
   const latlons = grJson.coordinates[0].map(lonlat => [lonlat[1], lonlat[0]])
   latlons.pop()
@@ -282,14 +291,15 @@ function setMapClickedGR() {
     } else {
       clickedGrPoly.setLatLngs(latlons)
     }
-    el('clicked-gr').innerText = gr
+    el('clicked-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?cp=${lat}~${lon}&style=s&lvl=15.1'>${gr}</a>`
   } else {
     if (!clickedLatLonMkr) {
       clickedLatLonMkr = L.marker([lat, lon]).addTo(map)
     } else {
       clickedLatLonMkr.setLatLng([lat, lon])
     }
-    el('clicked-gr').innerText = `lat: ${lat}, lon: ${lon}`
+    console.log('set lat log')
+    el('clicked-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?cp=${lat}~${lon}&style=s&lvl=15.1'>lat: ${lat}, lon: ${lon}</a>`
   }
 }
 

@@ -1,5 +1,5 @@
 #location-details {
-  --ctrl-height: 150px;
+  --ctrl-height: 200px;
   --head-height: 30px;
   --message-height: 25px;
 }
@@ -20,6 +20,10 @@
   font-size: 0.8em;
   height: var(--message-height);
   line-height: var(--message-height);
+}
+#bing-note {
+  font-size: 0.8em;
+  margin: 0.5em 0;
 }
 #nominatim-location {
   margin-top: 5px;
