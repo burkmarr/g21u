@@ -65,8 +65,8 @@ export async function displayTaxonMatches(e) {
     const scientificName = taxon.name
     const commonName = taxon.commonName ? taxon.commonName : ''
     return `
-      <li>
-        <div class="taxon-list-item">
+      <li class="taxon-list-item">
+        <div>
           <span class="taxon-name scientific"><i>${scientificName}</i></span>
           <br/>
           <span class="taxon-name common">${commonName}</span>
@@ -77,7 +77,15 @@ export async function displayTaxonMatches(e) {
   el(suggestionId).innerHTML = html
   const taxa = document.getElementsByClassName("taxon-list-item")
   for (let i=0; i < taxa.length; i++) {
+    taxa[i].setAttribute('id', `${scientific ? 'scientific' : 'common'}-taxon-list-item-${i}`)
+    taxa[i].setAttribute('tabindex', -1)
     taxa[i].addEventListener('click', taxonSelected, false)
+    taxa[i].addEventListener('keyup', function(e) {
+      if (e.keyCode === 13) {
+        taxonSelected(e)
+        el(`${scientific ? 'scientific' : 'common'}-name-input`).focus()
+      }
+    })
   }
 }
 
@@ -175,15 +183,14 @@ export async function taxonDetails() {
       sDiv.innerHTML = '<b>Synonyms</b> - none'
       el('taxa-details').appendChild(sDiv)
     }
-   
   }
-  
 }
 
 function taxonSelected(e) {
+  const innerDiv = document.querySelector(`#${e.target.id} div`)
   e.stopPropagation()
-  const scientific = e.target.children[0].innerText
-  const common = e.target.children[2].innerText
+  const scientific = innerDiv.children[0].innerText
+  const common = innerDiv.children[2].innerText
   el('scientific-name-input').value = scientific
   el('common-name-input').value = common
   hideTaxonMatches()

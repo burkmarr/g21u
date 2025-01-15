@@ -119,7 +119,7 @@ export function getFieldDefs({
       inputLabel: 'Stage',
       jsonId: 'stage',
       iRecord: 'Stage',
-      default: 'Not recorded',
+      default: 'not recorded',
       novalue: '',
       optional: true,
       info: `Stage of recorded taxon.`
@@ -326,7 +326,7 @@ export function getTermList(term) {
       'Mine (vacated)',
       'Mixed',
       'Nest',
-      'Not recorded',
+      'not recorded',
       'Nymph',
       'Other',
       'Pupa',

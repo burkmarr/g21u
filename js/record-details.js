@@ -132,43 +132,59 @@ function initRecordFields() {
       const fieldDefs = getFieldDefs()
       const currentInputIndex = fieldDefs.findIndex(f => f.inputId === e.target.id)
 
-      
-      // Move focus to an input control
-      let focussed = false
-      for (let i = currentInputIndex+1; i<fieldDefs.length; i++) {
-        const inputId = fieldDefs[i].inputId
-        const value = el(inputId).value
-        const edited = el(inputId).classList.contains('edited')
-        console.log(inputId, value)
+      // Determine whether or not the scientifc or common names
+      // selection list is displayed.
+      const scientificListDisplayed = !el('scientific-name-input-suggestions').classList.contains('hide')
+      const commonListDisplayed = !el('common-name-input-suggestions').classList.contains('hide')
 
-        if (e.shiftKey) {
-          // If shift and tab pressed, then just go to next input control
-          el(inputId).focus()
-          focussed = true
-          break
+      if (scientificListDisplayed || commonListDisplayed) {
+        // Move focus to an element in a taxon selection list
+        const listId = scientificListDisplayed ?'scientific-name-input-suggestions' : 'common-name-input-suggestions'
+        if (e.target.classList.contains('taxon-list-item')) {
+          // Move focus to the next element in the list
+          const next = document.querySelector(`#${e.target.id} + .taxon-list-item`)
+          next.focus()
         } else {
-          // If only tab pressed, do special behaviour
+          // Move focus to the first element in the list
+          const first = document.querySelector(`#${listId} .taxon-list-item`)
+          first.focus()
+        }
+      } else {
+        // Move focus to an input control
+        let focussed = false
+        for (let i = currentInputIndex+1; i<fieldDefs.length; i++) {
+          const inputId = fieldDefs[i].inputId
+          const value = el(inputId).value
+          const edited = el(inputId).classList.contains('edited')
+          if (e.shiftKey) {
+            // If shift and tab pressed, then just go to next input control
+            el(inputId).focus()
+            focussed = true
+            break
+          } else {
+            // If only tab pressed, do special behaviour
+            if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
+              el(inputId).focus()
+              focussed = true
+              if (value.toLowerCase() === 'not recorded') {
+                el(inputId).select()
+              }
+              break
+            } 
+          }
+
           if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
             el(inputId).focus()
             focussed = true
-            if (value.toLowerCase() === 'not recorded') {
-              el(inputId).select()
-            }
             break
-          } 
+          }
         }
 
-        if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
-          el(inputId).focus()
-          focussed = true
-          break
+        if (!focussed) {
+          // No more fields to focus on
+          // shift to save button
+          el('record-save-button').focus()
         }
-      }
-
-      if (!focussed) {
-        // No more fields to focus on
-        // shift to save button
-        el('record-save-button').focus()
       }
     }
   }, false)

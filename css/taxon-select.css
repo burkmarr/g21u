@@ -23,6 +23,6 @@
   }
 }
 
-.taxon-name {
+.taxon-list-item div, .taxon-name {
   pointer-events: none;
 }
