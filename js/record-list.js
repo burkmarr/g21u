@@ -487,13 +487,31 @@ function recordChecked(e) {
   e.stopPropagation()
 }
 
-function recordSelected(e) {
+async function recordSelected(e) {
+
   const currentSelected = document.getElementsByClassName("record-selected")
   if(currentSelected[0].getAttribute('data-file-name') !== e.target.getAttribute('data-file-name')) {
-    currentSelected[0].classList.remove("record-selected")
-    e.target.classList.add("record-selected")
-    setSs( 'selectedFile', e.target.getAttribute('data-file-name'))
-    populateRecordFields()
+    // Check whether current record is being edited
+    let edited = false
+    const currentlySelectedFile = currentSelected[0].getAttribute('data-file-name')
+    const json = await getRecordJson(`${currentlySelectedFile}.txt`)
+    getFieldDefs({filename: currentlySelectedFile}).forEach(f => {
+      const fld = el(f.inputId)
+      if (fld.value !== json[f.jsonId]) {
+        edited = true
+      }
+    })
+    // If currently selected record is edited, then warn user
+    // and do not select the one clicked on. Note that this will
+    // not work in mobile mode, but is most likely to occur on full screen.
+    if (edited) {
+      generalMessage("You have pending edits. Either save or cancel these before selecting another record.")
+    } else {
+      currentSelected[0].classList.remove("record-selected")
+      e.target.classList.add("record-selected")
+      setSs( 'selectedFile', e.target.getAttribute('data-file-name'))
+      populateRecordFields()
+    }
   }
 }
 
