@@ -588,3 +588,19 @@ export function deleteConfirmCheckboxChanged (e) {
   console.log(e.target.checked)
   el('delete-archive-records').innerText = e.target.checked ? 'delete' : 'archive'
 }
+
+export async function getPreviousRecJson() {
+  let iCurrent
+  for (let i=0; i<storRecs.length; i++) {
+    if (storRecs[i].filename ===  getSs('selectedFile')) {
+      iCurrent = i
+      break
+    }
+  }
+  if (iCurrent) {
+    const previousJson =  await getRecordJson(`${storRecs[iCurrent-1].filename}.txt`)
+    return previousJson
+  } else {
+    return null
+  }
+}

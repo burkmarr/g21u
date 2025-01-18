@@ -3,7 +3,7 @@ import { el, keyValuePairTable, detailsFromFilename,
 import { getFieldDefs, getTermList } from './fields.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { initLocationDetails, invalidateSize, updateMap } from './mapping.js'
-import { setRecordContent, initialiseList, moveSelected } from './record-list.js'
+import { setRecordContent, initialiseList, moveSelected, getPreviousRecJson } from './record-list.js'
 import { getRecordJson, storSaveFile, storFileExists, storGetFile, copyRecord } from './file-handling.js'
 import { playBlob } from './play.js'
 
@@ -117,10 +117,18 @@ function initRecordFields() {
   ctrl.appendChild(save)
 
   // Handling form focus on tab press
-  document.addEventListener('keyup', function (e) {
+  document.addEventListener('keyup', async function (e) {
     if (e.code === 'Enter' && e.target.id === 'record-save-button') {
       // User has saved record shift focus to next record button
       el('next-record').focus()
+    }
+    if (e.code === 'Enter' && e.shiftKey) {
+      // Copy value from previous record
+      const previosRecJson = await getPreviousRecJson()
+      const fieldDefs = getFieldDefs()
+      const currentFld = fieldDefs.find(f => f.inputId === e.target.id)
+      el(e.target.id).value = previosRecJson[currentFld.jsonId]
+      highlightFields()
     } 
   })
   document.addEventListener('keydown', function (e) {
