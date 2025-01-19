@@ -241,3 +241,35 @@ body:not(.small-edit) #record-details {
   margin-right: 1em;
 }
 
+.term-suggestions {
+  overflow-y: auto; 
+  overflow-x: hidden; 
+  max-height: 250px;
+}
+
+.term-suggestions.hide {
+  display: none;
+}
+
+.term-suggestions {
+  li {
+    list-style: none;
+    border-bottom: 1px solid #D8D8D8;
+    margin:0;
+    padding:10px;
+    &:nth-child(even) {
+      background: linear-gradient(to bottom,  #ffffff 0%,#EFEFEF 100%);
+    }
+    &:nth-child(odd) {
+      background: linear-gradient(to bottom,  #ffffff 0%,#EFEFEF 100%);
+    }
+  }
+}
+
+.taxon-list-item div, .taxon-name {
+  pointer-events: none;
+}
+
+.term-suggestions li.hide {
+  display: none;
+}

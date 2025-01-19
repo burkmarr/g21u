@@ -54,7 +54,7 @@ function initRecordFields() {
     }
     input.setAttribute('id', f.inputId)
     input.addEventListener('input', highlightFields)
-    //input.addEventListener('focus', fieldFocus)
+    input.addEventListener('focus', hideTermMatches)
     ctrl.appendChild(input)
 
     // Custom control modifications
@@ -62,12 +62,11 @@ function initRecordFields() {
     if (f.inputType === 'taxon') {
       input.setAttribute('type', 'text')
       input.addEventListener('input', displayTaxonMatches)
-      //el('manage').addEventListener('click', hideTaxonMatches)
       document.getElementsByTagName('body')[0].addEventListener('click', hideTaxonMatches)
   
       const ul =  document.createElement('div')
       ul.setAttribute('id', `${f.inputId}-suggestions`)
-      ul.classList.add('taxon-suggestions')
+      ul.classList.add('term-suggestions')
       ctrl.appendChild(ul)
 
       if (f.inputId === 'scientific-name-input') {
@@ -79,17 +78,37 @@ function initRecordFields() {
       }
     }
     // Term lists
+    // Datalist isn't customisable, so we use our own control
     if (f.inputType.startsWith('term-')) {
       input.setAttribute('type', 'text')
-      input.setAttribute('list', f.inputType)
-      const datalist = document.createElement('datalist')
-      datalist.setAttribute('id', f.inputType)
-      getTermList(f.inputType).forEach(t => {
-        const opt = document.createElement('option')
-        opt.setAttribute('value', t)
-        datalist.appendChild(opt)
+      input.addEventListener('input', displayTermMatches)
+      input.addEventListener('focus', displayTermMatches)
+      document.getElementsByTagName('body')[0].addEventListener('click', hideTermMatches)
+  
+      const ul =  document.createElement('div')
+      ul.setAttribute('id', `${f.inputId}-suggestions`)
+      ul.classList.add('term-suggestions')
+      ul.classList.add('hide')
+      ctrl.appendChild(ul)
+
+      getTermList(f.inputType).forEach((t,i) => {
+        const li = document.createElement('li')
+        li.setAttribute('id', `${f.inputId}-item-${i}`)
+        li.setAttribute('tabindex', '-1') // In order to allow event handling
+        li.addEventListener('click', (e) => {
+          input.value = e.target.innerText
+          input.focus()
+        })
+        li.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            input.value = e.target.innerText
+            input.focus()
+            hideTermMatches()
+          }
+        })
+        li.innerText =  t
+        ul.appendChild(li)
       })
-      ctrl.appendChild(datalist)
     }
   })
 
@@ -145,17 +164,26 @@ function initRecordFields() {
       const scientificListDisplayed = !el('scientific-name-input-suggestions').classList.contains('hide')
       const commonListDisplayed = !el('common-name-input-suggestions').classList.contains('hide')
 
-      if (scientificListDisplayed || commonListDisplayed) {
-        // Move focus to an element in a taxon selection list
-        const listId = scientificListDisplayed ?'scientific-name-input-suggestions' : 'common-name-input-suggestions'
-        if (e.target.classList.contains('taxon-list-item')) {
-          // Move focus to the next element in the list
-          const next = document.querySelector(`#${e.target.id} + .taxon-list-item`)
-          next.focus()
-        } else {
+      // Determine whether a term-suggestion list is displayed
+      const suggestionLists = document.getElementsByClassName('term-suggestions')
+      let suggestionList
+      for (let i=0; i<suggestionLists.length; i++) {
+        if (!suggestionLists[i].classList.contains('hide')) {
+          suggestionList = suggestionLists[i]
+        }
+      }
+      if (suggestionList) {
+        // Move focus to an element in list
+        const listId = suggestionList.id
+        const inputId = suggestionList.id.substring(0, suggestionList.id.length - 12) // remove '-suggestions' suffix
+        if (e.target.id === inputId) {
           // Move focus to the first element in the list
-          const first = document.querySelector(`#${listId} .taxon-list-item`)
+          const first = document.querySelector(`#${listId} li:not(.hide)`)
           first.focus()
+        } else {
+          // Move focus to the next element in the list
+          const next = document.querySelector(`#${e.target.id} + li:not(.hide)`)
+          if (next) next.focus()
         }
       } else {
         // Move focus to an input control
@@ -196,6 +224,27 @@ function initRecordFields() {
       }
     }
   }, false)
+}
+
+function displayTermMatches(e) {
+  // Display suggestion list
+  el(`${e.target.id}-suggestions`).classList.remove('hide')
+  // Filter list based on current value typed by user
+  const opts = document.querySelectorAll(`#${e.target.id}-suggestions li`)
+  for (let i = 0; i < opts.length; i++) {
+    if (opts[i].innerText.toLowerCase().includes(e.target.value.toLowerCase())) {
+      opts[i].classList.remove('hide')
+    } else {
+      opts[i].classList.add('hide')
+    }
+  }
+}
+
+function hideTermMatches(e) {
+  const suggestionDivs = document.getElementsByClassName('term-suggestions')
+  for (let i = 0; i < suggestionDivs.length; i++) {
+    suggestionDivs[i].classList.add('hide')
+  }
 }
 
 export async function getMetadata() {
