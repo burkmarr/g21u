@@ -32,7 +32,7 @@ const APP_STATIC_RESOURCES = [
   "js/fields.js",
   "js/svg-icons.js",
   "js/nl.min.js",
-  "jszip.min.js",
+  "js/jszip.min.js",
   "manifest.json",
   "images/icon-512x512.svg",
   "images/icon-512x512.png",
