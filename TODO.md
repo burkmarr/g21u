@@ -1,6 +1,6 @@
 # TODO
 - Various
-  - A way to zip files before sharing? Would overcome problem with browser limit.
+  - A way to zip files before sharing? Would overcome problem with browser limit (https://www.npmjs.com/package/jszip)
 - Testing
   - Need to check how everything works without internet.
   - Need to test that everything works with the different file handling options.

@@ -8,6 +8,7 @@ export function initialiseGui() {
   document.getElementById("emulate-v1").checked = getOpt('emulate-v1') === "true"
   document.getElementById("georef-format").value = getOpt('georef-format')
   document.getElementById("georef-precision").value = getOpt('georef-precision')
+  document.getElementById("zip-downloads").checked = getOpt('zip-downloads') === "true"
   document.getElementById("automatic-playback").checked = getOpt('automatic-playback') === "true"
   document.getElementById("playback-volume").value = getOpt('playback-volume')
   document.getElementById("beep-volume").value = getOpt('beep-volume')
@@ -68,6 +69,10 @@ export function georefFormat() {
 
 export function georefPrecision() {
   setOpt('georef-precision', document.getElementById("georef-precision").value)
+}
+
+export function zipDownloads() {
+  setOpt('zip-downloads', document.getElementById("zip-downloads").checked) 
 }
 
 export function automaticPlayback() {

@@ -47,6 +47,11 @@
       <option value="5000">Quadrant (5km)</option>
       <option value="10000">Hectad (10km)</option>
     </select>
+    <div class="opts-label"><b>Zip downloaded records: indicate whether downloaded records should be zipped into a single file.</b> </div>
+    <label class="switch">
+      <input id="zip-downloads" type="checkbox">
+      <span class="slider round"></span>
+    </label>
     <div class="opts-label"><b>Storage:</b> indicate how sound files are to be handled & stored on device.</div>
     <select id="file-handling">
       <option value="download">Immediate download</option>
@@ -102,7 +107,7 @@
     import { navbot } from './js/navbot.js'
     import { georefFormat, georefPrecision, automaticPlayback, playbackVolume, beepVolume, 
       fileHandling, defaultRecorder, defaultDeterminer, useMode, initialiseGui ,
-      browseMainFolder, browseArchiveFolder
+      browseMainFolder, browseArchiveFolder, zipDownloads
     } from './js/options.js'
 
     // Add class to body if emulating v1
@@ -114,6 +119,7 @@
     document.getElementById('emulate-v1').addEventListener('change', useMode)
     document.getElementById('georef-format').addEventListener('change', georefFormat)
     document.getElementById('georef-precision').addEventListener('change', georefPrecision)
+    document.getElementById('zip-downloads').addEventListener('change', zipDownloads)
     document.getElementById('automatic-playback').addEventListener('change', automaticPlayback)
     document.getElementById('playback-volume').addEventListener('change', playbackVolume)
     document.getElementById('beep-volume').addEventListener('change', beepVolume)

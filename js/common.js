@@ -225,6 +225,7 @@ export function getOpt(id) {
     'emulate-v1': 'false',
     'georef-format': 'osgr',
     'georef-precision': '10',
+    'zip-downloads': 'true',
     'automatic-playback': 'false',
     'playback-volume': '0.5',
     'beep-volume': '0.5',

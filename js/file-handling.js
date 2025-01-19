@@ -430,13 +430,13 @@ export async function downloadFile(filename) {
   const blob = await storGetFile (filename)
   downloadBlob(blob, filename)
   // Update record's metadata if this is a json text file
-  if (filename.endsWith('.txt')) {
-    const json = await getRecordJson(filename)
-    json.metadata.downloads.push(getDateTime(true))
-    // Write the file
-    const jsonString = JSON.stringify(json)
-    await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
-  }
+  // if (filename.endsWith('.txt')) {
+  //   const json = await getRecordJson(filename)
+  //   json.metadata.downloads.push(getDateTime(true))
+  //   // Write the file
+  //   const jsonString = JSON.stringify(json)
+  //   await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
+  // }
 }
 
 export async function shareRecs(recs) {

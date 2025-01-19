@@ -1,9 +1,9 @@
 import { storGetRecs, storDeleteFiles, storArchiveFiles, storSaveFile, downloadFile, 
-  storFileExists, storGetFile, getRecordJson, shareRecs, recsToCsv
+  storFileExists, storGetFile, getRecordJson, shareRecs, recsToCsv, downloadBlob
 } from './file-handling.js'
 import { getFieldDefs } from './fields.js'
 import { el, getOpt, detailsFromFilename, getSs, setSs, generalMessage, deleteConfirm, flash, 
-  createProgressBar, closeProgressBar, updateProgressBar } from './common.js'
+  createProgressBar, closeProgressBar, updateProgressBar, getDateTime } from './common.js'
 import { playBlob } from './play.js'
 import { populateRecordFields } from './record-details.js'
 import { download, share, csv } from './svg-icons.js'
@@ -432,25 +432,57 @@ export async function shareChecked(e) {
 }
 
 export async function downloadChecked(e) {
-  //console.log('e', e)
   flash(e.target.id)
+  const zipit = getOpt('zip-downloads') === "true"
   const n =  storRecs.reduce((a,r,i) => el(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const promises = []
+    const zip = new JSZip() // Library included in HTML script tag
+    if (zipit) createProgressBar(storRecs.length, "Zipping record files for download...")
     for (let i=0; i<storRecs.length; i++) {
+      if (zipit) updateProgressBar(i+1)
       const name = storRecs[i].filename
       if (el(`record-checkbox-${i}`).checked) {
         // Download WAV if it exists
         if (await storFileExists(`${name}.wav`)) {
-          promises.push(downloadFile(`${name}.wav`))
+          if (zipit) {
+            const wav = await storGetFile(`${name}.wav`)
+            zip.file(`${name}.wav`, wav, {binary: true})
+          } else {
+            promises.push(downloadFile(`${name}.wav`))
+          }
         }
         // Download JSON (txt) if it exists and not emulating v1
         if (getOpt('emulate-v1') === 'false' && await storFileExists(`${name}.txt`)) {
-          promises.push(downloadFile(`${name}.txt`))
+          if (zipit) {
+            const txt = await storGetFile(`${name}.txt`)
+            zip.file(`${name}.txt`, txt, {binary: true})
+          } else {
+            promises.push(downloadFile(`${name}.txt`))
+          }
+          // Update metadata
+          const json = await getRecordJson(`${name}.txt`)
+          json.metadata.downloads.push(getDateTime(true))
+          // Write the file
+          const jsonString = JSON.stringify(json)
+          await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${name}.txt`)
         }
       }
     }
-    await Promise.all(promises)
+
+    if (zipit) {
+      const unformattedDateTime = getDateTime()
+      const blobZip = await zip.generateAsync({type:"blob"})
+      const file = new File([blobZip], `g21-recs-${unformattedDateTime}.zip`, {
+        type: blobZip.type,
+        lastModified: new Date().getTime()
+      })
+      downloadBlob(blobZip, `g21-recs-${unformattedDateTime}.zip`)
+      closeProgressBar
+    } else {
+      await Promise.all(promises)
+    }
+
     await initialiseList()
     populateRecordFields()
   }
