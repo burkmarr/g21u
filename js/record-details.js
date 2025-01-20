@@ -1,4 +1,4 @@
-import { el, keyValuePairTable, detailsFromFilename, 
+import { el, keyValuePairTable, detailsFromFilename, generalMessage,
   collapsibleDiv, unorderedList, setSs, getSs, getOpt, flash } from './common.js'
 import { getFieldDefs, getTermList } from './fields.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
@@ -525,6 +525,22 @@ export async function duplicateRecord(e) {
   if (!originalName) {
     return
   }
+
+  // Ensure selected record does not have pending edits
+  let edited = false
+  const json = await getRecordJson(`${originalName}.txt`)
+  getFieldDefs({filename: originalName}).forEach(f => {
+    const fld = el(f.inputId)
+    if (fld.value !== json[f.jsonId]) {
+      edited = true
+    }
+  })
+  if (edited) {
+    generalMessage("You have pending edits. Either save or cancel these before duplicating the record.")
+    return
+  }
+  
+  // Do the duplication
   const oSplit = originalName.split('_')
   if (oSplit[oSplit.length-1].startsWith('d')) {
     // The original record is a duplicate of another one - reset
