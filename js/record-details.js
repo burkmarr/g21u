@@ -40,6 +40,13 @@ function initRecordFields() {
   `
   
   el('record-duplicate').addEventListener('click', duplicateRecord)
+  el('record-duplicate').addEventListener('keypress', e => {
+    // Don't allow enter key on Duplicate button - it can
+    // lead to record duplication by mistake
+    if (e.key === 'Enter') {
+      e.preventDefault()
+    }
+  })
 
   // Generate the input fields
   getFieldDefs().forEach(f => {
