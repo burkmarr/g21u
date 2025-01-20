@@ -1,6 +1,4 @@
 # TODO
-- Various
-  - Replace datalists with custom control
 - Testing
   - Need to check how everything works without internet.
   - Need to test that everything works with the different file handling options.
