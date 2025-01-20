@@ -48,6 +48,12 @@ function initRecordFields() {
     let input
     if (f.inputType === 'textarea') {
       input = document.createElement('textarea')
+      input.addEventListener('keypress', e => {
+        // Don't allow carriage returns in text area
+        if (e.key === 'Enter') {
+          e.preventDefault()
+        }
+      })
     } else {
       input = document.createElement('input')
       input.setAttribute('type', f.inputType)
@@ -136,43 +142,62 @@ function initRecordFields() {
   ctrl.appendChild(save)
 
   // Handling form focus on tab press
-  document.addEventListener('keyup', async function (e) {
+  document.addEventListener('keypress', async function (e) {
     if (e.code === 'Enter' && e.target.id === 'record-save-button') {
       // User has saved record shift focus to next record button
       el('next-record').focus()
-    }
-    if (e.code === 'Enter' && e.shiftKey) {
+    } else if (e.code === 'Enter' && e.shiftKey) {
       // Copy value from previous record
       const previosRecJson = await getPreviousRecJson()
       const fieldDefs = getFieldDefs()
       const currentFld = fieldDefs.find(f => f.inputId === e.target.id)
       el(e.target.id).value = previosRecJson[currentFld.jsonId]
       highlightFields()
-    } 
+    } else if (e.code === 'Enter') {
+      const fieldDefs = getFieldDefs()
+      const currentInputIndex = fieldDefs.findIndex(f => f.inputId === e.target.id)
+  
+      let focussed = false
+      for (let i = currentInputIndex+1; i<fieldDefs.length; i++) {
+        const inputId = fieldDefs[i].inputId
+        const value = el(inputId).value
+        const edited = el(inputId).classList.contains('edited')
+        // Focus on next empty, edited or 'not recorded' field
+        if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
+          el(inputId).focus()
+          focussed = true
+          if (value.toLowerCase() === 'not recorded') {
+            el(inputId).select()
+          }
+          break
+        } 
+      }
+      if (!focussed) {
+        // No more fields to focus on
+        // so move it to save button
+        el('record-save-button').focus()
+      }
+    }
   })
   document.addEventListener('keydown', function (e) {
     if (e.code === 'Tab') {
       // Tab key pressed
-      e.preventDefault()
-      e.stopPropagation()
-
-      const fieldDefs = getFieldDefs()
-      const currentInputIndex = fieldDefs.findIndex(f => f.inputId === e.target.id)
-
-      // Determine whether or not the scientifc or common names
-      // selection list is displayed.
-      const scientificListDisplayed = !el('scientific-name-input-suggestions').classList.contains('hide')
-      const commonListDisplayed = !el('common-name-input-suggestions').classList.contains('hide')
 
       // Determine whether a term-suggestion list is displayed
       const suggestionLists = document.getElementsByClassName('term-suggestions')
-      let suggestionList
+      let suggestionList, availableOpts
+
       for (let i=0; i<suggestionLists.length; i++) {
         if (!suggestionLists[i].classList.contains('hide')) {
           suggestionList = suggestionLists[i]
+          // Determine if any options currently displayed in list
+          availableOpts = document.querySelectorAll(`#${suggestionList.id} li:not(.hide)`)
         }
       }
-      if (suggestionList) {
+      
+      if (suggestionList && availableOpts.length > 0) {
+        e.preventDefault()
+        e.stopPropagation()
         // Move focus to an element in list
         const listId = suggestionList.id
         const inputId = suggestionList.id.substring(0, suggestionList.id.length - 12) // remove '-suggestions' suffix
@@ -182,44 +207,19 @@ function initRecordFields() {
           first.focus()
         } else {
           // Move focus to the next element in the list
-          const next = document.querySelector(`#${e.target.id} + li:not(.hide)`)
-          if (next) next.focus()
-        }
-      } else {
-        // Move focus to an input control
-        let focussed = false
-        for (let i = currentInputIndex+1; i<fieldDefs.length; i++) {
-          const inputId = fieldDefs[i].inputId
-          const value = el(inputId).value
-          const edited = el(inputId).classList.contains('edited')
-          if (e.shiftKey) {
-            // If shift and tab pressed, then just go to next input control
-            el(inputId).focus()
-            focussed = true
-            break
-          } else {
-            // If only tab pressed, do special behaviour
-            if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
-              el(inputId).focus()
-              focussed = true
-              if (value.toLowerCase() === 'not recorded') {
-                el(inputId).select()
-              }
+          const availableOpts = document.querySelectorAll(`#${listId} li:not(.hide)`)
+          let next
+          for (let i=0; i<availableOpts.length-1; i++) {
+            if (availableOpts[i].id === e.target.id) {
+              next = availableOpts[i+1]
               break
-            } 
+            }
           }
-
-          if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
+          if (next) {
+            next.focus()
+          } else {
             el(inputId).focus()
-            focussed = true
-            break
-          }
-        }
-
-        if (!focussed) {
-          // No more fields to focus on
-          // shift to save button
-          el('record-save-button').focus()
+          }   
         }
       }
     }
@@ -232,7 +232,9 @@ function displayTermMatches(e) {
   // Filter list based on current value typed by user
   const opts = document.querySelectorAll(`#${e.target.id}-suggestions li`)
   for (let i = 0; i < opts.length; i++) {
-    if (opts[i].innerText.toLowerCase().includes(e.target.value.toLowerCase())) {
+    if (opts[i].innerText.toLowerCase() === e.target.value.toLowerCase()) {
+      opts[i].classList.add('hide')
+    } else if (opts[i].innerText.toLowerCase().includes(e.target.value.toLowerCase())) {
       opts[i].classList.remove('hide')
     } else {
       opts[i].classList.add('hide')
