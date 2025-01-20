@@ -80,8 +80,8 @@ export async function displayTaxonMatches(e) {
     taxa[i].setAttribute('id', `${scientific ? 'scientific' : 'common'}-taxon-list-item-${i}`)
     taxa[i].setAttribute('tabindex', -1)
     taxa[i].addEventListener('click', taxonSelected, false)
-    taxa[i].addEventListener('keyup', function(e) {
-      if (e.keyCode === 13) {
+    taxa[i].addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
         taxonSelected(e)
         el(`${scientific ? 'scientific' : 'common'}-name-input`).focus()
       }
