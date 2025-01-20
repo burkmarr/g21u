@@ -153,17 +153,16 @@ function initRecordFields() {
     if (e.code === 'Enter' && e.target.id === 'record-save-button') {
       // User has saved record shift focus to next record button
       el('next-record').focus()
-    } else if (e.code === 'Enter' && e.shiftKey) {
-      // Copy value from previous record
-      const previosRecJson = await getPreviousRecJson()
-      const fieldDefs = getFieldDefs()
-      const currentFld = fieldDefs.find(f => f.inputId === e.target.id)
-      el(e.target.id).value = previosRecJson[currentFld.jsonId]
-      highlightFields()
     } else if (e.code === 'Enter') {
       const fieldDefs = getFieldDefs()
+      if (e.shiftKey) {
+        // Copy value from previous record
+        const previosRecJson = await getPreviousRecJson()
+        const currentFld = fieldDefs.find(f => f.inputId === e.target.id)
+        el(e.target.id).value = previosRecJson[currentFld.jsonId]
+        highlightFields()
+      }
       const currentInputIndex = fieldDefs.findIndex(f => f.inputId === e.target.id)
-  
       let focussed = false
       for (let i = currentInputIndex+1; i<fieldDefs.length; i++) {
         const inputId = fieldDefs[i].inputId
@@ -231,6 +230,25 @@ function initRecordFields() {
       }
     }
   }, false)
+
+  function moveFocusToNextEmpty(currentInputIndex, fieldDefs) {
+    let focussed = false
+    for (let i = currentInputIndex+1; i<fieldDefs.length; i++) {
+      const inputId = fieldDefs[i].inputId
+      const value = el(inputId).value
+      const edited = el(inputId).classList.contains('edited')
+      // Focus on next empty, edited or 'not recorded' field
+      if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
+        el(inputId).focus()
+        focussed = true
+        if (value.toLowerCase() === 'not recorded') {
+          el(inputId).select()
+        }
+        break
+      } 
+    }
+    return focussed
+  }
 }
 
 function displayTermMatches(e) {
