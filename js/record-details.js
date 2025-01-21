@@ -8,6 +8,11 @@ import { getRecordJson, storSaveFile, storFileExists, storGetFile, copyRecord } 
 import { playBlob } from './play.js'
 
 let audioPlayer = new Audio()
+let pendingEdits = false
+
+export function editsPending() {
+  return pendingEdits
+}
 
 function createInputLabel(parent, label) {
   const ldiv = document.createElement('div')
@@ -66,7 +71,7 @@ function initRecordFields() {
       input.setAttribute('type', f.inputType)
     }
     input.setAttribute('id', f.inputId)
-    input.addEventListener('input', highlightFields)
+    input.addEventListener('input', checkEditStatus)
     input.addEventListener('focus', hideTermMatches)
     ctrl.appendChild(input)
 
@@ -151,7 +156,7 @@ function initRecordFields() {
   // Handling form focus on tab press
   el('record-details').addEventListener('keypress', async function (e) {
     if (e.code === 'Enter' && e.target.id === 'record-save-button') {
-      // User has saved record shift focus to next record button
+      // User has saved record - shift focus to next record button
       el('next-record').focus()
     } else if (e.code === 'Enter') {
       const fieldDefs = getFieldDefs()
@@ -159,8 +164,8 @@ function initRecordFields() {
         // Copy value from previous record
         const previosRecJson = await getPreviousRecJson()
         const currentFld = fieldDefs.find(f => f.inputId === e.target.id)
-        el(e.target.id).value = previosRecJson[currentFld.jsonId]
-        highlightFields()
+        e.target.value = previosRecJson[currentFld.jsonId]
+        checkEditStatus()
       }
       const currentInputIndex = fieldDefs.findIndex(f => f.inputId === e.target.id)
       let focussed = false
@@ -230,25 +235,6 @@ function initRecordFields() {
       }
     }
   }, false)
-
-  function moveFocusToNextEmpty(currentInputIndex, fieldDefs) {
-    let focussed = false
-    for (let i = currentInputIndex+1; i<fieldDefs.length; i++) {
-      const inputId = fieldDefs[i].inputId
-      const value = el(inputId).value
-      const edited = el(inputId).classList.contains('edited')
-      // Focus on next empty, edited or 'not recorded' field
-      if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
-        el(inputId).focus()
-        focussed = true
-        if (value.toLowerCase() === 'not recorded') {
-          el(inputId).select()
-        }
-        break
-      } 
-    }
-    return focussed
-  }
 }
 
 function displayTermMatches(e) {
@@ -350,18 +336,17 @@ async function saveRecord() {
   const selectedFile = getSs('selectedFile')
 
   const json = await getRecordJson(`${selectedFile}.txt`)
-  //console.log(json)
 
   getFieldDefs({filename: selectedFile}).forEach(f => {
     json[f.jsonId] =  el(f.inputId).value
+    el(f.inputId).setAttribute('data-value', el(f.inputId).value)
   })
 
-  //console.log('new json', json)
   // Save the file
   const jsonString = JSON.stringify(json)
   await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${selectedFile}.txt`)
 
-  highlightFields()
+  checkEditStatus()
 
   // Update the record text in case details changed
   setRecordContent(selectedFile)
@@ -409,14 +394,14 @@ export async function populateRecordFields() {
   getFieldDefs({filename: selectedFile}).forEach(f => {
     if (json) {
       el(f.inputId).value = json[f.jsonId]
-    // } else if (selectedFile) {
-    //   el(f.inputId).value = f.default
+      el(f.inputId).setAttribute('data-value', json[f.jsonId])
     } else {
       el(f.inputId).value = f.novalue
+      el(f.inputId).setAttribute('data-value', '')
     }
   })
 
-  highlightFields()
+  checkEditStatus()
 
   // Initialise the field details panel
   getMetadata()
@@ -433,43 +418,23 @@ export async function populateRecordFields() {
   } else {
     el('record-details').classList.add('disable') 
   }
-
-  // Set initial focus to sound play button
-  //el('record-details-playback-button').focus()
 }
 
-export async function highlightFields() {
-
-  // Selected file
-  const selectedFile = getSs('selectedFile')
-  let json
-  if (selectedFile) {
-    // Get corresponding record JSON if it exists
-    json = await getRecordJson(`${selectedFile}.txt`)
-    //console.log(json)
-  }
-  let edited = false
-  getFieldDefs({filename: selectedFile}).forEach(f => {
+export async function checkEditStatus() {
+  // pendingEdits is a global that can be queried elsewhere
+  pendingEdits = false
+  getFieldDefs().forEach(f => {
     const fld = el(f.inputId)
     fld.classList.remove('edited')
     fld.classList.remove('saved')
-    if (selectedFile) {
-      if (json) {
-        if (fld.value === json[f.jsonId]) {
-          fld.classList.add('saved')
-        } else {
-          //console.log(f.jsonId, 'edited', json[f.jsonId], fld.value)
-          fld.classList.add('edited')
-          edited = true
-        }
-      } else if (fld.value !== f.default) {
-        fld.classList.add('edited')
-        edited = true
-      }
+    if (fld.value === fld.getAttribute('data-value')) {
+      fld.classList.add('saved')
+    } else {
+      fld.classList.add('edited')
+      pendingEdits = true
     }
   })
-
-  if (edited) {
+  if (pendingEdits) {
     el('record-save-cancel').classList.add('edited')
   } else {
     el('record-save-cancel').classList.remove('edited')
@@ -545,16 +510,7 @@ export async function duplicateRecord(e) {
     return
   }
 
-  // Ensure selected record does not have pending edits
-  let edited = false
-  const json = await getRecordJson(`${originalName}.txt`)
-  getFieldDefs({filename: originalName}).forEach(f => {
-    const fld = el(f.inputId)
-    if (fld.value !== json[f.jsonId]) {
-      edited = true
-    }
-  })
-  if (edited) {
+  if (pendingEdits) {
     generalMessage("You have pending edits. Either save or cancel these before duplicating the record.")
     return
   }

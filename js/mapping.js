@@ -1,7 +1,7 @@
 import { el, getSs, getOpt, precisions, precisionFromGr, detailsFromFilename } from './common.js'
 import { getRecordJson } from './file-handling.js'
 import { getCent, getSquare, getGr } from './nl.min.js'
-import { highlightFields } from './record-details.js'
+import { checkEditStatus } from './record-details.js'
 
 let map
 let currentGrPoly, currentLatLonMkr
@@ -312,13 +312,13 @@ function useClickedGeoref() {
     el('lat-input').value = clickedLatLon.lat
     el('lon-input').value = clickedLatLon.lon
   }
-  highlightFields()
+  checkEditStatus()
 }
 
 function useCurrentGeoref() {
   // Only available when georef-format is osgr
   el('gridref-input').value = el('current-gr').innerText
-  highlightFields()
+  checkEditStatus()
 }
 
 function clearClickedMarkers() {

@@ -5,7 +5,7 @@ import { getFieldDefs } from './fields.js'
 import { el, getOpt, detailsFromFilename, getSs, setSs, generalMessage, deleteConfirm, flash, 
   createProgressBar, closeProgressBar, updateProgressBar, getDateTime } from './common.js'
 import { playBlob } from './play.js'
-import { populateRecordFields } from './record-details.js'
+import { populateRecordFields, editsPending } from './record-details.js'
 import { download, share, csv } from './svg-icons.js'
 
 let storRecs, audioPlayers = {}
@@ -48,9 +48,17 @@ export async function initialiseList() {
 
   // If the currently selected file indicated by
   // session storage is no longer present, then
-  // reset it to the first record.
+  // reset it to the first record with no taxon name
   if (!storRecs.find(r => r.filename === getSs('selectedFile'))) {
-    setSs('selectedFile', storRecs[0].filename)
+    const firstNotEdited = storRecs.find(r => !r['scientific-name'])
+    console.log('firstNotEdited', firstNotEdited)
+    if (firstNotEdited) {
+      // Select the first record without scientific name set 
+      setSs('selectedFile', firstNotEdited.filename)
+    } else {
+      // Otherwise set to the first record
+      setSs('selectedFile', storRecs[0].filename)
+    }
   }
 
   // Populate with files from storage
@@ -64,8 +72,13 @@ export async function initialiseList() {
     fileDiv.setAttribute('data-file-name', name) 
     fileDiv.setAttribute('tabindex', '1') 
     fileDiv.classList.add('record-div')
-    fileDiv.addEventListener('click', recordSelected)
-    fileDiv.addEventListener('focus', recordSelected)
+    fileDiv.addEventListener('click', e => {
+      if (editsPending()) {
+        generalMessage("You have pending edits. Either save or cancel these before selecting another record.")
+      } else {
+        recordSelected(e.target)
+      }
+    })
     fileDiv.addEventListener('keypress', async function (e) {
       if (e.code === 'Enter') {
         el('record-details-playback-button').focus()
@@ -73,13 +86,18 @@ export async function initialiseList() {
     })
     fileDiv.addEventListener('keydown', async function (e) {
       if (e.code === 'Tab') {
-        // Move focus to record after that currently selected
+        // Move selection to record after that currently selected
         e.preventDefault()
-        const currentSelected = document.getElementsByClassName("record-selected")[0]
-        const iCurrent = Number(currentSelected.id.substring(9))
-        const nextSelected = el(`file-div-${iCurrent+1}`)
-        if (nextSelected) {
-          nextSelected.focus()
+        if (editsPending()) {
+          generalMessage("You have pending edits. Either save or cancel these before selecting another record.")
+        } else {
+          const currentSelected = document.getElementsByClassName("record-selected")[0]
+          const iCurrent = Number(currentSelected.id.substring(9))
+          const nextSelected = el(`file-div-${e.shiftKey ? iCurrent-1 : iCurrent+1}`)
+          if (nextSelected) {
+            recordSelected(nextSelected)
+            nextSelected.focus()
+          }
         }
       }
     })
@@ -544,31 +562,13 @@ function recordChecked(e) {
   e.stopPropagation()
 }
 
-async function recordSelected(e) {
-
+async function recordSelected(target) {
   const currentSelected = document.getElementsByClassName("record-selected")[0]
-  if(currentSelected.getAttribute('data-file-name') !== e.target.getAttribute('data-file-name')) {
-    // Check whether current record is being edited
-    let edited = false
-    const currentlySelectedFile = currentSelected.getAttribute('data-file-name')
-    const json = await getRecordJson(`${currentlySelectedFile}.txt`)
-    getFieldDefs({filename: currentlySelectedFile}).forEach(f => {
-      const fld = el(f.inputId)
-      if (fld.value !== json[f.jsonId]) {
-        edited = true
-      }
-    })
-    // If currently selected record is edited, then warn user
-    // and do not select the one clicked on. Note that this will
-    // not work in mobile mode, but is most likely to occur on full screen.
-    if (edited) {
-      generalMessage("You have pending edits. Either save or cancel these before selecting another record.")
-    } else {
-      currentSelected.classList.remove("record-selected")
-      e.target.classList.add("record-selected")
-      setSs( 'selectedFile', e.target.getAttribute('data-file-name'))
-      populateRecordFields()
-    }
+  if(currentSelected.getAttribute('data-file-name') !== target.getAttribute('data-file-name')) {
+    currentSelected.classList.remove("record-selected")
+    target.classList.add("record-selected")
+    setSs( 'selectedFile', target.getAttribute('data-file-name'))
+    populateRecordFields()
   }
 }
 
@@ -613,7 +613,6 @@ function stopPlayback(e) {
 }
 
 export async function moveSelected(backward) {
-  let iSelected
   for (let i=0; i<storRecs.length; i++) {
     if (storRecs[i].filename ===  getSs('selectedFile')) {
       let iNext

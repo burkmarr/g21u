@@ -1,4 +1,8 @@
 # TODO
+- Various
+  - Add option for CSV folder. If not set, system will use the main folder. If set, then CSVs will be created here and custom locations should reside there too.
+  - When record list is initialised, select the first record that has no taxon set.
+
 - Testing
   - Need to check how everything works without internet.
   - Need to test that everything works with the different file handling options.

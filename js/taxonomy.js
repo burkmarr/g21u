@@ -1,6 +1,6 @@
 import { el, keyValuePairTable, unorderedList, collapsibleDiv, getSs } from './common.js'
 import { getCSV } from './file-handling.js'
-import { highlightFields } from './record-details.js'
+import { checkEditStatus } from './record-details.js'
 
 let customTaxaCsv
 
@@ -194,6 +194,6 @@ function taxonSelected(e) {
   el('scientific-name-input').value = scientific
   el('common-name-input').value = common
   hideTaxonMatches()
-  highlightFields()
+  checkEditStatus()
   taxonDetails()
 }
