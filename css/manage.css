@@ -273,3 +273,11 @@ body:not(.small-edit) #record-details {
 .term-suggestions li.hide {
   display: none;
 }
+
+.record-n {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 0.8em;
+  color: grey;
+  pointer-events: none;
+}

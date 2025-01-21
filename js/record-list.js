@@ -67,6 +67,12 @@ export async function initialiseList() {
     if (name === getSs('selectedFile')) {
       fileDiv.classList.add('record-selected')
     }
+    // Number for info
+    const nDiv = document.createElement('div')
+    nDiv.classList.add('record-n')
+    nDiv.innerText = i+1
+    fileDiv.appendChild(nDiv)
+
     // Play image
     const playImage = document.createElement('img')
     let img
