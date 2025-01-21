@@ -64,6 +64,7 @@ export async function initialiseList() {
   // Populate with files from storage
   el('record-list').innerHTML = ''
 
+  let selectedFileDiv
   for (let i=0; i<storRecs.length; i++) {
     const name = storRecs[i].filename
     // Create div
@@ -96,13 +97,13 @@ export async function initialiseList() {
           const nextSelected = el(`file-div-${e.shiftKey ? iCurrent-1 : iCurrent+1}`)
           if (nextSelected) {
             recordSelected(nextSelected)
-            nextSelected.focus()
           }
         }
       }
     })
     if (name === getSs('selectedFile')) {
       fileDiv.classList.add('record-selected')
+      selectedFileDiv = fileDiv
     }
     // Number for info
     const nDiv = document.createElement('div')
@@ -161,6 +162,7 @@ export async function initialiseList() {
     // so doing it here at end which seems to work.
     setRecordContent(name)
   }
+  selectedFileDiv.focus()
 }
 
 export async function setRecordContent(filename) {
@@ -567,6 +569,7 @@ async function recordSelected(target) {
   if(currentSelected.getAttribute('data-file-name') !== target.getAttribute('data-file-name')) {
     currentSelected.classList.remove("record-selected")
     target.classList.add("record-selected")
+    target.focus()
     setSs( 'selectedFile', target.getAttribute('data-file-name'))
     populateRecordFields()
   }
