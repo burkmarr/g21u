@@ -324,7 +324,7 @@ export async function getMetadata() {
 
 async function moveSelectedRec(e) {
   moveSelected(e.target.id === 'previous-record')
-  el('record-details-playback-button').focus()
+ //el('record-details-playback-button').focus()
 }
 
 async function cancelRecord() {

@@ -92,12 +92,7 @@ export async function initialiseList() {
         if (editsPending()) {
           generalMessage("You have pending edits. Either save or cancel these before selecting another record.")
         } else {
-          const currentSelected = document.getElementsByClassName("record-selected")[0]
-          const iCurrent = Number(currentSelected.id.substring(9))
-          const nextSelected = el(`file-div-${e.shiftKey ? iCurrent-1 : iCurrent+1}`)
-          if (nextSelected) {
-            recordSelected(nextSelected)
-          }
+          moveSelected(e.shiftKey)
         }
       }
     })
@@ -616,23 +611,11 @@ function stopPlayback(e) {
 }
 
 export async function moveSelected(backward) {
-  for (let i=0; i<storRecs.length; i++) {
-    if (storRecs[i].filename ===  getSs('selectedFile')) {
-      let iNext
-      if (backward) {
-        iNext = i === 0 ? i : i-1
-      } else {
-        iNext = i === storRecs.length-1 ? i : i+1
-      }
-      if (iNext !== i) {
-        el(`file-div-${i}`).classList.remove('record-selected')
-        el(`file-div-${iNext}`).classList.add('record-selected')
-        el(`file-div-${iNext}`).scrollIntoView({ behavior: "smooth", block: "nearest" })
-        setSs('selectedFile', storRecs[iNext].filename)
-        populateRecordFields()
-      }
-      break
-    }
+  const currentSelected = document.getElementsByClassName("record-selected")[0]
+  const iCurrent = Number(currentSelected.id.substring(9))
+  const nextSelected = el(`file-div-${backward ? iCurrent-1 : iCurrent+1}`)
+  if (nextSelected) {
+    recordSelected(nextSelected)
   }
 }
 
