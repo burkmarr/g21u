@@ -62,8 +62,27 @@ export async function initialiseList() {
     const fileDiv = document.createElement('div')
     fileDiv.setAttribute('id', `file-div-${i}`)
     fileDiv.setAttribute('data-file-name', name) 
+    fileDiv.setAttribute('tabindex', '1') 
     fileDiv.classList.add('record-div')
     fileDiv.addEventListener('click', recordSelected)
+    fileDiv.addEventListener('focus', recordSelected)
+    fileDiv.addEventListener('keypress', async function (e) {
+      if (e.code === 'Enter') {
+        el('record-details-playback-button').focus()
+      }
+    })
+    fileDiv.addEventListener('keydown', async function (e) {
+      if (e.code === 'Tab') {
+        // Move focus to record after that currently selected
+        e.preventDefault()
+        const currentSelected = document.getElementsByClassName("record-selected")[0]
+        const iCurrent = Number(currentSelected.id.substring(9))
+        const nextSelected = el(`file-div-${iCurrent+1}`)
+        if (nextSelected) {
+          nextSelected.focus()
+        }
+      }
+    })
     if (name === getSs('selectedFile')) {
       fileDiv.classList.add('record-selected')
     }
@@ -527,11 +546,11 @@ function recordChecked(e) {
 
 async function recordSelected(e) {
 
-  const currentSelected = document.getElementsByClassName("record-selected")
-  if(currentSelected[0].getAttribute('data-file-name') !== e.target.getAttribute('data-file-name')) {
+  const currentSelected = document.getElementsByClassName("record-selected")[0]
+  if(currentSelected.getAttribute('data-file-name') !== e.target.getAttribute('data-file-name')) {
     // Check whether current record is being edited
     let edited = false
-    const currentlySelectedFile = currentSelected[0].getAttribute('data-file-name')
+    const currentlySelectedFile = currentSelected.getAttribute('data-file-name')
     const json = await getRecordJson(`${currentlySelectedFile}.txt`)
     getFieldDefs({filename: currentlySelectedFile}).forEach(f => {
       const fld = el(f.inputId)
@@ -545,7 +564,7 @@ async function recordSelected(e) {
     if (edited) {
       generalMessage("You have pending edits. Either save or cancel these before selecting another record.")
     } else {
-      currentSelected[0].classList.remove("record-selected")
+      currentSelected.classList.remove("record-selected")
       e.target.classList.add("record-selected")
       setSs( 'selectedFile', e.target.getAttribute('data-file-name'))
       populateRecordFields()

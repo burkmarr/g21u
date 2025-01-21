@@ -149,7 +149,7 @@ function initRecordFields() {
   ctrl.appendChild(save)
 
   // Handling form focus on tab press
-  document.addEventListener('keypress', async function (e) {
+  el('record-details').addEventListener('keypress', async function (e) {
     if (e.code === 'Enter' && e.target.id === 'record-save-button') {
       // User has saved record shift focus to next record button
       el('next-record').focus()
@@ -185,7 +185,7 @@ function initRecordFields() {
       }
     }
   })
-  document.addEventListener('keydown', function (e) {
+  el('record-details').addEventListener('keydown', function (e) {
     if (e.code === 'Tab') {
       // Tab key pressed
 
@@ -338,6 +338,7 @@ export async function getMetadata() {
 
 async function moveSelectedRec(e) {
   moveSelected(e.target.id === 'previous-record')
+  el('record-details-playback-button').focus()
 }
 
 async function cancelRecord() {
@@ -434,7 +435,7 @@ export async function populateRecordFields() {
   }
 
   // Set initial focus to sound play button
-  el('record-details-playback-button').focus()
+  //el('record-details-playback-button').focus()
 }
 
 export async function highlightFields() {
