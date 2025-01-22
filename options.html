@@ -59,8 +59,10 @@
       <option value="opfs">Private origin file system</option>
       <option value="native">Native file system</option>
     </select>
-    <div class="opts-label"><b>Main folder:</b> for native file systems select a folder for g21u files.</div>
+    <div class="opts-label"><b>Main folder:</b> for native file systems select a folder for g21u record files.</div>
     <button id="main-browse-folder-button" class="opts-button">Browse folder</button><div id="main-native-folder"></div>
+    <div class="opts-label"><b>CSV folder:</b> for native file systems select a folder for CSV files. If none selected, CSV files will go to the main folder.</div>
+    <button id="csv-browse-folder-button" class="opts-button">Browse folder</button><div id="csv-native-folder"></div>
     <div class="opts-label"><b>Archive folder:</b> for native file systems you can select a folder where g21u files can be archived instead of deleted.</div>
     <button id="archive-browse-folder-button" class="opts-button">Browse folder</button><div id="archive-native-folder"></div>
     <div class="opts-category">Sound</div>
@@ -107,7 +109,7 @@
     import { navbot } from './js/navbot.js'
     import { georefFormat, georefPrecision, automaticPlayback, playbackVolume, beepVolume, 
       fileHandling, defaultRecorder, defaultDeterminer, useMode, initialiseGui ,
-      browseMainFolder, browseArchiveFolder, zipDownloads
+      setNativeFolder, zipDownloads
     } from './js/options.js'
 
     // Add class to body if emulating v1
@@ -126,9 +128,10 @@
     document.getElementById('file-handling').addEventListener('change', fileHandling)
     document.getElementById('default-recorder').addEventListener('change', defaultRecorder)
     document.getElementById('default-determiner').addEventListener('change', defaultDeterminer)
-    document.getElementById('main-browse-folder-button').addEventListener('click', browseMainFolder)
-    document.getElementById('archive-browse-folder-button').addEventListener('click', browseArchiveFolder)
-
+    document.getElementById('main-browse-folder-button').addEventListener('click', () => setNativeFolder('main'))
+    document.getElementById('csv-browse-folder-button').addEventListener('click', () => setNativeFolder('csv'))
+    document.getElementById('archive-browse-folder-button').addEventListener('click', () => setNativeFolder('archive'))
+    
     // Initialise the gui
     initialiseGui()
 

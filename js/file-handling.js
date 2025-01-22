@@ -45,7 +45,13 @@ export async function storFileExists(filename) {
       return typeof file !== 'undefined'
     case 'native':
       //console.log('storFileExists', filename)
-      const dirHandle = await idb.get('main-native-folder')
+      let dirHandle
+      if (filename.endsWith('.csv')) {
+        dirHandle = await idb.get('csv-native-folder')
+        if(!dirHandle) dirHandle = await idb.get('main-native-folder')
+      } else {
+        dirHandle = await idb.get('main-native-folder')
+      }
       //console.log('dirHandle', dirHandle)
       const nativeHandle = await dirHandle.getFileHandle(filename, { create: false })
         .catch( e => {Promise.resolve()})
@@ -94,7 +100,13 @@ export async function storSaveFile(blob, name) {
       await idb.set(name, file)
       break
     case 'native':
-      const dirHandle = await idb.get('main-native-folder')
+      let dirHandle
+      if (name.endsWith('.csv')) {
+        dirHandle = await idb.get('csv-native-folder')
+        if(!dirHandle) dirHandle = await idb.get('main-native-folder')
+      } else {
+        dirHandle = await idb.get('main-native-folder')
+      }
       if (!dirHandle) {
         generalMessage(`
           Native file system selected but folder is not set in options.
@@ -127,7 +139,13 @@ export async function storRenameFile(oldName, newName) {
       await idb.del(oldName)
       break
     case 'native':
-      const dirHandle = await idb.get('main-native-folder')
+      let dirHandle
+      if (oldName.endsWith('.csv')) {
+        dirHandle = await idb.get('csv-native-folder')
+        if(!dirHandle) dirHandle = await idb.get('main-native-folder')
+      } else {
+        dirHandle = await idb.get('main-native-folder')
+      }
       const nativeHandle = await dirHandle.getFileHandle(oldName, { create: false })
       await nativeHandle.move(newName)
       break
@@ -155,7 +173,13 @@ export async function storDeleteFiles(files) {
       break
     case 'native':
       createProgressBar(files.length, "Deleting files...")
-      const dirHandle = await idb.get('main-native-folder')
+      let dirHandle
+      if (files[0].endsWith('.csv')) {
+        dirHandle = await idb.get('csv-native-folder')
+        if(!dirHandle) dirHandle = await idb.get('main-native-folder')
+      } else {
+        dirHandle = await idb.get('main-native-folder')
+      }
       for (const file of files) {
         updateProgressBar(++iCount)
         await dirHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}`))
@@ -335,11 +359,13 @@ export async function storGetCsvs() {
       }
       break
     case 'native':
-      const dirHandle = await idb.get('main-native-folder')
+      let dirHandle = await idb.get('csv-native-folder')
+      if (!dirHandle) dirHandle = await idb.get('main-native-folder')
+
       if (!dirHandle) {
         generalMessage(`
           Native file system selected but folder is not set in options.
-          Specify a folder into which to save files.
+          Specify a folder into which to save CSV files (otherwise set main folder).
         `)
       } else {
         let checkDir = true
@@ -392,7 +418,13 @@ export async function storGetFile (filename) {
       file = await idb.get(filename)
       break
     case 'native':
-      const dirHandle = await idb.get('main-native-folder')
+      let dirHandle
+      if (filename.endsWith('.csv')) {
+        dirHandle = await idb.get('csv-native-folder')
+        if(!dirHandle) dirHandle = await idb.get('main-native-folder')
+      } else {
+        dirHandle = await idb.get('main-native-folder')
+      }
       const nativeHandle = await dirHandle.getFileHandle(filename, { create: false })
       file = await nativeHandle.getFile()
       break

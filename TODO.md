@@ -1,6 +1,6 @@
 # TODO
 - Various
-  - Add option for CSV folder. If not set, system will use the main folder. If set, then CSVs will be created here and custom locations should reside there too.
+  - When creating a CSV, allow to append to existing CSV file.
 
 - Testing
   - Need to check how everything works without internet.
@@ -9,3 +9,4 @@
   - Need to test on iPhone.
 - Documentation
   - Document lack of sharing in Firefox.
+  - Document using zip to download and share with via Android file app.

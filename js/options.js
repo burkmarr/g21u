@@ -17,8 +17,11 @@ export function initialiseGui() {
   document.getElementById("default-determiner").value = getOpt('default-determiner')
 
   initFileHandlingOptions()
-  initMainNativeFolder()
-  initArchiveNativeFolder()
+  //initMainNativeFolder()
+  //initArchiveNativeFolder()
+  initNativeFolder('main')
+  initNativeFolder('csv')
+  initNativeFolder('archive')
   initFieldOptions()
   storageMetrics()
 }
@@ -30,33 +33,18 @@ function initFileHandlingOptions() {
   }
 }
 
-async function initMainNativeFolder() {
+async function initNativeFolder(type) {
   if (getOpt('file-handling') === 'native') {
-    document.getElementById("main-browse-folder-button").disabled = false
-    let directoryHandle = await idb.get('main-native-folder')
+    document.getElementById(`${type}-browse-folder-button`).disabled = false
+    let directoryHandle = await idb.get(`${type}-native-folder`)
     if (directoryHandle) {
-      document.getElementById("main-native-folder").innerHTML = `Folder name: ${directoryHandle.name}`
+      document.getElementById(`${type}-native-folder`).innerHTML = `Folder name: ${directoryHandle.name}`
     } else {
-      document.getElementById("main-native-folder").innerHTML = `No folder selected`
+      document.getElementById(`${type}-native-folder`).innerHTML = `No folder selected`
     }
   } else {
-    document.getElementById("main-browse-folder-button").disabled = true
-    document.getElementById("main-native-folder").innerHTML = ''
-  }
-}
-
-async function initArchiveNativeFolder() {
-  if (getOpt('file-handling') === 'native') {
-    document.getElementById("archive-browse-folder-button").disabled = false
-    let directoryHandle = await idb.get('archive-native-folder')
-    if (directoryHandle) {
-      document.getElementById("archive-native-folder").innerHTML = `Folder name: ${directoryHandle.name}`
-    } else {
-      document.getElementById("archive-native-folder").innerHTML = `No folder selected`
-    }
-  } else {
-    document.getElementById("archive-browse-folder-button").disabled = true
-    document.getElementById("archive-native-folder").innerHTML = ''
+    document.getElementById(`${type}-browse-folder-button`).disabled = true
+    document.getElementById(`${type}-native-folder`).innerHTML = ''
   }
 }
 
@@ -89,8 +77,11 @@ export function beepVolume() {
 
 export function fileHandling() {
   setOpt('file-handling', document.getElementById("file-handling").value)
-  initMainNativeFolder()
-  initArchiveNativeFolder()
+  // initMainNativeFolder()
+  // initArchiveNativeFolder()
+  initNativeFolder('main')
+  initNativeFolder('csv')
+  initNativeFolder('archive')
 }
 
 export function defaultRecorder() {
@@ -115,47 +106,16 @@ function optionalFieldChanged() {
   setOpt('optional-fields', optFields)
 }
 
-export async function browseMainFolder() {
-  try {
-    const directoryHandle = await window.showDirectoryPicker()
-
-    let granted = false
-    if (await directoryHandle.queryPermission({mode: 'readwrite'}) === 'granted') {
-      granted =  true
-    }
-    if (!granted) {
-      // Request permission
-      if (await directoryHandle.requestPermission({mode: 'readwrite'}) === 'granted') {
-        granted =  true
-      }
-      if (!granted) {
-        generalMessage(`You must grant read & write access to the folder you select.`)
-      }
-    }
-    if (granted) {
-      await idb.set('main-native-folder', directoryHandle)
-      document.getElementById("main-native-folder").innerHTML = `Folder name: ${directoryHandle.name}`
-    } else {
-      await idb.set('main-native-folder', null)
-      document.getElementById("main-native-folder").innerHTML = `No folder selected`
-    }
-  } catch (error) {
-    // Will get here if the open folder dialog is cancelled by user, so do nothing
-    //document.getElementById("main-native-folder").innerHTML =`${error.name}: ${error.message}`
-  }
-}
-
-export async function browseArchiveFolder() {
+export async function setNativeFolder(type) {
   const handle = await browseNativeFolder()
   if (handle) {
     // Can only work with an object here so need to store in indexeddb rather than local storage
-    await idb.set('archive-native-folder', handle)
-    document.getElementById("archive-native-folder").innerHTML = `Folder name: ${handle.name}`
+    await idb.set(`${type}-native-folder`, handle)
+    document.getElementById(`${type}-native-folder`).innerHTML = `Folder name: ${handle.name}`
   } else {
-    await idb.set('archive-native-folder', null)
-    document.getElementById("archive-native-folder").innerHTML = `No folder selected`
+    await idb.set(`${type}-native-folder`, null)
+    document.getElementById(`${type}-native-folder`).innerHTML = `No folder selected`
   }
-  
 }
 
 async function storageMetrics() {
