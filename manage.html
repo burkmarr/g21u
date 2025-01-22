@@ -59,6 +59,17 @@
     </div>
   </dialog>
 
+  <dialog id="csv-dialog">
+    <p>Indicate if you want to create a new CSV or append
+      to an existing one.</p>
+    <select id="csv-dialog-destination">
+    </select>
+    <div class="dialog-buttons">
+      <button id="csv-confirm">Create</button>
+      <button id="csv-cancel">Cancel</button>
+    </div>
+  </dialog>
+
   <div id="navtop" style="display: flex"></div>
   </div>
   <div id="manage-div" style="display: flex">
@@ -81,7 +92,7 @@
     import { navbot } from './js/navbot.js'
     import { navtop } from './js/navtop.js'
     import { initialiseList, metadataRemoveYesNo, 
-      copyValuesConfirmCancel } from './js/record-list.js'
+      copyValuesConfirmCancel, csvConfirmCancel } from './js/record-list.js'
     import { initRecordDetails, populateRecordFields, rightNavManage } from './js/record-details.js'
     import { getOpt, getSs, setSs } from './js/common.js'
 
@@ -99,6 +110,8 @@
     document.getElementById('metadata-remove-confirm').addEventListener('click', metadataRemoveYesNo)
     document.getElementById('copy-confirm').addEventListener('click', copyValuesConfirmCancel)
     document.getElementById('copy-cancel').addEventListener('click', copyValuesConfirmCancel)
+    document.getElementById('csv-confirm').addEventListener('click', csvConfirmCancel)
+    document.getElementById('csv-cancel').addEventListener('click', csvConfirmCancel)
 
     // Top navigation
     navtop('manage')

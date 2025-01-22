@@ -1,5 +1,6 @@
 import { storGetRecs, storDeleteFiles, storArchiveFiles, storSaveFile, downloadFile, 
-  storFileExists, storGetFile, getRecordJson, shareRecs, recsToCsv, downloadBlob
+  storFileExists, storGetFile, getRecordJson, shareRecs, recsToCsv, downloadBlob, storGetCsvs,
+  mergeCsvs, storRenameFile
 } from './file-handling.js'
 import { getFieldDefs } from './fields.js'
 import { el, getOpt, detailsFromFilename, getSs, setSs, generalMessage, deleteConfirm, flash, 
@@ -528,14 +529,59 @@ export async function downloadChecked(e) {
   }
 }
 
-export async function csvChecked(e) {
+export async function csvCheckedOld(e) {
   flash(e.target.id)
   const n =  storRecs.reduce((a,r,i) => el(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
     const recs = storRecs.filter((sr,i) => el(`record-checkbox-${i}`).checked).map(sr => sr.filename)
     await recsToCsv(recs)
     await initialiseList()
-    generalMessage('The CSV was created successfully!')
+  }
+}
+
+export async function csvChecked(e) {
+  flash(e.target.id)
+  const n =  storRecs.reduce((a,r,i) => el(`record-checkbox-${i}`).checked ? a+1 : a, 0)
+  if (n) {
+    const storCsvs = await storGetCsvs()
+    console.log(storCsvs)
+    if (storCsvs.length) {
+      const select = el('csv-dialog-destination')
+      select.innerHTML = ''
+
+      const optNew = document.createElement('option')
+      optNew.setAttribute('value', 'new')
+      optNew.innerHTML = 'Create new CSV'
+      select.appendChild(optNew)
+
+      storCsvs.forEach(csv => {
+        const optCSV = document.createElement('option')
+        optCSV.setAttribute('value', csv.name)
+        optCSV.innerHTML = csv.name
+        select.appendChild(optCSV)
+      })
+      el('csv-dialog').showModal()
+    } else {
+      await recsToCsv(recs)
+      await initialiseList()
+    }
+  }
+}
+
+export async function csvConfirmCancel(e) {
+  const dialog = el("csv-dialog")
+  dialog.close()
+  if (e.target.getAttribute('id') === 'csv-confirm') {
+    const recs = storRecs.filter((sr,i) => el(`record-checkbox-${i}`).checked).map(sr => sr.filename)
+    const destination = el('csv-dialog-destination').value
+    const newCsv = await recsToCsv(recs)
+    if (destination !== 'new') {
+      const tmpMerge = `g21-recs-${getDateTime()}-tmp.csv`
+      await mergeCsvs([newCsv, destination], tmpMerge)
+      await storDeleteFiles([newCsv, destination])
+      storRenameFile(tmpMerge, destination)
+    }
+    await initialiseList()
   }
 }
 

@@ -601,9 +601,20 @@ export async function recsToCsv(recs) {
   const csv = generateCsv(csvConfig)(csvRecs)
   const blob = asBlob(csvConfig)(csv)
   // The CSV file is given a name based on the current timestamp
-  await storSaveFile(blob, `g21-recs-${unformattedDateTime}.csv`)
+  const newName = `g21-recs-${unformattedDateTime}.csv`
+  await storSaveFile(blob, newName)
 
   closeProgressBar()
+
+  return newName
+}
+
+export async function appendRecsToCsv(recs, csvFile) {
+  console.log('append', recs, csvFile)
+
+  // Create a temporary CSV from recs
+  // Merge with selected CSV
+  // 
 }
 
 export async function getRecordJson(filename) {
