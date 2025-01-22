@@ -349,7 +349,7 @@ async function saveRecord() {
   checkEditStatus()
 
   // Update the record text in case details changed
-  setRecordContent(selectedFile)
+  setRecordContent(json)
 
   // Get taxon details in case taxon changes
   taxonDetails()

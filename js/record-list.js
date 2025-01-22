@@ -29,6 +29,7 @@ export async function initialiseList() {
     setSs('selectedFile', '')
     return
   }
+
   storRecs = storRecs.sort((a,b) => {
     // Sort on date first and then time
     let comparison = 0
@@ -38,9 +39,14 @@ export async function initialiseList() {
       comparison = 1
     }
     if (comparison === 0) {
-      if (a.time > b.time) {
+      // If record does not have time, then use
+      // file time instead.
+      const aTime = a.time ? a.time : detailsFromFilename(a.filename).time
+      const bTime = b.time ? b.time : detailsFromFilename(b.filename).time
+
+      if (aTime > bTime) {
         comparison = -1
-      } else if (a.time < b.time) {
+      } else if (aTime < bTime) {
         comparison = 1
       } 
     }
@@ -156,26 +162,30 @@ export async function initialiseList() {
     // If I set the text immediately after fileDiv.appendChild(textDiv)
     // it fails (for v1) because element appears not yet created,
     // so doing it here at end which seems to work.
-    setRecordContent(name)
+    setRecordContent(storRecs[i])
   }
   selectedFileDiv.focus()
 }
 
-export async function setRecordContent(filename) {
+export async function setRecordContent(rec) {
   
   let details
 
   // Text
   if (getOpt('emulate-v1') === 'true') {
     // Base text on the filename
-    details = detailsFromFilename(filename)
+    details = detailsFromFilename(rec.filename)
   } else {
     // Base text on the JSON file values
-    details = await getRecordJson(`${filename}.txt`)
+    details = rec
   }
   let html = details.date
   if (details.time) {
-    html = buildText(html, details.time.substring(0, 5), ' ')
+    html = buildText(html, `<span class="rec-time">${details.time.substring(0, 5)}</span>`, ' ')
+  } else {
+    // Time might not be present on record (not v1 emulation)
+    // In which case get it from the filename
+    html = buildText(html, `<span class="rec-time">${detailsFromFilename(details.filename).time.substring(0, 5)}</span>`, ' ')
   }
   if (getOpt('georef-format') === 'osgr') {
     html = buildText(html, details.gridref, '<br/>')
@@ -185,7 +195,7 @@ export async function setRecordContent(filename) {
   if (getOpt('emulate-v1') !== 'true') {
     html = buildText(html, `<i>${details['scientific-name']}</i>`, '<br/>')
   }
-  el(`rec-text-${filename}`).innerHTML = html
+  el(`rec-text-${rec.filename}`).innerHTML = html
 
   function buildText(txt1, txt2, sep) {
     if (txt1 && txt2) {
@@ -199,7 +209,7 @@ export async function setRecordContent(filename) {
 
   // Metadata icons
   if (getOpt('emulate-v1') !== 'true') {
-    const iconDiv = el(`rec-icons-${filename}`)
+    const iconDiv = el(`rec-icons-${rec.filename}`)
     let icons = ''
     if (details.metadata.downloads.length) {
       icons = `<svg viewBox="${download.viewBox}">${download.svgEls}</svg>`
