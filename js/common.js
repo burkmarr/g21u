@@ -226,6 +226,7 @@ export function getOpt(id) {
     'georef-format': 'osgr',
     'georef-precision': '10',
     'zip-downloads': 'true',
+    'reverse-record-sort': 'false',
     'automatic-playback': 'false',
     'playback-volume': '0.5',
     'beep-volume': '0.5',

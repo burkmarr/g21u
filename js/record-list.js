@@ -50,6 +50,8 @@ export async function initialiseList() {
         comparison = 1
       } 
     }
+    const reverse = getOpt('reverse-record-sort') === 'true'
+    if (comparison && reverse) comparison = -comparison
     return comparison
   })
 
