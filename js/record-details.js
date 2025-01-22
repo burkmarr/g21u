@@ -503,7 +503,7 @@ function stopPlaybackWav(e) {
 
 export async function duplicateRecord(e) {
 
-  flash(e.target.id)
+  //flash(e.target.id)
 
   let originalName = getSs('selectedFile')
   if (!originalName) {
@@ -532,7 +532,7 @@ export async function duplicateRecord(e) {
   // difference between original record made and this duplication to guarantee
   // a unique filename.
   const newName = `${originalName}_d${Math.floor(millisecsDiff/100)}`
-  await copyRecord(originalName, newName)
+  await copyRecord(originalName, newName, e.shiftKey)
   setSs('selectedFile', newName)
   initialiseList()
   populateRecordFields()

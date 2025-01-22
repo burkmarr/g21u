@@ -700,7 +700,7 @@ export async function getCSV(filename) {
   return csv
 }
 
-export async function copyRecord(originalName, newName) {
+export async function copyRecord(originalName, newName, all) {
   // If the wav file exists, copy it
   if (await storFileExists(`${originalName}.wav`)) {
     const oWavFile = await storGetFile(`${originalName}.wav`)
@@ -708,8 +708,14 @@ export async function copyRecord(originalName, newName) {
   }
   const json = await getRecordJson(`${originalName}.txt`)
   // Reset any fields which are not for duplication
+  // unless the all flag is set, in which case only reset
+  // taxonomy fields.
   getFieldDefs().filter(f => !f.forDuplication).forEach(f => {
-    json[f.jsonId] = ''
+    if (!all) {
+      json[f.jsonId] = f.default
+    } else if (f.inputType === 'taxon') {
+      json[f.jsonId] = ''
+    }
   })
   // Clear metadata
   json.metadata.downloads = []
