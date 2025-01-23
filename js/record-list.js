@@ -60,7 +60,6 @@ export async function initialiseList() {
   // reset it to the first record with no taxon name
   if (!storRecs.find(r => r.filename === getSs('selectedFile'))) {
     const firstNotEdited = storRecs.find(r => !r['scientific-name'])
-    console.log('firstNotEdited', firstNotEdited)
     if (firstNotEdited) {
       // Select the first record without scientific name set 
       setSs('selectedFile', firstNotEdited.filename)
@@ -164,19 +163,19 @@ export async function initialiseList() {
     // If I set the text immediately after fileDiv.appendChild(textDiv)
     // it fails (for v1) because element appears not yet created,
     // so doing it here at end which seems to work.
-    setRecordContent(storRecs[i])
+    setRecordContent(name, storRecs[i])
   }
   selectedFileDiv.focus()
 }
 
-export async function setRecordContent(rec) {
+export async function setRecordContent(filename, rec) {
   
   let details
 
   // Text
   if (getOpt('emulate-v1') === 'true') {
     // Base text on the filename
-    details = detailsFromFilename(rec.filename)
+    details = detailsFromFilename(filename)
   } else {
     // Base text on the JSON file values
     details = rec
@@ -187,7 +186,7 @@ export async function setRecordContent(rec) {
   } else {
     // Time might not be present on record (not v1 emulation)
     // In which case get it from the filename
-    html = buildText(html, `<span class="rec-time">${detailsFromFilename(details.filename).time.substring(0, 5)}</span>`, ' ')
+    html = buildText(html, `<span class="rec-time">${detailsFromFilename(filename).time.substring(0, 5)}</span>`, ' ')
   }
   if (getOpt('georef-format') === 'osgr') {
     html = buildText(html, details.gridref, '<br/>')
@@ -197,7 +196,7 @@ export async function setRecordContent(rec) {
   if (getOpt('emulate-v1') !== 'true') {
     html = buildText(html, `<i>${details['scientific-name']}</i>`, '<br/>')
   }
-  el(`rec-text-${rec.filename}`).innerHTML = html
+  el(`rec-text-${filename}`).innerHTML = html
 
   function buildText(txt1, txt2, sep) {
     if (txt1 && txt2) {
@@ -211,7 +210,7 @@ export async function setRecordContent(rec) {
 
   // Metadata icons
   if (getOpt('emulate-v1') !== 'true') {
-    const iconDiv = el(`rec-icons-${rec.filename}`)
+    const iconDiv = el(`rec-icons-${filename}`)
     let icons = ''
     if (details.metadata.downloads.length) {
       icons = `<svg viewBox="${download.viewBox}">${download.svgEls}</svg>`
