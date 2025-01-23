@@ -1,8 +1,5 @@
 # TODO
 - Various
-  - Should be able to reverse sort order.
-  - A way to duplicate a record including all fields except taxon? Shift click.
-  - Default duplication should include defaults for field's not copied.
 
 - Testing
   - Need to check how everything works without internet.
