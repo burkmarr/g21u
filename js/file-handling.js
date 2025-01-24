@@ -25,8 +25,9 @@ export async function storArchiveFiles(files) {
     const nativeWritable = await nativeHandle.createWritable()
     await nativeWritable.write(blob)
     await nativeWritable.close()
-    const dirMainHandle = await idb.get('main-native-folder')
-    await dirMainHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}`))
+    // const dirMainHandle = await idb.get('main-native-folder')
+    // await dirMainHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}: ${e}`))
+    await storDeleteFiles([file])
   }
   closeProgressBar()
 }
@@ -130,7 +131,7 @@ export async function storRenameFile(oldName, newName) {
     case 'opfs':
       const storRoot = await navigator.storage.getDirectory()
       const opfsHandle = await storRoot.getFileHandle(oldName, {create: false})
-      await opfsHandle.move(newName)
+      await opfsHandle.move(newName).catch(e => console.warn(`Could not move ${oldName}: ${e}`))
       break
     case 'idb':
       const file = await idb.get(oldName)
@@ -147,7 +148,7 @@ export async function storRenameFile(oldName, newName) {
         dirHandle = await idb.get('main-native-folder')
       }
       const nativeHandle = await dirHandle.getFileHandle(oldName, { create: false })
-      await nativeHandle.move(newName)
+      await nativeHandle.move(newName).catch(e => console.warn(`Could not move ${oldName}: ${e}`))
       break
     default:
       // No default handler
@@ -182,7 +183,7 @@ export async function storDeleteFiles(files) {
       }
       for (const file of files) {
         updateProgressBar(++iCount)
-        await dirHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}`))
+        await dirHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}: ${e}`))
       }
       break
     default:

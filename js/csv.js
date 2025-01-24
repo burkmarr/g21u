@@ -327,7 +327,7 @@ export async function mergeCsvYesNo (e) {
     await mergeCsvs(files, filename)
     await storDeleteFiles(files)
     if (el('radio-merge-name-select').value !== 'new') {
-      storRenameFile(filename, el('radio-merge-name-select').value)
+      await storRenameFile(filename, el('radio-merge-name-select').value)
     }
     initialiseCsvList()
   }

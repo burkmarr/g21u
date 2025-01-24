@@ -554,28 +554,30 @@ export async function csvChecked(e) {
   flash(e.target.id)
   const n =  storRecs.reduce((a,r,i) => el(`record-checkbox-${i}`).checked ? a+1 : a, 0)
   if (n) {
-    const storCsvs = await storGetCsvs()
-    console.log(storCsvs)
-    if (storCsvs.length) {
-      const select = el('csv-dialog-destination')
-      select.innerHTML = ''
+    // See csvConfirmCancel for account of why this is
+    // disabled.
+    //const storCsvs = await storGetCsvs()
+    //if (storCsvs.length) {
+      // const select = el('csv-dialog-destination')
+      // select.innerHTML = ''
 
-      const optNew = document.createElement('option')
-      optNew.setAttribute('value', 'new')
-      optNew.innerHTML = 'Create new CSV'
-      select.appendChild(optNew)
+      // const optNew = document.createElement('option')
+      // optNew.setAttribute('value', 'new')
+      // optNew.innerHTML = 'Create new CSV'
+      // select.appendChild(optNew)
 
-      storCsvs.forEach(csv => {
-        const optCSV = document.createElement('option')
-        optCSV.setAttribute('value', csv.name)
-        optCSV.innerHTML = csv.name
-        select.appendChild(optCSV)
-      })
-      el('csv-dialog').showModal()
-    } else {
+      // storCsvs.forEach(csv => {
+      //   const optCSV = document.createElement('option')
+      //   optCSV.setAttribute('value', csv.name)
+      //   optCSV.innerHTML = csv.name
+      //   select.appendChild(optCSV)
+      // })
+      // el('csv-dialog').showModal()
+    //} else {
+      const recs = storRecs.filter((sr,i) => el(`record-checkbox-${i}`).checked).map(sr => sr.filename)
       await recsToCsv(recs)
       await initialiseList()
-    }
+    //}
   }
 }
 
@@ -589,8 +591,17 @@ export async function csvConfirmCancel(e) {
     if (destination !== 'new') {
       const tmpMerge = `g21-recs-${getDateTime()}-tmp.csv`
       await mergeCsvs([newCsv, destination], tmpMerge)
+      console.log('merged')
       await storDeleteFiles([newCsv, destination])
-      storRenameFile(tmpMerge, destination)
+      console.log('deleted')
+      // There is an intermittent bug when doing the rename
+      // NotAllowedError: Failed to execute 'move' on 'FileSystemFileHandle': The request 
+      // is not allowed by the user agent or the platform in the current context.
+      // Even though looks almost identical to merge using existing name carried out
+      // in CSV management. Difference is that in that case, the two files already exist.
+      // Disabling form now.
+      await storRenameFile(tmpMerge, destination)
+      console.log('renamed')
     }
     await initialiseList()
   }
