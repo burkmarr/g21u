@@ -505,8 +505,8 @@ export async function duplicateRecord(e) {
 
   //flash(e.target.id)
 
-  let originalName = getSs('selectedFile')
-  if (!originalName) {
+  const copyFromName = getSs('selectedFile')
+  if (!copyFromName) {
     return
   }
 
@@ -516,6 +516,7 @@ export async function duplicateRecord(e) {
   }
   
   // Do the duplication
+  let originalName = copyFromName
   const oSplit = originalName.split('_')
   if (oSplit[oSplit.length-1].startsWith('d')) {
     // The original record is a duplicate of another one - reset
@@ -532,7 +533,7 @@ export async function duplicateRecord(e) {
   // difference between original record made and this duplication to guarantee
   // a unique filename.
   const newName = `${originalName}_d${Math.floor(millisecsDiff/100)}`
-  await copyRecord(originalName, newName, e.shiftKey)
+  await copyRecord(copyFromName, newName, e.shiftKey)
   setSs('selectedFile', newName)
   initialiseList()
   populateRecordFields()
