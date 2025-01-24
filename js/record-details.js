@@ -367,7 +367,7 @@ export async function populateRecordFields() {
   const selectedFile = getSs('selectedFile')
   const prevSelectedFile = getSs('prevSelectedFile')
 
-  console.log(prevSelectedFile, selectedFile)
+  //console.log(prevSelectedFile, selectedFile)
 
   // Check if the selected file is using the same wav file as the previously
   // selected - which would happen if a duplicate record was created - and
