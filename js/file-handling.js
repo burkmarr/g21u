@@ -703,7 +703,6 @@ export async function getCSV(filename) {
 
 export async function copyRecord(originalName, newName, all) {
 
-  console.log('copy', originalName, 'to', newName)
   // If the wav file exists, copy it
   if (await storFileExists(`${originalName}.wav`)) {
     const oWavFile = await storGetFile(`${originalName}.wav`)

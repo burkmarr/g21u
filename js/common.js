@@ -360,3 +360,16 @@ export function precisionFromGr(gr) {
     }
   }
 }
+
+export function getOriginalFilename(name) {
+  let returnName = name
+  if (returnName) {
+    const split = returnName.split('_')
+    if (split[split.length-1].startsWith('d')) {
+      // The original record is a duplicate of another one - reset the original name
+      split.pop()
+      returnName = split.join('_')
+    }
+  }
+  return returnName
+}

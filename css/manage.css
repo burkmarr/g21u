@@ -223,6 +223,12 @@ body:not(.small-edit) #record-details {
   height: 38px;
   font-size: 1em;
 }
+#record-details-pause-button {
+  width: 80px;
+  height: 38px;
+  font-size: 1em;
+  margin-left: 0.5em;
+}
 
 #copy-field-dialog-checkboxes {
   display: grid;

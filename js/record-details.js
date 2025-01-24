@@ -1,5 +1,5 @@
 import { el, keyValuePairTable, detailsFromFilename, generalMessage,
-  collapsibleDiv, unorderedList, setSs, getSs, getOpt, flash } from './common.js'
+  collapsibleDiv, unorderedList, setSs, getSs, getOpt, getOriginalFilename } from './common.js'
 import { getFieldDefs, getTermList } from './fields.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { initLocationDetails, invalidateSize, updateMap } from './mapping.js'
@@ -9,6 +9,7 @@ import { playBlob } from './play.js'
 
 let audioPlayer = new Audio()
 let pendingEdits = false
+let playbackPaused = false
 
 export function editsPending() {
   return pendingEdits
@@ -40,10 +41,13 @@ function initRecordFields() {
   parent.innerHTML = `<h3 id="record-details-title"></h3>
     <div id ="record-details-playback-div">
       <button id="record-details-playback-button"><img id="record-details-playback-image"></button>
+      <button id="record-details-pause-button" disabled>Pause</button>
       <button id="record-duplicate">Duplicate</button>
     </div>
   `
-  
+  setSs('prevSelectedFile', null)
+  playbackPaused = false
+  el('record-details-pause-button').addEventListener('click', pauseResumePlayBack)
   el('record-duplicate').addEventListener('click', duplicateRecord)
   el('record-duplicate').addEventListener('keypress', e => {
     // Don't allow enter key on Duplicate button - it can
@@ -361,7 +365,15 @@ async function saveRecord() {
 export async function populateRecordFields() {
   // Selected file
   const selectedFile = getSs('selectedFile')
-  //console.log('selectedFile', selectedFile)
+  const prevSelectedFile = getSs('prevSelectedFile')
+
+  console.log(prevSelectedFile, selectedFile)
+
+  // Check if the selected file is using the same wav file as the previously
+  // selected - which would happen if a duplicate record was created - and
+  // if it is, don't change the WAV file. We want a paused recording to
+  // carry on where it left off.
+  const sameWav = getOriginalFilename(selectedFile) === getOriginalFilename(prevSelectedFile)
 
   if (!selectedFile) {
     el('record-details-title').innerHTML = 'Record details <span class="header-note">- no record selected</span>'
@@ -369,18 +381,24 @@ export async function populateRecordFields() {
   } else {
     el('record-details-title').innerHTML = 'Record details <span class="header-note">for selected record</span>'
     // Interrupt any current playing
-    audioPlayer.pause()
-    audioPlayer.currentTime = 0
-    const but = el('record-details-playback-button')
-    const img = el('record-details-playback-image')
-    but.removeEventListener('click', playRecordWav)
-    but.removeEventListener('click', stopPlaybackWav)
-    // Set up listerners and playing image
-    if (await storFileExists(`${selectedFile}.wav`)) {
-      img.setAttribute('src', 'images/playback-green.png')
-      but.addEventListener('click', playRecordWav)
-    } else {
-      img.setAttribute('src', 'images/playback-grey.png')
+    if (!sameWav) {
+      audioPlayer.pause()
+      audioPlayer.currentTime = 0
+      const but = el('record-details-playback-button')
+      const img = el('record-details-playback-image')
+      const pause =  el('record-details-pause-button')
+      but.removeEventListener('click', playRecordWav)
+      but.removeEventListener('click', stopPlaybackWav)
+      playbackPaused = false
+      pause.innerText = 'Pause'
+      pause.disabled = true
+      // Set up listerners and playing image
+      if (await storFileExists(`${selectedFile}.wav`)) {
+        img.setAttribute('src', 'images/playback-green.png')
+        but.addEventListener('click', playRecordWav)
+      } else {
+        img.setAttribute('src', 'images/playback-grey.png')
+      }
     }
   }
 
@@ -418,6 +436,8 @@ export async function populateRecordFields() {
   } else {
     el('record-details').classList.add('disable') 
   }
+
+  setSs('prevSelectedFile', selectedFile)
 }
 
 export async function checkEditStatus() {
@@ -469,12 +489,17 @@ async function playRecordWav(e) {
 
   const but = el('record-details-playback-button')
   const img = el('record-details-playback-image')
+  const pause =  el('record-details-pause-button')
+
+  playbackPaused = false
+  pause.disabled = false
+  pause.innerText = 'Pause'
 
   but.removeEventListener('click', playRecordWav)
   img.src = "images/playback-red.png"
   img.classList.add("flashing")
   but.addEventListener('click', stopPlaybackWav)
-
+ 
   audioPlayer = new Audio()
   const audioFile = await storGetFile(`${getSs('selectedFile')}.wav`)
   await playBlob(audioPlayer, audioFile, getOpt('playback-volume'))
@@ -483,6 +508,8 @@ async function playRecordWav(e) {
   img.src = "images/playback-green.png"
   img.classList.remove("flashing")
   but.addEventListener('click', playRecordWav)
+
+  pause.disabled = true
 }
 
 function stopPlaybackWav(e) {
@@ -491,6 +518,7 @@ function stopPlaybackWav(e) {
 
   const but = el('record-details-playback-button')
   const img = el('record-details-playback-image')
+  const pause =  el('record-details-pause-button')
 
   audioPlayer.pause()
   audioPlayer.currentTime = 0
@@ -499,6 +527,23 @@ function stopPlaybackWav(e) {
   img.src = "images/playback-green.png"
   img.classList.remove("flashing")
   but.addEventListener('click', playRecordWav)
+
+  playbackPaused = false
+  pause.innerText = 'Pause'
+  pause.disabled = true
+}
+
+function pauseResumePlayBack() {
+  const pause =  el('record-details-pause-button')
+  if (playbackPaused) {
+    playbackPaused = false
+    pause.innerText = 'Pause'
+    audioPlayer.play()
+  } else {
+    playbackPaused = true
+    pause.innerText = 'Resume'
+    audioPlayer.pause()
+  }
 }
 
 export async function duplicateRecord(e) {
