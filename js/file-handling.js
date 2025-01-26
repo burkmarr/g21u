@@ -25,9 +25,16 @@ export async function storArchiveFiles(files) {
     const nativeWritable = await nativeHandle.createWritable()
     await nativeWritable.write(blob)
     await nativeWritable.close()
-    // const dirMainHandle = await idb.get('main-native-folder')
-    // await dirMainHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}: ${e}`))
-    await storDeleteFiles([file])
+   
+    // await storDeleteFiles([file]) - avoid using here to avoid progress bar for each delete
+    let dirHandle
+    if (file.endsWith('.csv')) {
+      dirHandle = await idb.get('csv-native-folder')
+      if(!dirHandle) dirHandle = await idb.get('main-native-folder')
+    } else {
+      dirHandle = await idb.get('main-native-folder')
+    }
+    await dirHandle.removeEntry(file).catch(e => console.warn(`Could not delete ${file}: ${e}`))
   }
   closeProgressBar()
 }
