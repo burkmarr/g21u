@@ -263,7 +263,7 @@ export async function deleteChecked(e) {
           }
           
           await initialiseList()
-          populateRecordFields()
+          await populateRecordFields()
         }
       },
     })
@@ -337,7 +337,7 @@ export async function metadataRemoveYesNo(e) {
     }
   }
   await initialiseList()
-  populateRecordFields()
+  await populateRecordFields()
 }
 
 export async function deleteSoundChecked(e) {
@@ -371,7 +371,7 @@ export async function deleteSoundChecked(e) {
             await storArchiveFiles(files)
           }
           await initialiseList()
-          populateRecordFields()
+          await populateRecordFields()
         }
       },
     })
@@ -461,7 +461,7 @@ export async function shareChecked(e) {
     const share = await shareRecs(recs)
     if (share === 'success') {
       await initialiseList()
-      populateRecordFields()
+      await populateRecordFields()
     } else if (share.startsWith('error')) {
       if (!share.includes('AbortError')) {
         // For browsers that can detect when user aborts share
@@ -536,7 +536,7 @@ export async function downloadChecked(e) {
     }
 
     await initialiseList()
-    populateRecordFields()
+    await populateRecordFields()
   }
 }
 
@@ -634,7 +634,7 @@ async function recordSelected(target) {
     target.classList.add("record-selected")
     target.focus()
     setSs( 'selectedFile', target.getAttribute('data-file-name'))
-    populateRecordFields()
+    await populateRecordFields()
   }
 }
 

@@ -29,12 +29,12 @@ function createInputDiv(parent, id) {
   return div
 }
 
-export function initRecordDetails() {
-  initRecordFields()
+export async function initRecordDetails() {
+  await initRecordFields()
   initLocationDetails()
 }
 
-function initRecordFields() {
+async function initRecordFields() {
 
   const parent = el('record-details')
 
@@ -58,7 +58,10 @@ function initRecordFields() {
   })
 
   // Generate the input fields
-  getFieldDefs().forEach(f => {
+  //getFieldDefs().forEach(f => {
+  const fieldDefs = getFieldDefs()
+  for (let i=0; i < fieldDefs.length; i++) {
+    const f = fieldDefs[i]
     const ctrl = createInputDiv(parent, f.inputId.substring(0,f.inputId.length-6))
     createInputLabel(ctrl, `${f.inputLabel}:`)
     let input
@@ -113,7 +116,8 @@ function initRecordFields() {
       ul.classList.add('hide')
       ctrl.appendChild(ul)
 
-      getTermList(f.inputType).forEach((t,i) => {
+      const terms = await getTermList(f.inputType)
+      terms.forEach((t,i) => {
         const li = document.createElement('li')
         li.setAttribute('id', `${f.inputId}-item-${i}`)
         li.setAttribute('tabindex', '-1') // In order to allow event handling
@@ -132,7 +136,8 @@ function initRecordFields() {
         ul.appendChild(li)
       })
     }
-  })
+  }
+  //})
 
   // Save/cancel buttons
   const ctrl = createInputDiv(parent, 'record-save-cancel')
@@ -581,5 +586,5 @@ export async function duplicateRecord(e) {
   await copyRecord(copyFromName, newName, e.shiftKey)
   setSs('selectedFile', newName)
   initialiseList()
-  populateRecordFields()
+  await populateRecordFields()
 }

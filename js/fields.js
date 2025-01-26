@@ -1,4 +1,7 @@
 import { getOpt, dateFromString, grChangePrecision, detailsFromFilename } from './common.js'
+import { storFileExists, getCSV } from './file-handling.js'
+
+let locations
 
 export function getFieldDefs({
   filename = null,
@@ -249,7 +252,7 @@ export function getFieldDefs({
     },
     {
       inputId: 'location-input',
-      inputType: 'text',
+      inputType: 'term-location',
       inputLabel: 'Location name',
       jsonId: 'location',
       iRecord: 'Site name',
@@ -301,7 +304,7 @@ export function getFieldDefs({
   }
 }
 
-export function getTermList(term) {
+export async function getTermList(term) {
   // term will be of format 'term-<termid>'
   const termId = term.substring(5)
 
@@ -402,5 +405,23 @@ export function getTermList(term) {
       'Yes'
     ]
   }
-  return terms[termId]
+
+  if (termId === 'location') {
+    // Special behaviour for location termlist
+    // First get locations.csv file if it exists
+    // and hasn't yet been read
+    const locFileExists = await storFileExists('locations.csv')
+    console.log('locFileExists', locFileExists)
+    if (!locations && locFileExists) {
+      const locs =  await getCSV('locations.csv')
+      locations = locs.map(l => l.name)
+      return locations
+    } else if (locations) {
+      return locations
+    } else {
+      return []
+    }
+  } else {
+    return terms[termId]
+  }
 }
