@@ -408,17 +408,18 @@ export async function getTermList(term) {
 
   if (termId === 'location') {
     // Special behaviour for location termlist
-    // First get locations.csv file if it exists
-    // and hasn't yet been read
-    const locFileExists = await storFileExists('locations.csv')
-    console.log('locFileExists', locFileExists)
+    const locFileExists = await storFileExists('custom-locations.csv')
     if (!locations && locFileExists) {
-      const locs =  await getCSV('locations.csv')
+      // Get custom-locations.csv file if it exists
+      // and hasn't yet been read
+      const locs =  await getCSV('custom-locations.csv')
       locations = locs.map(l => l.name)
       return locations
     } else if (locations) {
+      // Return locations if already read
       return locations
     } else {
+      // Return empty list if no locations file
       return []
     }
   } else {

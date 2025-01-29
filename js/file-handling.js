@@ -701,9 +701,7 @@ export async function getRecordJson(filename) {
 
 export async function getCSV(filename) {
   let csv
-  //console.log('locations does exist', filename)
   if (await storFileExists(filename)) {
- 
     const blob = await storGetFile(filename)
     csv = csvParse(await blob.text())
   } else {
