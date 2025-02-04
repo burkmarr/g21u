@@ -199,7 +199,8 @@ export async function updateMap() {
 
   // Initialise current GR
   if (georef === 'osgr') {
-    el('current-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?cp=${lat}~${lon}&style=s&lvl=15.1'>${json.gridref}</a>`
+    //el('current-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?cp=${lat}~${lon}&style=s&lvl=15.1'>${json.gridref}</a>`
+    el('current-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?style=s&lvl=15.1&cp=${lat}~${lon}&sp=point.${lat}_${lon}_${json.gridref}'>${json.gridref}</a>`
     if (json.gridref) {
       el('current-precision').value = String(precisionFromGr(json.gridref))
     } else {
@@ -258,7 +259,7 @@ async function currentPrecisionChanged(e) {
   grs = getGr(lon, lat, 'wg', 'gb', [Number(e.target.value)]) 
   //el('current-gr').innerHTML = grs[`p${e.target.value}`]
   const currentGr = grs[`p${e.target.value}`]
-  el('current-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?cp=${lat}~${lon}&style=s&lvl=15.1'>${currentGr}</a>`
+  el('current-gr').innerHTML = `<a target='_blank' href='https:///maps?cp=${lat}~${lon}&style=s&lvl=15.1'>${currentGr}</a>`
     
   const grJson = getSquare(grs[`p${e.target.value}`])
   const latlons = grJson.coordinates[0].map(lonlat => [lonlat[1], lonlat[0]])
@@ -291,7 +292,8 @@ function setMapClickedGR() {
     } else {
       clickedGrPoly.setLatLngs(latlons)
     }
-    el('clicked-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?cp=${lat}~${lon}&style=s&lvl=15.1'>${gr}</a>`
+    //el('clicked-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?cp=${lat}~${lon}&style=s&lvl=15.1'>${gr}</a>`
+    el('clicked-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?style=s&lvl=15.1&cp=${lat}~${lon}&sp=point.${lat}_${lon}_${gr}'>${gr}</a>`
   } else {
     if (!clickedLatLonMkr) {
       clickedLatLonMkr = L.marker([lat, lon]).addTo(map)
@@ -299,7 +301,8 @@ function setMapClickedGR() {
       clickedLatLonMkr.setLatLng([lat, lon])
     }
     console.log('set lat log')
-    el('clicked-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?cp=${lat}~${lon}&style=s&lvl=15.1'>lat: ${lat}, lon: ${lon}</a>`
+    //el('clicked-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?cp=${lat}~${lon}&style=s&lvl=15.1'>lat: ${lat}, lon: ${lon}</a>`
+    el('clicked-gr').innerHTML = `<a target='_blank' href='https://www.bing.com/maps?style=s&lvl=15.1&cp=${lat}~${lon}&sp=point.${lat}_${lon}_lat: ${lat}, lon: ${lon}'>lat: ${lat}, lon: ${lon}</a>`
   }
 }
 
@@ -308,9 +311,11 @@ function useClickedGeoref() {
   if (!clickedLatLon) return
   if (georef === 'osgr') {
     el('gridref-input').value = el('clicked-gr').innerText
+    el('gridref-input').focus()
   } else {
     el('lat-input').value = clickedLatLon.lat
     el('lon-input').value = clickedLatLon.lon
+    el('lon-input').focus()
   }
   checkEditStatus()
 }
@@ -319,6 +324,7 @@ function useCurrentGeoref() {
   // Only available when georef-format is osgr
   el('gridref-input').value = el('current-gr').innerText
   checkEditStatus()
+  el('gridref-input').focus()
 }
 
 function clearClickedMarkers() {
