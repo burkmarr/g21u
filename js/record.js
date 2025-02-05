@@ -16,6 +16,23 @@ let audioBlob
 let capturedStream = null
 let playback
 
+// Shake test
+function handleMotion(event) {
+  const x = event.accelerationIncludingGravity.x
+  const y = event.accelerationIncludingGravity.y
+  const z = event.accelerationIncludingGravity.z
+
+  const acceleration = Math.sqrt(x * x + y * y + z * z)
+
+  // Implement your shake detection logic here
+  // Example: Check if acceleration exceeds a threshold within a timeframe
+  if (acceleration > 15 /* additional conditions for time window */) {
+      doubleBeep(1200, 0.15)
+  }
+}
+
+window.addEventListener('devicemotion', handleMotion)
+
 // Add event handler to gps icon to remove blink class
 // on animation completion
 const gpsEl = document.getElementById('gps-rec-gps')
