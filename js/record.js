@@ -30,8 +30,7 @@ function handleMotion(event) {
       doubleBeep(1200, 0.15)
   }
 }
-
-window.addEventListener('devicemotion', handleMotion)
+//window.addEventListener('devicemotion', handleMotion)
 
 // Add event handler to gps icon to remove blink class
 // on animation completion
