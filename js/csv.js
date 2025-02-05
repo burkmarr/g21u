@@ -45,6 +45,18 @@ export async function initialiseCsvList () {
   //   return comparison
   // })
 
+  console.log(storCsvs)
+  storCsvs = storCsvs.sort((a,b) => {
+    // Sort on name
+    let comparison = 0
+    if (a.name > b.name) {
+      comparison = 1
+    } else if (a.name < b.name) {
+      comparison = -1
+    }
+    return comparison
+  })
+
   // If the currently selected csv indicated by
   // session storage is no longer present, then
   // reset it to the first record.
