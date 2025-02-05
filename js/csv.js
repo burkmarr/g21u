@@ -127,9 +127,6 @@ export async function csvDetails () {
   el('csv-details-rename-input').value = selectedCsv
 
   // CSV summary info
-  //const earliest = selectedCsvRecs.reduce((a,r) => {return a ? r.Date < a ? r.Date : a : r.Date}, null)
-  //const latest = selectedCsvRecs.reduce((a,r) => {return a ? r.Date > a ? r.Date : a : r.Date}, null)
-
   const earliest = selectedCsvRecs.reduce((a,r) => {return a ? dateParse(r.Date) < dateParse(a) ? r.Date : a : r.Date}, null)
   const latest = selectedCsvRecs.reduce((a,r) => {return a ? dateParse(r.Date) > dateParse(a) ? r.Date : a : r.Date}, null)
 
