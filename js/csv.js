@@ -1,5 +1,5 @@
 import { storGetCsvs, storFileExists, storDeleteFiles, storArchiveFiles, getCSV, shareCsvs, mergeCsvs, downloadFile, storRenameFile } from './file-handling.js'
-import { el, getSs, setSs, keyValuePairTable, generalMessage, getDateTime, flash, deleteConfirm } from './common.js'
+import { el, getSs, setSs, keyValuePairTable, generalMessage, getDateTime, flash, deleteConfirm, dateParse } from './common.js'
 import { getFieldDefs } from './fields.js'
 import { csv } from './svg-icons.js'
 
@@ -127,8 +127,12 @@ export async function csvDetails () {
   el('csv-details-rename-input').value = selectedCsv
 
   // CSV summary info
-  const earliest = selectedCsvRecs.reduce((a,r) => {return a ? r.Date < a ? r.Date : a : r.Date}, null)
-  const latest = selectedCsvRecs.reduce((a,r) => {return a ? r.Date > a ? r.Date : a : r.Date}, null)
+  //const earliest = selectedCsvRecs.reduce((a,r) => {return a ? r.Date < a ? r.Date : a : r.Date}, null)
+  //const latest = selectedCsvRecs.reduce((a,r) => {return a ? r.Date > a ? r.Date : a : r.Date}, null)
+
+  const earliest = selectedCsvRecs.reduce((a,r) => {return a ? dateParse(r.Date) < dateParse(a) ? r.Date : a : r.Date}, null)
+  const latest = selectedCsvRecs.reduce((a,r) => {return a ? dateParse(r.Date) > dateParse(a) ? r.Date : a : r.Date}, null)
+
   const osgr = selectedCsvRecs.some(r => r['Grid ref'])
   const latlon = selectedCsvRecs.some(r => r['Latitude'])
   const georef = osgr && latlon ? 'Mixed (OSGR & Lat/Lon)' : osgr ? 'OSGR' : 'Lat/Lon'

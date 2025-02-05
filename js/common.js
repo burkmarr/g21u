@@ -373,3 +373,17 @@ export function getOriginalFilename(name) {
   }
   return returnName
 }
+
+export function dateParse(dte) {
+  // Takes a date which can be of either of these formats
+  // yyyy-mm-dd or dd/mm/yyyy and returns it in the 
+  // format yyyy-mm-dd
+  if (dte.includes('/')) {
+    const year = dte.substring(6)
+    const month = dte.substring(3,5)
+    const day = dte.substring(0,2)
+    return `${year}-${month}-${day}`
+  } else {
+    return dte
+  }
+}
