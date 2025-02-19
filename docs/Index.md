@@ -1,7 +1,7 @@
 # Help index
 
 - [Introduction](https://burkmarr.github.io/g21u/docs/intro.md)
-- [Running & installing g21u]()
+- [Running & installing g21u](https://burkmarr.github.io/g21u/docs/install.md)
 - [Making records in the field]()
 - [Completing record details]()
   - [Navigating the record details panels]()
