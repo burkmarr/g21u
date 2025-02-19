@@ -1,5 +1,5 @@
 const VERSION = "v1.1.0"
-const BUILD = 28
+const BUILD = 29
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -8,6 +8,7 @@ const APP_STATIC_RESOURCES = [
   "options.html",
   "manage.html",
   "csv.html",
+  "help.html",
   "css/general.css",
   "css/options.css",
   "css/record.css",
@@ -15,6 +16,7 @@ const APP_STATIC_RESOURCES = [
   "css/mapping.css",
   "css/navigation.css",
   "css/csv.css",
+  "css/help.css",
   "js/taxonomy.js",
   "js/mapping.js",
   "js/location.js",
@@ -28,6 +30,7 @@ const APP_STATIC_RESOURCES = [
   "js/record-details.js",
   "js/play.js",
   "js/csv.js",
+  "js/help.js",
   "js/fields.js",
   "js/svg-icons.js",
   "js/nl.min.js",
@@ -49,7 +52,10 @@ const APP_STATIC_RESOURCES = [
   "images/playback-red.png",
   "images/playback-green.png",
   "images/playback-grey.png",
-  "images/gilbert.png"
+  "images/gilbert.png",
+  "docs/index.md",
+  "docs/intro.md",
+  "docs/install.md"
 ]
 const APP_INTERNET_RESOURCES = [
   "species-ws.nbnatlas.org",

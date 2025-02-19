@@ -1,0 +1,33 @@
+<!doctype  html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>g21u help</title>
+  <link rel="stylesheet" href="css/general.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/help.css">
+  <link rel="manifest" href="manifest.json" />
+</head>
+
+<body>
+  <div id="help"></div>
+  <div id="navbot"></div>
+
+  <script src="js/help.js" type="module" defer></script>
+
+  <script type="module">
+    import { navbot } from "./js/navbot.js"
+    import { getOpt } from "./js/common.js"
+
+    // Add class to body if emulating v1
+    if (getOpt('emulate-v1') === 'true') {
+      document.body.classList.add('emulate-v1')
+    }
+
+    // Main navigation (bottom) navbot
+    navbot()
+  </script>
+</body>
+</html>

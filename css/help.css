@@ -1,0 +1,14 @@
+#help {
+  margin: auto;
+  max-width: 800px;
+}
+body {
+  padding: 0 0.5em;
+}
+
+ul {
+  margin-top: 0.7em;
+}
+li {
+  margin-bottom: 0.7em;
+}
