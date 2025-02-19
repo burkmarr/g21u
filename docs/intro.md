@@ -1,13 +1,15 @@
+
+
 # Gilbert 21 Universal (g21u)
 
-[Go straight to help](https://burkmarr.github.io/g21u/docs/index.md)
+[Help index](/help.html?page=index)
 
 ## Introduction to g21u
 
 Gilbert 21 Universal (g21u) is a web-based application.
 That means you can run it entirely from the browser, just by
-entering the URL (https://burkmarr.github.io/g21u) in
-your browser's addres bar. No extra software or installation
+entering the URL ([https://burkmarr.github.io/g21u](https://burkmarr.github.io/g21u)) in
+your browser's address bar. No extra software or installation
 is required. 
 
 However, it is also a 

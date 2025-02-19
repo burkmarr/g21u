@@ -88,7 +88,7 @@ body.emulate-v1 .navtop-inner-container.right {
 }
 #navbot-inner {
   margin: 0 auto;
-  width: calc(var(--but-size) * 4);
+  width: calc(var(--but-size) * 5);
 }
 #navbot svg#navbot-link-edit { /* CSS selector needs to be more specific than below */
   display: none; /* Edit link is hidden by default */
@@ -111,7 +111,7 @@ body.emulate-v1 #navbot svg#navbot-link-csv {
     width: calc(var(--but-size) * 3);
   }
   #navbot-inner {
-    width: calc(var(--but-size) * 5);
+    width: calc(var(--but-size) * 6);
   }
   #navbot svg#navbot-link-edit { 
     display: block;

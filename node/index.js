@@ -9,6 +9,17 @@ import { connect } from 'extendable-media-recorder-wav-encoder'
 export * from 'd3-dsv' // Includes csvParse
 export * from 'export-to-csv'
 import { get, set, getMany, del, delMany, entries, keys } from 'idb-keyval'
+import markdownit from 'markdown-it'
+
+export async function md(raw) {
+  const md = markdownit({
+    html: true,
+    // linkify: true,
+    // typographer: true
+  })
+
+  return md.render(raw)
+}
 
 export async function registerWavEncoder() {
   await register(await connect())
