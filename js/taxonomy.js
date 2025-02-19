@@ -52,7 +52,9 @@ export async function displayTaxonMatches(e) {
       if (scientific) {
         return t.scientificNameMatches.length > 0
       } else {
-        return t.commonNameMatches.length > 0
+        // Sometimes commonNameMatches has zero length event when commonName
+        // matches the search term, so we can't just rely on t.commonNameMatches.length > 0
+        return t.commonNameMatches.length > 0 || (t.commonName && t.commonName.toLowerCase().includes(this.value.toLowerCase()))
       }
     })
   } else {
