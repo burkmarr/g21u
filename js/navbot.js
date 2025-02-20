@@ -1,4 +1,4 @@
-import { getSs, setSs } from './common.js'
+import { getSs, setSs, getUrlParam } from './common.js'
 import { microphone, list, details, options, csv, help } from './svg-icons.js'
 
 export function navbot () {
@@ -16,7 +16,8 @@ export function navbot () {
     },
     {
       id: 'navbot-link-edit',
-      href: location.pathname,
+      //href: location.pathname,
+      href: 'manage.html?small=edit',
       icon: details,
       disabledFor: ['index.html', 'options.html', 'help.html']
     },
@@ -42,39 +43,36 @@ export function navbot () {
   navbotInner.setAttribute('id', 'navbot-inner')
   navbot.appendChild(navbotInner)
 
+  //console.log(location.pathname)
   links.forEach(n => {
     const div = document.createElement('div')
     div.classList.add('main-nav')
-    if(n.id === getSs('mainNav')) {
+    //if(n.id === getSs('mainNav')) {
+    if (`${location.pathname}${location.search}` === `/${n.href}` || (location.pathname === `/${n.href}` && n.href === 'help.html')) {
       div.classList.add('selected-nav')
+    //   console.log('MATCH', `${location.pathname}${location.search}`, `/${n.href}`)
+    // } else {
+    //   console.log('no match', `${location.pathname}${location.search}`, `/${n.href}`)
     }
     navbotInner.appendChild(div)
     div.innerHTML = `<svg id="${n.id}" viewBox="${n.icon.viewBox}" class="navbar-icon">${n.icon.svgEls}</svg>`
   
     const disabled = n.disabledFor ? n.disabledFor.some(href => location.href.endsWith(href)) : false
-    //console.log('href', location.href)
-    //console.log('disabled', disabled)
 
-    // Handle highlighting of clicked div
     if (disabled) {
       const svg = document.getElementById(`${n.id}`)
       svg.classList.add('disabled')
     } else {
       div.addEventListener('click', function(e){
-        setSs('mainNav', e.target.id)
+        //setSs('mainNav', e.target.id)
         // Take selected class off all divs
-        const navs = document.getElementsByClassName("main-nav")
-        for (let i = 0; i < navs.length; i++) {
-          navs[i].classList.remove('selected-nav')
-        }
-        // Add selected class to the clicked div
-        div.classList.add('selected-nav')
-        navigateTo(n.href)
+        // const navs = document.getElementsByClassName("main-nav")
+        // for (let i = 0; i < navs.length; i++) {
+        //   navs[i].classList.remove('selected-nav')
+        // }
+        //div.classList.add('selected-nav')
+        window.location.href = n.href
       })
     }
   })
-}
-
-function navigateTo(href) {
-  window.location.href =href
 }

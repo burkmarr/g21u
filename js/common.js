@@ -387,3 +387,8 @@ export function dateParse(dte) {
     return dte
   }
 }
+
+export function getUrlParam(name) {
+  const params = new URLSearchParams(document.location.search)
+  return params.get(name)
+}

@@ -36,7 +36,7 @@
     import { navbot } from './js/navbot.js'
     import { navtop } from './js/navtop.js'
     import { mergeCsvYesNo, initialiseCsvList, rightNavCsv } from './js/csv.js'
-    import { getOpt, getSs, setSs } from './js/common.js'
+    import { getOpt, getSs, setSs, getUrlParam } from './js/common.js'
 
     // Top navigation
     navtop('csv')
@@ -44,7 +44,8 @@
     navbot()
 
     // Add class to body if small screen edit page
-    if (getSs('mainNav') === 'navbot-link-edit') { 
+    //if (getSs('mainNav') === 'navbot-link-edit') { 
+    if (getUrlParam('small')==='edit') {
       document.body.classList.add('small-edit')
       // Initialise edit view
       rightNavCsv()

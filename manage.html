@@ -94,14 +94,15 @@
     import { initialiseList, metadataRemoveYesNo, 
       copyValuesConfirmCancel, csvConfirmCancel } from './js/record-list.js'
     import { initRecordDetails, populateRecordFields, rightNavManage } from './js/record-details.js'
-    import { getOpt, getSs, setSs } from './js/common.js'
+    import { getOpt, getSs, setSs, getUrlParam } from './js/common.js'
 
     // Add class to body if emulating v1
     if (getOpt('emulate-v1') === 'true') {
       document.body.classList.add('emulate-v1')
     }
     // Add class to body if small screen edit page
-    if (getSs('mainNav') === 'navbot-link-edit') { 
+    //if (getSs('mainNav') === 'navbot-link-edit') { 
+    if (getUrlParam('small')==='edit') {
       document.body.classList.add('small-edit')
     }
 
@@ -133,7 +134,9 @@
 
     function screenLayout () {
       // On screen size change
-      if (getSs('mainNav') === 'navbot-link-edit' && !smallScreen.matches) {
+      //if (getSs('mainNav') === 'navbot-link-edit' && !smallScreen.matches) {
+      if (getUrlParam('small')==='edit' && !smallScreen.matches) {
+   
         if (getSs('topNav') === 'edit-record') {
           // If topnav edit was previously selected on small screen 
           // reset to nothing so that the appriate default is selected

@@ -1,8 +1,7 @@
-import { getSs, setSs } from "./common.js"
+import { getSs, setSs, getUrlParam } from "./common.js"
 import { md } from "./nl.min.js"
 
-const params = new URLSearchParams(document.location.search)
-let helpPage = params.get("page")
+let helpPage = getUrlParam("page")
 
 if (!helpPage) {
   // If no 'page' param in URL, get last used from session storage
