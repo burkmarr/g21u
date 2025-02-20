@@ -1,5 +1,5 @@
 const VERSION = "v1.1.0"
-const BUILD = 34
+const BUILD = 36
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -119,7 +119,9 @@ self.addEventListener("fetch", (event) => {
   } else {
     event.respondWith(
       (async () => {
+        
         const useInternet = APP_INTERNET_RESOURCES.find(r => event.request.url.includes(r))
+
         if (useInternet) {
           return fetch(event.request)
         }
