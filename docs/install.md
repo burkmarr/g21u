@@ -2,5 +2,11 @@
 
 [Help index](/help.html?page=index)
 
-## Blah
+## Installing on Android
 adsf
+
+## Installing on iOS
+adsf
+
+## Installing on Windows
+asdf

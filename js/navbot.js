@@ -18,7 +18,7 @@ export function navbot () {
       id: 'navbot-link-edit',
       href: location.pathname,
       icon: details,
-      disabledFor: ['index.html', 'options.html']
+      disabledFor: ['index.html', 'options.html', 'help.html']
     },
     {
       id: 'navbot-link-csv',
