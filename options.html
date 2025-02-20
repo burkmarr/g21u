@@ -21,8 +21,11 @@
       version 1 which just produces sound files compatible with the old G21 desktop application.
       To use version 2 - which replaces both the old G21 Android app <i>and</i> the 
       old Gilbert 21 desktop application - leave this toggle off. For more information on version 2
-      see <a id="help-link" href="/help.html?page=intro">v2 documentation</a>.
+      see <a id="help-link">v2 documentation</a>.
     </div>
+    <!-- For some reason when the link href="/help.html?page=intro" was specified directly above,
+     the html extension was being stripped out when page rendered (at least from netlify) so the 
+     href is now set dynamically in page JS -->
     <label class="switch">
       <input id="emulate-v1" type="checkbox">
       <span class="slider round"></span>

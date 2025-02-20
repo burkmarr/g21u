@@ -5,8 +5,9 @@ import { browseNativeFolder } from './file-handling.js'
 
 export function initialiseGui() {
 
-  //
+  // See page HTML for reason why help-link href attribute set from JS
   document.getElementById("help-link").setAttribute('href', '/help.html?page=intro')
+  
   // Initialise GUI option values
   document.getElementById("emulate-v1").checked = getOpt('emulate-v1') === "true"
   document.getElementById("georef-format").value = getOpt('georef-format')
