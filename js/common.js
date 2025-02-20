@@ -248,7 +248,7 @@ export function setSs(id, value) {
 
 export function getSs(id) {
   const defaults = {
-    mainNav: 'navbot-link-record',
+    //mainNav: 'navbot-link-record',
     'shown-edit-record': 'delete-selected',
     'shown-forward-record': 'share-selected',
     topNav: () => {
