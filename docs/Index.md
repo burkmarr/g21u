@@ -11,4 +11,4 @@
   - [Taxon details panel]()
   - [Metadata panel]()
 - [CSV file management]()
-- [Options]()
+- [Options](/help.html?page=install)

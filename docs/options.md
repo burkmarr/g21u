@@ -1,4 +1,7 @@
 # The options screen
+
+[Help index](/help.html?page=index)
+
 The options screen can be reached by tapping the small gear icon on the bottom navigation bar. The options are described below.
 
 ## Filename format
