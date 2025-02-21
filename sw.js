@@ -1,5 +1,5 @@
 const VERSION = "v1.1.0"
-const BUILD = 40
+const BUILD = 41
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -13,6 +13,8 @@ const APP_STATIC_RESOURCES = [
   "help.html?page=index",
   "help.html?page=intro",
   "help.html?page=install",
+  "help.html?page=options",
+
   "css/general.css",
   "css/options.css",
   "css/record.css",
@@ -59,7 +61,9 @@ const APP_STATIC_RESOURCES = [
   "images/gilbert.png",
   "docs/index.md",
   "docs/intro.md",
-  "docs/install.md"
+  "docs/install.md",
+  "docs/options.md",
+  "docs/images/windows-install.png"
 ]
 const APP_INTERNET_RESOURCES = [
   "species-ws.nbnatlas.org",
