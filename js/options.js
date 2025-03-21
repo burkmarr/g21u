@@ -14,10 +14,12 @@ export function initialiseGui() {
   document.getElementById("georef-precision").value = getOpt('georef-precision')
   document.getElementById("zip-downloads").checked = getOpt('zip-downloads') === "true"
   document.getElementById("reverse-record-sort").checked = getOpt('reverse-record-sort') === "true"
+  document.getElementById("select-first-record").checked = getOpt('select-first-record') === "true"
   document.getElementById("automatic-playback").checked = getOpt('automatic-playback') === "true"
   document.getElementById("playback-volume").value = getOpt('playback-volume')
   document.getElementById("beep-volume").value = getOpt('beep-volume')
   document.getElementById("file-handling").value = getOpt('file-handling')
+  document.getElementById("os-api-key").value = getOpt('os-api-key')
   document.getElementById("default-recorder").value = getOpt('default-recorder')
   document.getElementById("default-determiner").value = getOpt('default-determiner')
 
@@ -72,6 +74,10 @@ export function reverseRecordSort() {
   setOpt('reverse-record-sort', document.getElementById("reverse-record-sort").checked) 
 }
 
+export function selectFirstRecord() {
+  setOpt('select-first-record', document.getElementById("select-first-record").checked) 
+}
+
 export function automaticPlayback() {
   setOpt('automatic-playback', document.getElementById("automatic-playback").checked)
 }
@@ -91,6 +97,10 @@ export function fileHandling() {
   initNativeFolder('main')
   initNativeFolder('csv')
   initNativeFolder('archive')
+}
+
+export function osApiKey() {
+  setOpt('os-api-key', document.getElementById("os-api-key").value)
 }
 
 export function defaultRecorder() {

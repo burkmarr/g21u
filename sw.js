@@ -1,5 +1,5 @@
 const VERSION = "v1.1.0"
-const BUILD = 43
+const BUILD = 44
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -71,6 +71,7 @@ const APP_INTERNET_RESOURCES = [
   "openstreetmap",
   "stadiamaps",
   "arcgisonline",
+  "ordnancesurvey",
 ]
 
 self.addEventListener("install", (event) => {

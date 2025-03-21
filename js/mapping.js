@@ -45,11 +45,24 @@ export function initLocationDetails() {
   // Add event handlers
   map.on('click', mapClicked)
   // Add base layers and control
+  const osApiKey = getOpt('os-api-key')
   const baseLayers = {
     'Open Street Map': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       }).addTo(map),
+    'OS Outdoors': L.tileLayer(`https://api.os.uk/maps/raster/v1/zxy/Outdoor_3857/{z}/{x}/{y}.png?key=${osApiKey}`, {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.ordnancesurvey.co.uk/governance/crown-copyright">Ordnance Survey</a>'
+      }),
+    'OS Road': L.tileLayer(`https://api.os.uk/maps/raster/v1/zxy/Road_3857/{z}/{x}/{y}.png?key=${osApiKey}`, {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.ordnancesurvey.co.uk/governance/crown-copyright">Ordnance Survey</a>'
+      }),
+    'OS Light': L.tileLayer(`https://api.os.uk/maps/raster/v1/zxy/Light_3857/{z}/{x}/{y}.png?key=${osApiKey}`, {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.ordnancesurvey.co.uk/governance/crown-copyright">Ordnance Survey</a>'
+      }),
     'Stadia Alidade Satellite': L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.{ext}', {
         minZoom: 0,
         maxZoom: 20,
@@ -60,6 +73,13 @@ export function initLocationDetails() {
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
       }),
   }
+
+  if (!osApiKey) {
+    delete baseLayers['OS Outdoors']
+    delete baseLayers['OS Street']
+    delete baseLayers['OS Light']
+  }
+
   L.control.layers(baseLayers, []).addTo(map)
 
   // Controls

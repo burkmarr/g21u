@@ -55,10 +55,13 @@ export async function initialiseList() {
     return comparison
   })
 
-  // If the currently selected file indicated by
-  // session storage is no longer present, then
-  // reset it to the first record with no taxon name
-  if (!storRecs.find(r => r.filename === getSs('selectedFile'))) {
+  if (getOpt('select-first-record') === 'true') {
+    setSs('selectedFile', storRecs[0].filename)
+  } else if (!storRecs.find(r => r.filename === getSs('selectedFile'))) {
+    // If the currently selected file indicated by
+    // session storage is no longer present, then
+    // reset it to the first record with no taxon name.
+    // This is useful for when a record is deleted.
     const firstNotEdited = storRecs.find(r => !r['scientific-name'])
     if (firstNotEdited) {
       // Select the first record without scientific name set 
