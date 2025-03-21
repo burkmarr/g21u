@@ -76,7 +76,7 @@ export function initLocationDetails() {
 
   if (!osApiKey) {
     delete baseLayers['OS Outdoors']
-    delete baseLayers['OS Street']
+    delete baseLayers['OS Road']
     delete baseLayers['OS Light']
   }
 
