@@ -1,4 +1,4 @@
-import { el, getSs, getOpt, precisions, precisionFromGr, detailsFromFilename } from './common.js'
+import { el, getSs, setOpt, getOpt, precisions, precisionFromGr, detailsFromFilename } from './common.js'
 import { getRecordJson } from './file-handling.js'
 import { getCent, getSquare, getGr } from './nl.min.js'
 import { checkEditStatus } from './record-details.js'
@@ -44,13 +44,17 @@ export function initLocationDetails() {
   map = L.map('map-div').setView([51.505, -0.09], 13)
   // Add event handlers
   map.on('click', mapClicked)
+  map.on('baselayerchange', function(e) {
+    setOpt('baselayer', e.name)
+  })
+
   // Add base layers and control
   const osApiKey = getOpt('os-api-key')
   const baseLayers = {
     'Open Street Map': L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      }).addTo(map),
+      }),
     'OS Outdoors': L.tileLayer(`https://api.os.uk/maps/raster/v1/zxy/Outdoor_3857/{z}/{x}/{y}.png?key=${osApiKey}`, {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.ordnancesurvey.co.uk/governance/crown-copyright">Ordnance Survey</a>'
@@ -74,10 +78,18 @@ export function initLocationDetails() {
       }),
   }
 
+  // Remove OS API base layers if key not set
   if (!osApiKey) {
     delete baseLayers['OS Outdoors']
     delete baseLayers['OS Road']
     delete baseLayers['OS Light']
+  }
+  // Set current base layer
+  const currentBaseLayer = getOpt('baselayer')
+  if (currentBaseLayer && Object.keys(baseLayers).includes(currentBaseLayer)) {
+    baseLayers[currentBaseLayer].addTo(map)
+  } else {
+    baseLayers['Open Street Map'].addTo(map)
   }
 
   L.control.layers(baseLayers, []).addTo(map)
