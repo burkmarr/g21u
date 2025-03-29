@@ -1,5 +1,5 @@
 const VERSION = "v1.1.0"
-const BUILD = 46
+const BUILD = 48
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -14,6 +14,7 @@ const APP_STATIC_RESOURCES = [
   "help.html?page=intro",
   "help.html?page=install",
   "help.html?page=options",
+  "help.html?page=field",
 
   "css/general.css",
   "css/options.css",
@@ -63,6 +64,7 @@ const APP_STATIC_RESOURCES = [
   "docs/intro.md",
   "docs/install.md",
   "docs/options.md",
+  "docs/field.md",
   "docs/images/windows-install.png"
 ]
 const APP_INTERNET_RESOURCES = [
