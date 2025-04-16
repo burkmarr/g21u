@@ -3,9 +3,9 @@
 - [Introduction](/help.html?page=intro)
 - [Running & installing g21u](/help.html?page=install)
 - [Making records in the field](/help.html?page=field)
-- [Completing record details]()
-  - [Navigating the record details panels]()
-  - [Record summary list panel]()
+- Viewing and editing record details
+  - [Navigating the record details panels](/help.html?page=navigation)
+  - [Record summary list panel](/help.html?page=record-list)
   - [Record details input panel]()
   - [Location details panel]()
   - [Taxon details panel]()

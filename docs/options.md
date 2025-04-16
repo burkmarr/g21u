@@ -2,7 +2,7 @@
 
 [Help index](/help.html?page=index)
 
-The options screen can be reached by tapping the small gear icon on the bottom navigation bar. The options are described below.
+<img src="/docs/images/nav-options.png" style="float: right; width: 40px; margin: 10px" />The options screen can be reached by tapping the small gear icon on the bottom navigation bar. The options are described below.
 
 ## Mode of operation
 ### V1 emulation
