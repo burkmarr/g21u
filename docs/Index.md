@@ -6,7 +6,7 @@
 - Viewing and editing record details
   - [Navigating the record details panels](/help.html?page=navigation)
   - [Record summary list panel](/help.html?page=record-list)
-  - [Record details input panel]()
+  - [Record details input panel](/help.html?page=record-details)
   - [Location details panel]()
   - [Taxon details panel]()
   - [Metadata panel]()
