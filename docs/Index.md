@@ -7,7 +7,7 @@
   - [Navigating the record details panels](/help.html?page=navigation)
   - [Record summary list panel](/help.html?page=record-list)
   - [Record details input panel](/help.html?page=record-details)
-  - [Location details panel]()
+  - [Location details panel](/help.html?page=location)
   - [Taxon details panel]()
   - [Metadata panel]()
 - [CSV file management]()

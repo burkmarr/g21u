@@ -70,7 +70,7 @@ To delete the sound files for checked records, ensure that the delete sound file
 
 The option to delete rather than archive the record files will only be presented if you have selected the *native file system* storage option in the [options](/help.html?page=options) (which is available on desktop). If you have selected any other storage option (e.g. on mobile), you can't archive the files - they will be deleted from your device.
 
-**How I use it...**
+**How I use it...**<br/>
 In practice I have never found it necessary to use this function. I always process my records and move them into CSVs soon after making them. Then delete (on mobile) or archive (on desktop) the whole record - sound and text file together.
 
 ## Copying field values from selected record
@@ -87,19 +87,22 @@ To download the files for checked records (sound files and record details text f
 
 If the *zip downloaded records* option is not set, the individual text and sound files associated with each checked record are downloaded to accessible storage on your device (e.g. the downloads folder on Android). Your platform may ask you to accept the download - either all of them or individually. If the *zip downloaded records* option is set - which is recommended - the text and sound files are first used to create a single zip file which is then downloaded to accessible storage on your device.
 
-**How I use it...** See the section *Transferring records between mobile and desktop in practice* below.
+**How I use it...**<br/>
+See the section *Transferring records between mobile and desktop in practice* below.
 
 ## Sharing records
 To share (transfer) the files for checked records (sound files and record details text files), ensure that the share button is the displayed function button from the second group, then tap/click it. What happens then depends partly on your platform (e.g. Windows, Android or iOS). Your platform will likely ask you to select a method/location to share files.
 
 Unfortunately most browsers, e.g. Chrome, impose a limit on the number of files that can be shared in one go which limits the usefulness of this method of transferring records. On Chrome the limit is 10 files at once which normally limits you to 5 records (one sound file and one text details file for each record).
 
-**How I use it...** See the section *Transferring records between mobile and desktop in practice* below.
+**How I use it...**<br/>
+See the section *Transferring records between mobile and desktop in practice* below.
 
 ## Exporting records to CSV files
 To export checked records to a CSV file, ensure that the CSV button is the displayed function button from the second group, then tap/click it. A new CSV file will be created in the location indicated by your storage settings in [options](/help.html?page=options).
 
-**How I use it...** I post-process all my records on my desktop after transferring them from my smartphone (see next section) and I have set *Native file system* in my options and specified a folder where I want my CSVs to be created. Therefore I know where to access my CSV files, e.g. for import into iRecord or any checking/tweaking with Excel before importing to iRecord.
+**How I use it...**<br/>
+I post-process all my records on my desktop after transferring them from my smartphone (see next section) and I have set *Native file system* in my options and specified a folder where I want my CSVs to be created. Therefore I know where to access my CSV files, e.g. for import into iRecord or any checking/tweaking with Excel before importing to iRecord.
 
 ## Transferring records between mobile and desktop in practice
 On my Android smartphone I always have the *zip downloaded records* option set. After a day's recording in the field, I download all the record files, via a single zipfile, into the *downloads* folder on my phone. From there I use Android's *Files* app to open the download folder, select the zipfile and use that app's share feature to transfer the zipfile to a folder in my cloud storage - Google Drive. I can access that folder from my Desktop, so I go there and unzip the record files into the folder I have specified as the *Main folder* in desktop's g21u app options. Then when I open g21u on my dekstop and go to the records list, they are there ready for processing.

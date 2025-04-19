@@ -32,7 +32,7 @@ By default, *g21u* lists records from newest to oldest. This is the most conveni
 ### Select first record
 By default, *g21u* reselects the previously selected record when you switch to the record list pane or, if this is not available, the first record with no scientific name is selected. That's useful behaviour when post-processing records, but not always so good in the field when you normally always want the last record made (first in list when the *Reverse sort order* option is not set) to be selected (and therefore visible). 
 
-**How I use it...**
+**How I use it...**<br/>
 On my phone, for field recording, I have the *Reverse sort order* option off and the *Select first record* option on. On my laptop, for post-processing, I have the I have the *Reverse sort order* option on and the *Select first record* option off.
 
 ### Storage

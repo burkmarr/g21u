@@ -705,7 +705,7 @@ export async function getCSV(filename) {
     const blob = await storGetFile(filename)
     csv = csvParse(await blob.text())
   } else {
-    console.log('locations does not exist', filename)
+    console.log('Custom file does not exist:', filename)
   }
   return csv
 }

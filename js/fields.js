@@ -70,7 +70,7 @@ export function getFieldDefs({
       default: '',
       novalue: '',
       optional: false,
-      info: `Scientific name of the recorded taxon.`
+      info: `Scientific name of the recorded taxon. Suggested names are supplied by the NBN species search API (and optionally, your own list). `
     },
     {
       inputId: 'common-name-input',
@@ -81,7 +81,7 @@ export function getFieldDefs({
       default: '',
       novalue: '',
       optional: true,
-      info: `Common (vernacular) name of the recorded taxon.`
+      info: `Common (vernacular) name of the recorded taxon.  Suggested names are supplied by the NBN species search API (and optionally, your own list). `
     },
     {
       inputId: 'certainty-input',

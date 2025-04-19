@@ -332,6 +332,10 @@ export async function getMetadata() {
 }
 
 async function moveSelectedRec(e) {
+  if (pendingEdits) {
+    generalMessage("You have pending edits. Either save or cancel these before duplicating the record.")
+    return
+  }
   moveSelected(e.target.id === 'previous-record')
  //el('record-details-playback-button').focus()
 }

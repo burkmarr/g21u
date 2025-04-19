@@ -199,7 +199,7 @@ function initFieldOptions() {
     const iRecordTerm = f.iRecord && f.inputType.startsWith('term-') ? `
       You can choose a term from a list 
       of those accepted by iRecord, or you can enter a term of your
-      own. (Don't enter your own term if planning to import to iRecord).` : ''
+      own. (Don't enter your own term if planning to import to iRecord.)` : ''
     const mandatory = f.optional ? '' : ' <b>This field must be included</b> - you cannot switch it off.'
     p.innerHTML = `
       <b>${f.inputLabel}</b>. ${f.info}${iRecordTerm}${iRecordText}${mandatory}
