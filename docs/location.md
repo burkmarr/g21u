@@ -2,9 +2,9 @@
 
 [Help index](/help.html?page=index)
 
-<img src="/docs/images/nav-mapping.png" style="float: right; width: 40px; margin: 10px" /><img src="/docs/images/nav-list.png" style="float: right; width: 40px; margin: 10px" />On desktop, the location details panel is one of three selectable panels found to the right of the record details input panel which is reached by tapping the list icon on the bottom navigation bar (shown on the near right). If the location details panel is not already displayed, you can display it clicking on the map navigation button (shown on the far right).
+<img src="/docs/images/nav-mapping.png" style="float: right; width: 40px; margin: 10px" /><img src="/docs/images/nav-list.png" style="float: right; width: 40px; margin: 10px" />On desktop, the location details panel is one of three selectable panels found to the right of the record details input panel which is reached by clicking the list icon on the bottom navigation bar (shown on the near right). If the location details panel is not already displayed, you can display it by clicking on the map navigation button (shown on the far right).
 
-<img src="/docs/images/nav-mapping.png" style="float: right; width: 40px; margin: 10px" /><img src="/docs/images/nav-details.png" style="float: right; width: 40px; margin: 10px" />On mobile, the record details page can be reached by tapping the on the navigation button (shown on the near right). The location details panel is then displayed by checking on the map button (shown on the far right).
+<img src="/docs/images/nav-mapping.png" style="float: right; width: 40px; margin: 10px" /><img src="/docs/images/nav-details.png" style="float: right; width: 40px; margin: 10px" />On mobile, the record details page can be reached by tapping the on the navigation button (shown on the near right). The location details panel is then displayed by tapping the map button (shown on the far right).
 
 The record location panel shows the location for the record currently selected in the record summary panel (i.e. the one highlighted in yellow) and allows you to alter the grid reference (or lat/lon) of the selected record.
 
