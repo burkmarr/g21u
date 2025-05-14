@@ -177,7 +177,23 @@ async function initRecordFields() {
         e.target.value = previosRecJson[currentFld.jsonId]
         checkEditStatus()
       }
-      
+
+      // If input field is grid ref or lat and the value is orig
+      // then change the grid ref or lat/lon values to those originally recorded
+      if (e.target.value === 'orig') {
+        console.log(e.target.id)
+        if (e.target.id === 'gridref-input' || e.target.id === 'lat-input') {
+          const defsWithDefaults = getFieldDefs({filename: getSs('selectedFile')}) 
+          if (e.target.id === 'gridref-input') {
+            e.target.value = defsWithDefaults.find(d => d.inputId === 'gridref-input').default
+          } else {
+            e.target.value = defsWithDefaults.find(d => d.inputId === 'lat-input').default
+            el('lon-input').value =  defsWithDefaults.find(d => d.inputId === 'lon-input').default
+          }
+          checkEditStatus()
+        }
+      }
+
       // Check if input matches any custom input codes 
       if (!customInputCsv) {
         customInputCsv = await getCSV('custom-input.csv')
