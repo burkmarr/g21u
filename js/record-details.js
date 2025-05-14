@@ -4,12 +4,13 @@ import { getFieldDefs, getTermList } from './fields.js'
 import { hideTaxonMatches, displayTaxonMatches, taxonDetails } from './taxonomy.js'
 import { initLocationDetails, invalidateSize, updateMap } from './mapping.js'
 import { setRecordContent, initialiseList, moveSelected, getPreviousRecJson } from './record-list.js'
-import { getRecordJson, storSaveFile, storFileExists, storGetFile, copyRecord } from './file-handling.js'
+import { getRecordJson, storSaveFile, storFileExists, storGetFile, copyRecord, getCSV } from './file-handling.js'
 import { playBlob } from './play.js'
 
 let audioPlayer = new Audio()
 let pendingEdits = false
 let playbackPaused = false
+let customInputCsv
 
 export function editsPending() {
   return pendingEdits
@@ -176,26 +177,51 @@ async function initRecordFields() {
         e.target.value = previosRecJson[currentFld.jsonId]
         checkEditStatus()
       }
-      const currentInputIndex = fieldDefs.findIndex(f => f.inputId === e.target.id)
-      let focussed = false
-      for (let i = currentInputIndex+1; i<fieldDefs.length; i++) {
-        const inputId = fieldDefs[i].inputId
-        const value = el(inputId).value
-        const edited = el(inputId).classList.contains('edited')
-        // Focus on next empty, edited or 'not recorded' field
-        if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
-          el(inputId).focus()
-          focussed = true
-          if (value.toLowerCase() === 'not recorded') {
-            el(inputId).select()
-          }
-          break
-        } 
+      
+      // Check if input matches any custom input codes 
+      if (!customInputCsv) {
+        customInputCsv = await getCSV('custom-input.csv')
       }
-      if (!focussed) {
-        // No more fields to focus on
-        // so move it to save button
-        el('record-save-button').focus()
+      let customInputMade = false
+      if (customInputCsv) {
+        let customInput = customInputCsv.filter(c => `${c.colin}-input` === e.target.id && c.valin === e.target.value)
+        // Set the specified fields to the specified values
+        customInput.forEach(c => {
+          const inputOut = el(`${c.colout}-input`)
+          if (!inputOut) {
+            console.log(`Field '${c.colout}' specified in custom-input.csv file does not exist.`)
+          } else {
+            el(`${c.colout}-input`).value = c.valout
+            customInputMade = true
+          }
+        })
+        checkEditStatus()
+      }
+      if (customInputMade) {
+        // If a custom input was made, shift the focus to the location field
+        el('location-input').focus()
+      } else {
+        const currentInputIndex = fieldDefs.findIndex(f => f.inputId === e.target.id)
+        let focussed = false
+        for (let i = currentInputIndex+1; i<fieldDefs.length; i++) {
+          const inputId = fieldDefs[i].inputId
+          const value = el(inputId).value
+          const edited = el(inputId).classList.contains('edited')
+          // Focus on next empty, edited or 'not recorded' field
+          if (value === '' || value.toLowerCase() === 'not recorded' || edited ) {
+            el(inputId).focus()
+            focussed = true
+            if (value.toLowerCase() === 'not recorded') {
+              el(inputId).select()
+            }
+            break
+          } 
+        }
+        if (!focussed) {
+          // No more fields to focus on
+          // so move it to save button
+          el('record-save-button').focus()
+        }
       }
     }
   })
