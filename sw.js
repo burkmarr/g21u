@@ -1,5 +1,5 @@
 const VERSION = "v2.0.0"
-const BUILD = 3
+const BUILD = 4
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -22,6 +22,7 @@ const APP_STATIC_RESOURCES = [
   "help.html?page=record-details",
   "help.html?page=record-list",
   "help.html?page=taxon",
+  "help.html?page=releases",
   "css/general.css",
   "css/options.css",
   "css/record.css",
@@ -78,6 +79,7 @@ const APP_STATIC_RESOURCES = [
   "docs/record-details.md",
   "docs/record-list.md",
   "docs/taxon.md",
+  "docs/releases.md",
   "docs/images/windows-install.png",
   "docs/images/bin-orange.png",
   "docs/images/csv-delete-dialog.png",
