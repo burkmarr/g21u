@@ -12,3 +12,4 @@
   - [Metadata panel](/help.html?page=metadata)
 - [CSV file management](/help.html?page=csv)
 - [Options](/help.html?page=options)
+- [Releases](/help.html?page=releases)

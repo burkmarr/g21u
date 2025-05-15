@@ -102,3 +102,31 @@ Create a file called *custom-taxa.csv* in the folder specified for *CSV folder* 
 If there are locations that you visit frequently, you can save time when processing records by creating your own custom location filterable list. You can only do this on desktop and if you have specified the *Native file system* storage option.
 
 Create a file called *custom-locations.csv* in the folder specified for *CSV folder* in your [options](/help.html?page=options) (or the *Main folder* if you haven't set the *CSV folder*). It should have just one column with the header *name*. Then on each subsequent row list the location names that you wish to include in a filterable list that will appear when you enter data in the *Location name* field.
+
+## Adding input shortcuts
+You may often find that you need to enter similar values for a number of records. For example, if you record territorial birds singing you may often want to set the following values:
+- Breeding evidence (birds) - *02: Singing male (S)*
+- Stage - *Adult*
+- Sex - *male*
+- Quantity - *1*
+
+Rather than set the four values individually, you can define a shortcut, e.g. *bs*, which when entered into a particular field will set all of the values automatically. You can only do this on desktop and if you have specified the *Native file system* storage option.
+
+Create a file called *custom-input.csv* in the folder specified for *CSV folder* in your [options](/help.html?page=options) (or the *Main folder* if you haven't set the *CSV folder*). It should have four columns with the headers *colin*, *valin*, *colout*, *valout*. The column *colin* represents the ID of the field you will type your short-cut code into and the column *valin* represents the short-cut code itself. You can get the field IDs for the *colin* column (and *colout* column) from the software file *fields.js* here: https://github.com/burkmarr/g21u/blob/main/js/fields.js. The values you want are specified in the *jsonId* attribute of each field object.
+
+The column *colout* represents the ID of a field where you want a value to be entered in response to your short-cut code, and the column *valout* represents the value you wish to be entered there.
+
+For the singing bird example outlined above, your CSV file would look something like this:
+
+colin,valin,colout,valout
+birdbreed,bs,birdbreed,02: Singing male (S)
+birdbreed,bs,stage,Adult
+birdbreed,bs,sex,male
+birdbreed,bs,quantity,1
+
+To use this short-cut you would type *bs* into the *Breeding evidence (birds)* column and when you hit enter, the four required field values would be entered automatically.
+
+You can define as many shortcut codes as you like in the file.
+
+## Core short-cuts
+There is a short-cut defined in the software itself. It allows you to reset either the grid reference or lat/long fields to their original values if you have changed them. To use it, enter *orig* into either the *Grid reference* or *Latitude* fields.
