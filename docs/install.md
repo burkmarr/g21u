@@ -9,7 +9,7 @@ For the best results, I recommend using the Google Chrome browser regardless of 
 Many of the web technologies that drive this app (e.g. reading from and writing to the native file system) are relatively new and not all browsers support all features fully. Where I know of problems with any particular browsers or platforms I mention them in the help.
 
 ## General instructions for installation and use
-To install this app, open the browser on your device when you have an internet connection and navigate to this URL: [https://burkmarr.github.io/g21u](https://burkmarr.github.io/g21u).
+To install this app, open the browser on your device when you have an internet connection and navigate to this URL: [https://g21u.netlify.app/](https://g21u.netlify.app/).
 
 *g21u* will cache all of the resources it needs to run offiline when you first open it. So, from this point on, you will be able to use it in the field even when you have no internet connection just by navigating to the URL again in your browser. 
 

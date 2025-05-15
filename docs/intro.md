@@ -8,7 +8,7 @@
 If you used version 1 of *g21u* (not the Android app), you will notice extra features in version 2. The new features are explained in these help pages, but if you want a quick way of making version 2 look and feel like version 1 for field recording, switch on the *V1 emulation* toggle under *Mode of operation* in the [options](/help.html?page=options).
 
 ## Introduction to g21u
-Gilbert 21 universal (*g21u*) is a web application. That means you can run it entirely from the browser, just by entering the URL ([https://burkmarr.github.io/g21u](https://burkmarr.github.io/g21u)) in your browser's address bar. No extra software or installation is required. 
+Gilbert 21 universal (*g21u*) is a web application. That means you can run it entirely from the browser, just by entering the URL ([https://g21u.netlify.app/](https://g21u.netlify.app/)) in your browser's address bar. No extra software or installation is required. 
 
 However, it is also a *Progressive Web Application* (PWA), which means that on many platforms you can 'install' it. That puts an icon on your home screen just like a conventionally installed app and when started via this icon, it looks bit different than when run in a browser - you don't see the normal browser decorations such as the address bar or navigation buttons - but under the hood it still runs in the browser you installed it from.
 
