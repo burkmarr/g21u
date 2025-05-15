@@ -2,7 +2,7 @@
 
 [Help index](/help.html?page=index)
 
-## v2.0.0 (15/05/20250)
+## v2.0.0 (15/05/2025)
 - Adds the facility to add record details
 - Adds mapping
 - Adds record metadata
@@ -13,5 +13,5 @@
 - Adds help
 - Adds ability to automatically zip records into single download file
 
-## v1.0.0 ()
+## v1.0.0 (2024)
 First release.
