@@ -117,12 +117,13 @@ Create a file called *custom-input.csv* in the folder specified for *CSV folder*
 The column *colout* represents the ID of a field where you want a value to be entered in response to your short-cut code, and the column *valout* represents the value you wish to be entered there.
 
 For the singing bird example outlined above, your CSV file would look something like this:
-
+<pre>
 colin,valin,colout,valout
 birdbreed,bs,birdbreed,02: Singing male (S)
 birdbreed,bs,stage,Adult
 birdbreed,bs,sex,male
 birdbreed,bs,quantity,1
+</pre>
 
 To use this short-cut you would type *bs* into the *Breeding evidence (birds)* column and when you hit enter, the four required field values would be entered automatically.
 
