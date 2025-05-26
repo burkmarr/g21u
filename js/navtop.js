@@ -336,6 +336,12 @@ export function navtop (page) {
       div.appendChild(span)
     })
   })
+
+  const cancel = document.createElement('button')
+  cancel.innerText = 'Cancel'
+  cancel.setAttribute('id', 'group-button-dlg-cancel')
+  cancel.addEventListener('click', () => groupButtonChangeDialog.close())
+  groupButtonChangeDialog.appendChild(cancel)
 }
 
 function groupButtonChange(e) {

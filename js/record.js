@@ -33,29 +33,19 @@ function handleMotion(event) {
 }
 //window.addEventListener('devicemotion', handleMotion)
 
-// document.getElementById("gps-rec-record").addEventListener('touchstart', (event) => {
-//     console.log(event.touches[0].clientX)
-// })
-
 function addRemoveClickTouchEvent(el, fn, add) {
   const isTouch = navigator.maxTouchPoints
   if (isTouch) {
     if (add) {
       el.addEventListener('touchstart', fn)
-      //el.addEventListener('touchmove', fn)
-      //el.addEventListener('mousedown', fn)
     } else {
       el.removeEventListener('touchstart', fn)
-      //el.removeEventListener('touchmove', fn)
-      //el.removeEventListener('mousedown', fn)
     }
   } else {
     if (add) {
       el.addEventListener('click', fn)
-      //el.addEventListener('mousedown', fn)
     } else {
       el.removeEventListener('click', fn)
-      //el.removeEventListener('mousedown', fn)
     }
   }
 }
