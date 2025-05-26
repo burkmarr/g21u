@@ -225,6 +225,7 @@ export function getOpt(id) {
     'emulate-v1': 'false',
     'georef-format': 'osgr',
     'georef-precision': '10',
+    'show-tetrad': 'false',
     'zip-downloads': 'true',
     'reverse-record-sort': 'false',
     'select-first-record': 'false',

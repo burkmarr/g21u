@@ -12,6 +12,7 @@ export function initialiseGui() {
   document.getElementById("emulate-v1").checked = getOpt('emulate-v1') === "true"
   document.getElementById("georef-format").value = getOpt('georef-format')
   document.getElementById("georef-precision").value = getOpt('georef-precision')
+  document.getElementById("show-tetrad").checked = getOpt('show-tetrad') === "true"
   document.getElementById("zip-downloads").checked = getOpt('zip-downloads') === "true"
   document.getElementById("reverse-record-sort").checked = getOpt('reverse-record-sort') === "true"
   document.getElementById("select-first-record").checked = getOpt('select-first-record') === "true"
@@ -64,6 +65,10 @@ export function georefFormat() {
 
 export function georefPrecision() {
   setOpt('georef-precision', document.getElementById("georef-precision").value)
+}
+
+export function showTetrad() {
+  setOpt('show-tetrad', document.getElementById("show-tetrad").checked) 
 }
 
 export function zipDownloads() {

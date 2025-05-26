@@ -50,6 +50,11 @@ function addRemoveClickTouchEvent(el, fn, add) {
   }
 }
 
+// Show tetrad if option selected
+if (getOpt('show-tetrad') === "true") {
+   document.getElementById('gps-rec-tetrad').classList.add('show')
+}
+
 // Add event handler to gps icon to remove blink class
 // on animation completion
 const gpsEl = document.getElementById('gps-rec-gps')
@@ -110,8 +115,9 @@ function geolocated(position) {
   lon = Math.round(lon * 1000000) / 1000000
   const accuracy = Math.ceil(position.coords.accuracy)
   const altitude = position.coords.altitude ? Math.floor(position.coords.altitude) : null
-  const gr = getGr(lon, lat, 'wg', 'gb', [1,10])
+  const gr = getGr(lon, lat, 'wg', 'gb', [1,10,2000])
   const gr10 = gr.p1
+  const tetrad = gr.p2000
   //const gr8 = gr.p10
   if (getOpt('georef-format') === 'osgr') {
     //2015-02-14_20-54-29_SD65821128_18_0.wav
@@ -135,6 +141,8 @@ function geolocated(position) {
   document.getElementById("gps-rec-altitude").innerHTML = altitude ? `Altitude: ${altitude} m` : 'Altitude:'
   // Update gui lat/lng
   document.getElementById("gps-rec-latlon").innerHTML = `${lat} / ${lon}`
+  // Update tetrad
+  document.getElementById("gps-rec-tetrad").innerHTML = tetrad
   // Clear any error msg
   document.getElementById("gps-rec-msg").innerHTML = ""
 }

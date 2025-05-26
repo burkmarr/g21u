@@ -43,7 +43,7 @@ The menu for the right-hand group presents the selection menu shown below.
 
 <img src="/docs/images/function-button-right-group.png" style="" />
 
-To change the displayed (and therefore usable) function button, select the one you want from either of these lists. That will change the button visible on the toolbar and you can then use the function button by tapping/clicking it. The following sections describe the various functions that can be performed.
+To change the displayed function button, select the one you want from either of these lists. That will change the button visible on the toolbar (and also run the function associated with it). Thereafter you can just use the function button by tapping/clicking it. The following sections describe the various functions that can be performed.
 
 ## Deleting records
 To delete checked records, ensure that the delete button is the displayed function button from the first group, then tap/click it. You will be presented with a confirmation dialog like the one shown below.
