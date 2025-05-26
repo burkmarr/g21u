@@ -9,183 +9,182 @@ import { bin, download, share, csv, checkAll, uncheckAll,
 
 let groupButtonChangeDialog
 
+const navs = [
+  {
+    id: 'delete-selected',
+    fn: deleteChecked,
+    icon: bin,
+    page: 'manage',
+    group: 'edit-record',
+    section: 'left',
+    info: 'Delete checked records'
+  },
+  {
+    id: 'manage-metadata-selected',
+    fn: manageMetadataChecked,
+    icon: closeMetadata,
+    page: 'manage',
+    group: 'edit-record',
+    section: 'left',
+    classes: 'v2',
+    info: 'Manage metadata of checked records.'
+  },
+  {
+    id: 'delete-sound-selected',
+    fn: deleteSoundChecked,
+    icon: delSound,
+    page: 'manage',
+    group: 'edit-record',
+    section: 'left',
+    classes: 'v2',
+    info: 'Delete sound files associated with checked records.'
+  },
+  {
+    id: 'copy-values-selected',
+    fn: copyValuesChecked,
+    icon: copy,
+    page: 'manage',
+    group: 'edit-record',
+    section: 'left',
+    classes: 'v2',
+    info: 'Copy field values from selected record to checked records.'
+  },
+  {
+    id: 'download-selected',
+    fn: downloadChecked,
+    icon: download,
+    page: 'manage',
+    group: 'forward-record',
+    section: 'left',
+    info: 'Download checked records.'
+  },
+  {
+    id: 'share-selected',
+    fn: shareChecked,
+    icon: share,
+    page: 'manage',
+    group: 'forward-record',
+    section: 'left',
+    info: 'Share checked records.'
+  },
+  {
+    id: 'csv-selected',
+    fn: csvChecked,
+    icon: csv,
+    page: 'manage',
+    group: 'forward-record',
+    section: 'left',
+    info: 'Export checked records to CSV.',
+    classes: 'v2'
+  },
+  {
+    id: 'select-all',
+    fn: checkAllRecs,
+    icon: checkAll,
+    page: 'manage',
+    section: 'left'
+  },
+  // {
+  //   id: 'duplicate',
+  //   fn: duplicateRecord,
+  //   icon: duplicate,
+  //   page: 'manage',
+  //   section: 'middle'
+  // },
+  {
+    id: 'deselect-all',
+    fn: uncheckAllRecs,
+    icon: uncheckAll,
+    page: 'manage',
+    section: 'left'
+  },
+  {
+    id: 'edit-record',
+    div: 'record-details',
+    icon: edit,
+    page: 'manage',
+    section: 'right'
+  },
+  {
+    id: 'edit-location',
+    div: 'location-details',
+    icon: map,
+    page: 'manage',
+    section: 'right'
+  },
+  {
+    id: 'edit-taxa',
+    div: 'taxa-details',
+    icon: beetle,
+    page: 'manage',
+    section: 'right'
+  },
+  {
+    id: 'edit-metadata',
+    div: 'metadata-details',
+    icon: metadata,
+    page: 'manage',
+    section: 'right'
+  },
+  {
+    id: 'delete-csv-selected',
+    fn: deleteCheckedCsv,
+    icon: bin,
+    page: 'csv',
+    section: 'left'
+  },
+  {
+    id: 'share-csv-selected',
+    fn: shareCheckedCsv,
+    icon: share,
+    page: 'csv',
+    section: 'left'
+  },
+  {
+    id: 'download-csv-selected',
+    fn: downloadCsvChecked,
+    icon: download,
+    page: 'csv',
+    section: 'left'
+  },
+  {
+    id: 'merge-csv-selected',
+    fn: mergeCheckedCsv,
+    icon: chevronCollapse,
+    page: 'csv',
+    section: 'left'
+  },
+  {
+    id: 'select-all-csv',
+    fn: checkAllCsvs,
+    icon: checkAll,
+    page: 'csv',
+    section: 'left'
+  },
+  {
+    id: 'deselect-all-csv',
+    fn: uncheckAllCsvs,
+    icon: uncheckAll,
+    page: 'csv',
+    section: 'left'
+  },
+  {
+    id: 'csv-csv-details',
+    div: 'csv-details',
+    icon: listCircle,
+    page: 'csv',
+    section: 'right'
+  },
+  {
+    id: 'csv-record-details',
+    div: 'record-details',
+    icon: infoCircle,
+    page: 'csv',
+    section: 'right'
+  },
+]
+
 export function navtop (page) {
-
-  const navs = [
-    {
-      id: 'delete-selected',
-      fn: deleteChecked,
-      icon: bin,
-      page: 'manage',
-      group: 'edit-record',
-      section: 'left',
-      info: 'Delete checked records'
-    },
-    {
-      id: 'manage-metadata-selected',
-      fn: manageMetadataChecked,
-      icon: closeMetadata,
-      page: 'manage',
-      group: 'edit-record',
-      section: 'left',
-      classes: 'v2',
-      info: 'Manage metadata of checked records.'
-    },
-    {
-      id: 'delete-sound-selected',
-      fn: deleteSoundChecked,
-      icon: delSound,
-      page: 'manage',
-      group: 'edit-record',
-      section: 'left',
-      classes: 'v2',
-      info: 'Delete sound files associated with checked records.'
-    },
-    {
-      id: 'copy-values-selected',
-      fn: copyValuesChecked,
-      icon: copy,
-      page: 'manage',
-      group: 'edit-record',
-      section: 'left',
-      classes: 'v2',
-      info: 'Copy field values from selected record to checked records.'
-    },
-    {
-      id: 'download-selected',
-      fn: downloadChecked,
-      icon: download,
-      page: 'manage',
-      group: 'forward-record',
-      section: 'left',
-      info: 'Download checked records.'
-    },
-    {
-      id: 'share-selected',
-      fn: shareChecked,
-      icon: share,
-      page: 'manage',
-      group: 'forward-record',
-      section: 'left',
-      info: 'Share checked records.'
-    },
-    {
-      id: 'csv-selected',
-      fn: csvChecked,
-      icon: csv,
-      page: 'manage',
-      group: 'forward-record',
-      section: 'left',
-      info: 'Export checked records to CSV.',
-      classes: 'v2'
-    },
-    {
-      id: 'select-all',
-      fn: checkAllRecs,
-      icon: checkAll,
-      page: 'manage',
-      section: 'left'
-    },
-    // {
-    //   id: 'duplicate',
-    //   fn: duplicateRecord,
-    //   icon: duplicate,
-    //   page: 'manage',
-    //   section: 'middle'
-    // },
-    {
-      id: 'deselect-all',
-      fn: uncheckAllRecs,
-      icon: uncheckAll,
-      page: 'manage',
-      section: 'left'
-    },
-    {
-      id: 'edit-record',
-      div: 'record-details',
-      icon: edit,
-      page: 'manage',
-      section: 'right'
-    },
-    {
-      id: 'edit-location',
-      div: 'location-details',
-      icon: map,
-      page: 'manage',
-      section: 'right'
-    },
-    {
-      id: 'edit-taxa',
-      div: 'taxa-details',
-      icon: beetle,
-      page: 'manage',
-      section: 'right'
-    },
-    {
-      id: 'edit-metadata',
-      div: 'metadata-details',
-      icon: metadata,
-      page: 'manage',
-      section: 'right'
-    },
-    {
-      id: 'delete-csv-selected',
-      fn: deleteCheckedCsv,
-      icon: bin,
-      page: 'csv',
-      section: 'left'
-    },
-    {
-      id: 'share-csv-selected',
-      fn: shareCheckedCsv,
-      icon: share,
-      page: 'csv',
-      section: 'left'
-    },
-    {
-      id: 'download-csv-selected',
-      fn: downloadCsvChecked,
-      icon: download,
-      page: 'csv',
-      section: 'left'
-    },
-    {
-      id: 'merge-csv-selected',
-      fn: mergeCheckedCsv,
-      icon: chevronCollapse,
-      page: 'csv',
-      section: 'left'
-    },
-    {
-      id: 'select-all-csv',
-      fn: checkAllCsvs,
-      icon: checkAll,
-      page: 'csv',
-      section: 'left'
-    },
-    {
-      id: 'deselect-all-csv',
-      fn: uncheckAllCsvs,
-      icon: uncheckAll,
-      page: 'csv',
-      section: 'left'
-    },
-    {
-      id: 'csv-csv-details',
-      div: 'csv-details',
-      icon: listCircle,
-      page: 'csv',
-      section: 'right'
-    },
-    {
-      id: 'csv-record-details',
-      div: 'record-details',
-      icon: infoCircle,
-      page: 'csv',
-      section: 'right'
-    },
-
-  ]
 
   const navtop = document.getElementById('navtop')
   let navContainer
@@ -337,6 +336,7 @@ export function navtop (page) {
     })
   })
 
+  // Cancel button
   const cancel = document.createElement('button')
   cancel.innerText = 'Cancel'
   cancel.setAttribute('id', 'group-button-dlg-cancel')
@@ -374,4 +374,7 @@ function groupButtonSelected(e) {
   document.getElementById(chosen).classList.remove('hide')
 
   groupButtonChangeDialog.close()
+
+  // Now run the button function (pass an argument that mimics event so button can be identified)
+  const fn = navs.find(n => n.id === chosen).fn({target: {id: chosen}})
 }
