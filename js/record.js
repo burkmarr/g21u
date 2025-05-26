@@ -11,6 +11,7 @@ let isGeolocated = false
 let filenameLoc
 
 let mediaRecorder = null
+let recording = false
 let audioBlobs = []
 let audioBlob
 let capturedStream = null
@@ -31,6 +32,24 @@ function handleMotion(event) {
   }
 }
 //window.addEventListener('devicemotion', handleMotion)
+
+
+function addRemoveClickTouchEvent(el, fn, add) {
+  const isTouch = 'touchstart' in document.documentElement
+  if (isTouch) {
+    if (add) {
+      el.addEventListener('touchstart', fn)
+    } else {
+      el.removeEventListener('touchstart', fn)
+    }
+  } else {
+    if (add) {
+      el.addEventListener('click', fn)
+    } else {
+      el.removeEventListener('click', fn)
+    }
+  }
+}
 
 // Add event handler to gps icon to remove blink class
 // on animation completion
@@ -53,10 +72,31 @@ navigator.geolocation.watchPosition(geolocated, geolocateFailure, {
   enableHighAccuracy: true
 })
 
+// Perform certain actions when document becomes visible
+// or hidden (e.g. screen turned off or app minimised).
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    console.log('hidden')
+    if (recording) {
+      // If currently recording, stop.
+      stopRecording()
+    }
+    // Unset isGeolocated flag so that when screen is re-activated
+    // user can't make record until GPS location updated.
+    isGeolocated = false
+    //document.getElementById("gps-rec-record").removeEventListener('touchstart', startRecording)
+    addRemoveClickTouchEvent(document.getElementById("gps-rec-record"), startRecording, false)
+    document.getElementById("gps-rec-record").src = "images/record-grey.png"
+  } else {
+    console.log('shown')
+  }
+})
+
 function geolocated(position) {
   if (!isGeolocated) {
     // First time in
-    document.getElementById("gps-rec-record").addEventListener('click', startRecording)
+    //document.getElementById("gps-rec-record").addEventListener('touchstart', startRecording)
+    addRemoveClickTouchEvent(document.getElementById("gps-rec-record"), startRecording, true)
     document.getElementById("gps-rec-record").src = "images/record-green.png"
     isGeolocated = true
   }
@@ -108,7 +148,6 @@ function geolocateFailure(err) {
 async function startRecording() {
 
   console.log('start recording')
-
   const stream = await  navigator.mediaDevices.getUserMedia({
     audio: {
       // Echo cancellation, if switched on, causes problems when
@@ -127,16 +166,21 @@ async function startRecording() {
   })
 
   const elMicrophone = document.getElementById("gps-rec-record")
-  elMicrophone.removeEventListener('click', startRecording)
+  //elMicrophone.removeEventListener('touchstart', startRecording)
+  addRemoveClickTouchEvent(elMicrophone, startRecording, false)
   await beep(600, 0.3) // Await ensures that beep won't be on playback
   mediaRecorder.start()
   elMicrophone.src = "images/record-red.png"
   elMicrophone.classList.add("flashing")
-  elMicrophone.addEventListener('click', stopRecording)
+  //elMicrophone.addEventListener('touchstart', stopRecording)
+  addRemoveClickTouchEvent(elMicrophone, stopRecording, true)
 
   const elBin = document.getElementById("gps-rec-bin")
   elBin.src = "images/bin-orange.png"
-  elBin.addEventListener('click', cancelRecording)
+  //elBin.addEventListener('touchstart', cancelRecording)
+  addRemoveClickTouchEvent(elBin, cancelRecording, true)
+
+  recording = true
 }
 
 async function stopRecording() {
@@ -160,28 +204,43 @@ async function stopRecording() {
       playback = null
       beep(600, 0.2)
       const elMicrophone = document.getElementById("gps-rec-record")
-      elMicrophone.removeEventListener('click', stopPlayback)
-      elMicrophone.src = "images/record-green.png"
+      //elMicrophone.removeEventListener('touchstart', stopPlayback)
+      addRemoveClickTouchEvent(elMicrophone, stopPlayback, false)
       elMicrophone.classList.remove("flashing")
-      elMicrophone.addEventListener('click', startRecording)
+      if (isGeolocated) {
+        elMicrophone.src = "images/record-green.png"
+        //elMicrophone.addEventListener('touchstart', startRecording)
+        addRemoveClickTouchEvent(elMicrophone, startRecording, true)
+      } else {
+        elMicrophone.src = "images/record-grey.png"
+      }
     }
   })
   mediaRecorder.stop()
   doubleBeep(600, 0.15)
   const elMicrophone = document.getElementById("gps-rec-record")
-  elMicrophone.removeEventListener('click', stopRecording)
+  //elMicrophone.removeEventListener('touchstart', stopRecording)
+  addRemoveClickTouchEvent(elMicrophone, stopRecording, false)
   elMicrophone.classList.remove("flashing")
   const elBin = document.getElementById("gps-rec-bin")
   elBin.src = "images/bin-grey.png"
-  elBin.removeEventListener('click', cancelRecording)
+  //elBin.removeEventListener('touchstart', cancelRecording)
+  addRemoveClickTouchEvent(elBin, cancelRecording, false)
   if (getOpt('automatic-playback') === "true") {
     elMicrophone.src = "images/playback-red-padded.png"
     elMicrophone.classList.add("flashing")
-    elMicrophone.addEventListener('click', stopPlayback)
+    //elMicrophone.addEventListener('touchstart', stopPlayback)
+    addRemoveClickTouchEvent(elMicrophone, stopPlayback, true)
   } else {
-    elMicrophone.src = "images/record-green.png"
-    elMicrophone.addEventListener('click', startRecording)
+    if (isGeolocated) {
+      elMicrophone.src = "images/record-green.png"
+      //elMicrophone.addEventListener('touchstart', startRecording)
+      addRemoveClickTouchEvent(elMicrophone, startRecording, true)
+    } else {
+      elMicrophone.src = "images/record-grey.png"
+    }
   }
+  recording = false
 }
 
 function stopPlayback() {
@@ -193,23 +252,35 @@ function stopPlayback() {
 
   beep(600, 0.2)
   const elMicrophone = document.getElementById("gps-rec-record")
-  elMicrophone.removeEventListener('click', stopPlayback)
-  elMicrophone.src = "images/record-green.png"
+  //elMicrophone.removeEventListener('touchstart', stopPlayback)
+  addRemoveClickTouchEvent(elMicrophone, stopPlayback, false)
   elMicrophone.classList.remove("flashing")
-  elMicrophone.addEventListener('click', startRecording)
+
+  if (isGeolocated) {
+    elMicrophone.src = "images/record-green.png"
+    //elMicrophone.addEventListener('touchstart', startRecording)
+    addRemoveClickTouchEvent(elMicrophone, startRecording, true)
+  } else {
+    elMicrophone.src = "images/record-grey.png"
+  }
 }
 
 function cancelRecording() {
   beep(450, 0.4)
   
   const elMicrophone = document.getElementById("gps-rec-record")
-  elMicrophone.removeEventListener('click', stopRecording)
+  //elMicrophone.removeEventListener('touchstart', stopRecording)
+  addRemoveClickTouchEvent(elMicrophone, stopRecording, false)
   elMicrophone.src = "images/record-green.png"
   elMicrophone.classList.remove("flashing")
   console.log('Add startRecording from cancelRecording')
-  elMicrophone.addEventListener('click', startRecording)
+  //elMicrophone.addEventListener('touchstart', startRecording)
+  addRemoveClickTouchEvent(elMicrophone, startRecording, true)
 
   const elBin = document.getElementById("gps-rec-bin")
   elBin.src = "images/bin-grey.png"
-  elBin.removeEventListener('click', cancelRecording)
+  //elBin.removeEventListener('touchstart', cancelRecording)
+  addRemoveClickTouchEvent(elBin, cancelRecording, false)
+
+  recording = false
 }
