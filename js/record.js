@@ -33,22 +33,29 @@ function handleMotion(event) {
 }
 //window.addEventListener('devicemotion', handleMotion)
 
+// document.getElementById("gps-rec-record").addEventListener('touchstart', (event) => {
+//     console.log(event.touches[0].clientX)
+// })
 
 function addRemoveClickTouchEvent(el, fn, add) {
-  const isTouch = 'touchstart' in document.documentElement
+  const isTouch = navigator.maxTouchPoints
   if (isTouch) {
     if (add) {
       el.addEventListener('touchstart', fn)
-      el.addEventListener('touchmove', fn)
+      //el.addEventListener('touchmove', fn)
+      //el.addEventListener('mousedown', fn)
     } else {
       el.removeEventListener('touchstart', fn)
-      el.removeEventListener('touchmove', fn)
+      //el.removeEventListener('touchmove', fn)
+      //el.removeEventListener('mousedown', fn)
     }
   } else {
     if (add) {
       el.addEventListener('click', fn)
+      //el.addEventListener('mousedown', fn)
     } else {
       el.removeEventListener('click', fn)
+      //el.removeEventListener('mousedown', fn)
     }
   }
 }
@@ -147,7 +154,11 @@ function geolocateFailure(err) {
   document.getElementById("gps-rec-msg").innerHTML = err.message
 }
 
-async function startRecording() {
+async function startRecording(e) {
+  //console.log(event.touches[0].clientX)
+  e.preventDefault()
+
+  console.log(e)
 
   console.log('start recording')
   const stream = await  navigator.mediaDevices.getUserMedia({
