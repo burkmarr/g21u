@@ -29,11 +29,12 @@ export async function displayTaxonMatches(e) {
   let customTaxa
   if (customTaxaCsv) {
     customTaxa = customTaxaCsv.filter(t => {
-      if (scientific) {
-        return t.scientific.toLowerCase().includes(this.value.toLowerCase())
-      } else {
-        return t.common.toLowerCase().includes(this.value.toLowerCase())
-      }
+      // if (scientific) {
+      //   return t.scientific.toLowerCase().includes(this.value.toLowerCase())
+      // } else {
+      //   return t.common.toLowerCase().includes(this.value.toLowerCase())
+      // }
+      return t.scientific.toLowerCase().includes(this.value.toLowerCase()) || t.common.toLowerCase().includes(this.value.toLowerCase())
     }).map(t => {
       return {
         name: t.scientific,
@@ -48,15 +49,16 @@ export async function displayTaxonMatches(e) {
   const ret = await fetch(nbnapi).then(data => data.json()).catch(e => Promise.resolve(null))
   let nbnTaxa
   if (ret) {
-    nbnTaxa = ret.autoCompleteList.filter(t => {
-      if (scientific) {
-        return t.scientificNameMatches.length > 0
-      } else {
-        // Sometimes commonNameMatches has zero length event when commonName
-        // matches the search term, so we can't just rely on t.commonNameMatches.length > 0
-        return t.commonNameMatches.length > 0 || (t.commonName && t.commonName.toLowerCase().includes(this.value.toLowerCase()))
-      }
-    })
+    // nbnTaxa = ret.autoCompleteList.filter(t => {
+    //   if (scientific) {
+    //     return t.scientificNameMatches.length > 0
+    //   } else {
+    //     // Sometimes commonNameMatches has zero length event when commonName
+    //     // matches the search term, so we can't just rely on t.commonNameMatches.length > 0
+    //     return t.commonNameMatches.length > 0 || (t.commonName && t.commonName.toLowerCase().includes(this.value.toLowerCase()))
+    //   }
+    // })
+    nbnTaxa = ret.autoCompleteList
   } else {
     nbnTaxa = []
   }
