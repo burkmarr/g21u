@@ -23,6 +23,9 @@ You can use the *Lat/lon* option to make records anywhere in the world (includin
 ### Default grid ref precision
 When sound files are recorded, they are named using a convention which retains maximal location precision (whether using the *OSGR* or *Lat/lon* spatial referencing). If you are using OS grid references to display and record locations, you can use this option to choose the default precision to use to make your records. Whatever option you choose, you can always change the precision of an individual record when editing it.
 
+### Show tetrad on recording screen
+Set this option toggle on if you would like to see your current tetrad on the recording screen.
+
 ### Zip downloaded records
 Set this option toggle on to zip record files (WAV files and associated record detail text files) together into a single file when downloading records. This is generally much more convenient than downloading individual files. It provides a convenient first step to sharing multiple records (e.g. when sending them to cloud storage to facilitate post-processing of records). There are browser limits on sharing multiple files (records) using *g21u*'s share feature and it is usually more convenient to download a zipped file of multiple records and then share this with cloud storage, e.g. by using the share feature of Andriod's *File* app.
 
