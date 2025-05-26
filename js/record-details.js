@@ -242,8 +242,9 @@ async function initRecordFields() {
     }
   })
   el('record-details').addEventListener('keydown', function (e) {
-    if (e.code === 'Tab') {
-      // Tab key pressed
+    if (e.code === 'Tab' || e.code === 'ArrowDown' || e.code === 'ArrowUp') {
+      // Tab or up/down arrow key pressed (Tab with shift means up, otherwise down)
+      const down = e.code === 'Tab' && !e.shiftKey || e.code === 'ArrowDown'
 
       // Determine whether a term-suggestion list is displayed
       const suggestionLists = document.getElementsByClassName('term-suggestions')
@@ -264,7 +265,7 @@ async function initRecordFields() {
         const listId = suggestionList.id
         const inputId = suggestionList.id.substring(0, suggestionList.id.length - 12) // remove '-suggestions' suffix
         if (e.target.id === inputId) {
-          // Move focus to the first element in the list
+          // Move focus to the first element in the list (regardless of key pressed)
           const first = document.querySelector(`#${listId} li:not(.hide)`)
           first.focus()
         } else {
@@ -273,7 +274,11 @@ async function initRecordFields() {
           let next
           for (let i=0; i<availableOpts.length-1; i++) {
             if (availableOpts[i].id === e.target.id) {
-              next = availableOpts[i+1]
+              if (down) {
+                next = availableOpts[i+1]
+              } else {
+                next = availableOpts[i-1]
+              }
               break
             }
           }
