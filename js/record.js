@@ -39,8 +39,10 @@ function addRemoveClickTouchEvent(el, fn, add) {
   if (isTouch) {
     if (add) {
       el.addEventListener('touchstart', fn)
+      el.addEventListener('touchmove', fn)
     } else {
       el.removeEventListener('touchstart', fn)
+      el.removeEventListener('touchmove', fn)
     }
   } else {
     if (add) {
