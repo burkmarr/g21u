@@ -2,7 +2,7 @@
 
 [Help index](/help.html?page=index)
 
-## v2.0.1 (29/05/2025)
+## v2.1.0 (29/05/2025)
 - Added optional display of current tetrad on recording screen (issue #4).
 - Added feature whereby a recording can be completed by turning off phone screen (issue #7).
 - Added cancel button on toolbar button selection dialogs (issue #8).
