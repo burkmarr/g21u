@@ -4,6 +4,13 @@
   font-size: 1.2em;
 }
 
+.opt-div {
+  padding: 0.3em;
+  /* border:1px dashed grey; */
+  margin-bottom: 0.5em;
+  background-color: rgb(230,230,230);
+}
+
 /* Option category titles */
 .opts-category {
   font-size: 1.3em;

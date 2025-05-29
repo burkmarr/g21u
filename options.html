@@ -17,102 +17,135 @@
 
     <div class="opts-category">Mode of operation</div>
     <hr/>
-    <div class="opts-label"><b>V1 emulation:</b> turn on to emulate 
-      version 1 which just produces sound files compatible with the old G21 desktop application.
-      To use version 2 - which replaces both the old G21 Android app <i>and</i> the 
-      old Gilbert 21 desktop application - leave this toggle off. For more information on version 2
-      see <a id="help-link">v2 documentation</a>.
+    <div class="opt-div">
+      <div class="opts-label"><b>V1 emulation:</b> turn on to emulate 
+        version 1 which just produces sound files compatible with the old G21 desktop application.
+        To use version 2 - which replaces both the old G21 Android app <i>and</i> the 
+        old Gilbert 21 desktop application - leave this toggle off. For more information on version 2
+        see <a id="help-link">v2 documentation</a>.
+      </div>
+      <!-- For some reason when the link href="/help.html?page=intro" was specified directly above,
+      the html extension was being stripped out when page rendered (at least from netlify) so the 
+      href is now set dynamically in page JS -->
+      <label class="switch">
+        <input id="emulate-v1" type="checkbox">
+        <span class="slider round"></span>
+      </label>
     </div>
-    <!-- For some reason when the link href="/help.html?page=intro" was specified directly above,
-     the html extension was being stripped out when page rendered (at least from netlify) so the 
-     href is now set dynamically in page JS -->
-    <label class="switch">
-      <input id="emulate-v1" type="checkbox">
-      <span class="slider round"></span>
-    </label>
 
     <div class="opts-category">File & geolocation handling</div>
     <hr/>
-    <div class="opts-label"><b>Geolocation format:</b> indicate whether sound records should 
-      use OSGR or lat/lon for geolocation. This also governs the file naming convention of new records.</div>
-    <select id="georef-format">
-      <option value="osgr">OSGR</option>
-      <option value="latlon">Lat/lon</option>
-    </select>
-    <div class="opts-label"><b>Default grid ref precision:</b> indicate the default precision
-      to use for grid references.</div>
-    <select id="georef-precision">
-      <option value="1">10 figure (1m)</option>
-      <option value="10">8 figure (10m)</option>
-      <option value="100">6 figure (100m)</option>
-      <option value="1000">Monad (1km)</option>
-      <option value="2000">Tetrad (2km)</option>
-      <option value="5000">Quadrant (5km)</option>
-      <option value="10000">Hectad (10km)</option>
-    </select>
-    <div class="opts-label"><b>Show tetrad on recording screen:</b> indicate whether or not you wish to show the current tetrad on the recording screen.</div>
-    <label class="switch">
-      <input id="show-tetrad" type="checkbox">
-      <span class="slider round"></span>
-    </label>
+    <div class="opt-div">
+      <div class="opts-label"><b>Geolocation format:</b> indicate whether sound records should 
+        use OSGR or lat/lon for geolocation. This also governs the file naming convention of new records.</div>
+      <select id="georef-format">
+        <option value="osgr">OSGR</option>
+        <option value="latlon">Lat/lon</option>
+      </select>
+    </div>
+    <div class="opt-div">
+      <div class="opts-label"><b>Default grid ref precision:</b> indicate the default precision
+        to use for grid references.</div>
+      <select id="georef-precision">
+        <option value="1">10 figure (1m)</option>
+        <option value="10">8 figure (10m)</option>
+        <option value="100">6 figure (100m)</option>
+        <option value="1000">Monad (1km)</option>
+        <option value="2000">Tetrad (2km)</option>
+        <option value="5000">Quadrant (5km)</option>
+        <option value="10000">Hectad (10km)</option>
+      </select>
+    </div>
+    <div class="opt-div">
+      <div class="opts-label"><b>Show tetrad on recording screen:</b> indicate whether or not you wish to show the current tetrad on the recording screen.</div>
+      <label class="switch">
+        <input id="show-tetrad" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="opt-div">
     <div class="opts-label"><b>Zip downloaded records:</b> indicate whether downloaded records should be zipped into a single file.</div>
-    <label class="switch">
-      <input id="zip-downloads" type="checkbox">
-      <span class="slider round"></span>
-    </label>
-    <div class="opts-label"><b>Reverse record sort order:</b> the default sort order is newest to older which is best in the
-      field, but not so good when processing records. If you set this toggle records will be sorted from oldest to newest.</div>
-    <label class="switch">
-      <input id="reverse-record-sort" type="checkbox">
-      <span class="slider round"></span>
-    </label>
-    <div class="opts-label"><b>Select first record:</b> always select first record in the list. It is useful to set this for 
-      use in the field to ensure that the last record you made is automatically selected (when <i>Reverse record sort order</i>
-      is not set). The default is for this to be unset in which case the previously selected record is reselected or, if this is not
-      available, the first record with no scientific name is selected - which is more useful when processing records.</div>
-    <label class="switch">
-      <input id="select-first-record" type="checkbox">
-      <span class="slider round"></span>
-    </label>
-    <div class="opts-label"><b>Storage:</b> indicate how files are to be handled & stored on device.</div>
-    <select id="file-handling">
-      <option value="download">Immediate download</option>
-      <option value="idb">IndexedDB</option>
-      <option value="opfs">Private origin file system</option>
-      <option value="native">Native file system</option>
-    </select>
-    <div class="opts-label"><b>Main folder:</b> for native file systems select a folder for g21u record files.</div>
-    <button id="main-browse-folder-button" class="opts-button">Browse folder</button><div id="main-native-folder"></div>
-    <div class="opts-label"><b>CSV folder:</b> for native file systems select a folder for CSV files. If none selected, CSV files will go to the main folder.</div>
-    <button id="csv-browse-folder-button" class="opts-button">Browse folder</button><div id="csv-native-folder"></div>
-    <div class="opts-label"><b>Archive folder:</b> for native file systems you can select a folder where g21u files can be archived instead of deleted.</div>
-    <button id="archive-browse-folder-button" class="opts-button">Browse folder</button><div id="archive-native-folder"></div>
+      <label class="switch">
+        <input id="zip-downloads" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="opt-div">
+      <div class="opts-label"><b>Reverse record sort order:</b> the default sort order is newest to older which is best in the
+        field, but not so good when processing records. If you set this toggle records will be sorted from oldest to newest.</div>
+      <label class="switch">
+        <input id="reverse-record-sort" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="opt-div">
+      <div class="opts-label"><b>Select first record:</b> always select first record in the list. It is useful to set this for 
+        use in the field to ensure that the last record you made is automatically selected (when <i>Reverse record sort order</i>
+        is not set). The default is for this to be unset in which case the previously selected record is reselected or, if this is not
+        available, the first record with no scientific name is selected - which is more useful when processing records.</div>
+      <label class="switch">
+        <input id="select-first-record" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="opt-div">
+      <div class="opts-label"><b>Storage:</b> indicate how files are to be handled & stored on device.</div>
+      <select id="file-handling">
+        <option value="download">Immediate download</option>
+        <option value="idb">IndexedDB</option>
+        <option value="opfs">Private origin file system</option>
+        <option value="native">Native file system</option>
+      </select>
+    </div>
+    <div class="opt-div">
+      <div class="opts-label"><b>Main folder:</b> for native file systems select a folder for g21u record files.</div>
+      <button id="main-browse-folder-button" class="opts-button">Browse folder</button><div id="main-native-folder"></div>
+    </div>
+    <div class="opt-div">
+      <div class="opts-label"><b>CSV folder:</b> for native file systems select a folder for CSV files. If none selected, CSV files will go to the main folder.</div>
+      <button id="csv-browse-folder-button" class="opts-button">Browse folder</button><div id="csv-native-folder"></div>
+    </div>
+    <div class="opt-div">
+      <div class="opts-label"><b>Archive folder:</b> for native file systems you can select a folder where g21u files can be archived instead of deleted.</div>
+      <button id="archive-browse-folder-button" class="opts-button">Browse folder</button><div id="archive-native-folder"></div>
+    </div>
     <div class="opts-category">Sound</div>
     <hr/>
-    <div class="opts-label"><b>Automatic playback:</b> indicate whether or not to automatically playback at end of recording.</div>
-    <label class="switch">
-      <input id="automatic-playback" type="checkbox">
-      <span class="slider round"></span>
-    </label>
-    <div class="opts-label"><b>Playback volume:</b> set volume level for recording playback.</div>
-    <input type="range" min="0" max="1" step="0.1" id="playback-volume">
-    <div class="opts-label"><b>Sounds signal volume:</b> set volume level for sound signals.</div>
-    <input type="range" min="0" max="1" step="0.1" id="beep-volume">
+    <div class="opt-div">
+      <div class="opts-label"><b>Automatic playback:</b> indicate whether or not to automatically playback at end of recording.</div>
+      <label class="switch">
+        <input id="automatic-playback" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="opt-div">
+      <div class="opts-label"><b>Playback volume:</b> set volume level for recording playback.</div>
+      <input type="range" min="0" max="1" step="0.1" id="playback-volume">
+    </div>
+    <div class="opt-div">
+      <div class="opts-label"><b>Sounds signal volume:</b> set volume level for sound signals.</div>
+      <input type="range" min="0" max="1" step="0.1" id="beep-volume">
+    </div>
 
     <div class="opts-category">Mapping options</div>
     <hr/>
-    <div class="opts-label"><b>OS API key:</b> specify an OS API key for additional mapping options.</div>
-    <input id="os-api-key" type="text" />
-    
+    <div class="opt-div">
+      <div class="opts-label"><b>OS API key:</b> specify an OS API key for additional mapping options.</div>
+      <input id="os-api-key" type="text" />
+    </div>
     <div class="opts-category">Record options</div>
     <hr/>
-    <div class="opts-label"><b>Default recorder:</b> specify the name of the default recorder.</div>
-    <input id="default-recorder" type="text" />
-    <div class="opts-label"><b>Default determiner:</b> specify the name of the default determiner.</div>
-    <input id="default-determiner" type="text" />
-
+    <div class="opt-div">
+      <div class="opts-label"><b>Default recorder:</b> specify the name of the default recorder.</div>
+      <input id="default-recorder" type="text" />
+    </div>
+    <div class="opt-div">
+      <div class="opts-label"><b>Default determiner:</b> specify the name of the default determiner.</div>
+      <input id="default-determiner" type="text" />
+    </div>
     <div class="opts-category">Record fields</div>
     <hr/>
+
     <div class="opts-label">
       A number of fields are available for recording information
       on the record details form and many of them are optional. 

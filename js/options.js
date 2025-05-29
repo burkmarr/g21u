@@ -198,7 +198,8 @@ function initFieldOptions() {
   const optionalIncluded = getOpt('optional-fields').split(' ')
 
   getFieldDefs({allfields: true}).forEach(f => {
-    const p = document.createElement('p')
+    const p = document.createElement('div')
+    p.classList.add('opt-div')
 
     const iRecordText = f.iRecord ? ` Corresponds to the iRecord input field <i>${f.iRecord}</i>.` : 'This field is not imported by iRecord.'
     const iRecordTerm = f.iRecord && f.inputType.startsWith('term-') ? `

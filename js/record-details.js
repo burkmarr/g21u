@@ -37,6 +37,10 @@ export async function initRecordDetails() {
 
 async function initRecordFields() {
 
+  //if (!customInputCsv) {
+  customInputCsv = await getCSV('custom-input.csv')
+  //}
+
   const parent = el('record-details')
 
   parent.innerHTML = `<h3 id="record-details-title"></h3>
@@ -163,8 +167,9 @@ async function initRecordFields() {
   save.addEventListener('click', saveRecord)
   ctrl.appendChild(save)
 
-  // Handling form focus on tab press
+  // Handling form focus on tab/enter press
   el('record-details').addEventListener('keypress', async function (e) {
+    //console.log('keypress target', e.target.id)
     if (e.code === 'Enter' && e.target.id === 'record-save-button') {
       // User has saved record - shift focus to next record button
       el('next-record').focus()
@@ -181,7 +186,6 @@ async function initRecordFields() {
       // If input field is grid ref or lat and the value is orig
       // then change the grid ref or lat/lon values to those originally recorded
       if (e.target.value === 'orig') {
-        console.log(e.target.id)
         if (e.target.id === 'gridref-input' || e.target.id === 'lat-input') {
           const defsWithDefaults = getFieldDefs({filename: getSs('selectedFile')}) 
           if (e.target.id === 'gridref-input') {
@@ -195,9 +199,6 @@ async function initRecordFields() {
       }
 
       // Check if input matches any custom input codes 
-      if (!customInputCsv) {
-        customInputCsv = await getCSV('custom-input.csv')
-      }
       let customInputMade = false
       if (customInputCsv) {
         let customInput = customInputCsv.filter(c => `${c.colin}-input` === e.target.id && c.valin === e.target.value)
@@ -213,10 +214,11 @@ async function initRecordFields() {
         })
         checkEditStatus()
       }
+
       if (customInputMade) {
         // If a custom input was made, shift the focus to the location field
         el('location-input').focus()
-      } else {
+      } else { 
         const currentInputIndex = fieldDefs.findIndex(f => f.inputId === e.target.id)
         let focussed = false
         for (let i = currentInputIndex+1; i<fieldDefs.length; i++) {
@@ -372,7 +374,7 @@ export async function getMetadata() {
     }
   }
 
-  const {quota, usage, usageDetails} = await navigator.storage.estimate()
+  //const {quota, usage, usageDetails} = await navigator.storage.estimate()
   // console.log('quota', quota)
   // console.log('usage', usage)
   // console.log('usageDetails', usageDetails)

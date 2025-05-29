@@ -196,7 +196,9 @@ function taxonSelected(e) {
   const scientific = innerDiv.children[0].innerText
   const common = innerDiv.children[2].innerText
   el('scientific-name-input').value = scientific
-  el('common-name-input').value = common
+  if (el('common-name-input')) {
+    el('common-name-input').value = common
+  }
   hideTaxonMatches()
   checkEditStatus()
   taxonDetails()
