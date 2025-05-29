@@ -1,4 +1,4 @@
-# CSV file management panel
+# Releases
 
 [Help index](/help.html?page=index)
 
