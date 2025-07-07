@@ -2,6 +2,9 @@
 
 [Help index](/help.html?page=index)
 
+## v2.1.1 (07/07/2025)
+- Added a fix for issue #17 (a rarely encountered problem).
+
 ## v2.1.0 (29/05/2025)
 - Added optional display of current tetrad on recording screen (issue #4).
 - Added feature whereby a recording can be completed by turning off phone screen (issue #7).

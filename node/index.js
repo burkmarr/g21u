@@ -31,14 +31,35 @@ export function wavMediaRecorder(stream) {
   return mediaRecorder
 }
 export function getGr(lon, lat, from, to, precisions) {
-  return getGrFromCoords(lon, lat, from, to, precisions)
+  let ret
+  try {
+    ret = getGrFromCoords(lon, lat, from, to, precisions)
+  } catch(err) {
+    ret = 'invalid'
+  }
+  //return getGrFromCoords(lon, lat, from, to, precisions)
+  return ret
 }
 export function getCent(gridref, proj) {
-  return getCentroid(gridref, proj)
+  let ret
+  try {
+    ret = getCentroid(gridref, proj)
+  } catch(err) {
+    ret = {centroid: [0, 0], proj: proj}
+  }
+  //return getCentroid(gridref, proj)
+  return ret
 }
 
 export function getSquare(gr) {
-  return getGjson(gr, 'wg', 'square', 1)
+  let ret
+  try {
+    ret = getGjson(gr, 'wg', 'square', 1)
+  } catch(err) {
+    ret = null
+  }
+  //return getGjson(gr, 'wg', 'square', 1)
+  return ret
 }
 
 export const idb = {

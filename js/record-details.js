@@ -466,7 +466,6 @@ export async function populateRecordFields() {
     // Get corresponding record JSON if it exists
     json = await getRecordJson(`${selectedFile}.txt`)
   }
-  
   getFieldDefs({filename: selectedFile}).forEach(f => {
     if (json) {
       el(f.inputId).value = json[f.jsonId]
@@ -505,7 +504,8 @@ export async function checkEditStatus() {
     const fld = el(f.inputId)
     fld.classList.remove('edited')
     fld.classList.remove('saved')
-    if (fld.value === fld.getAttribute('data-value')) {
+    if (fld.value === fld.getAttribute('data-value') ||
+      (fld.value === '' && fld.getAttribute('data-value') === 'null')) {
       fld.classList.add('saved')
     } else {
       fld.classList.add('edited')
