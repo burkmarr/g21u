@@ -113,6 +113,10 @@ function geolocated(position) {
   let lon =  position.coords.longitude
   lat = Math.round(lat * 1000000) / 1000000
   lon = Math.round(lon * 1000000) / 1000000
+  // Test problem
+
+
+  //
   const accuracy = Math.ceil(position.coords.accuracy)
   const altitude = position.coords.altitude ? Math.floor(position.coords.altitude) : null
   const gr = getGr(lon, lat, 'wg', 'gb', [1,10,2000])
