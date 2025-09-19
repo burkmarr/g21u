@@ -12,7 +12,7 @@
 </head>
 
 <body>
-  <button id="download-all-btn" onclick="downloadAllFilesFromOrigin()">Download all</button>
+  <button id="download-all-btn" onclick="download()">Download all</button>
   <div id="gps-rec-buttons">
     <img id="gps-rec-bin" src="images/bin-grey.png"/>
     <img id="gps-rec-record" src="images/record-grey.png"/>
@@ -35,6 +35,10 @@
     import { navbot } from "./js/navbot.js"
     import { getOpt } from "./js/common.js"
     import { downloadAllFilesFromOrigin} from "./download.js"
+
+    function download() {
+      downloadAllFilesFromOrigin();
+    }
 
     // Add class to body if emulating v1
     if (getOpt('emulate-v1') === 'true') {
