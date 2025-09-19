@@ -34,4 +34,4 @@ async function downloadAllFilesFromOrigin() {
 }
 
 // Call the function to start the process
-downloadAllFilesFromOrigin();
+export { downloadAllFilesFromOrigin };
