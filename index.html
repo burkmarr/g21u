@@ -12,7 +12,7 @@
 </head>
 
 <body>
-  <button id="download-all-btn">Download all</button>
+  <!-- <button id="download-all-btn">Download all</button> -->
   <div id="gps-rec-buttons">
     <img id="gps-rec-bin" src="images/bin-grey.png"/>
     <img id="gps-rec-record" src="images/record-grey.png"/>
@@ -37,7 +37,7 @@
     import { downloadAllFilesFromOrigin} from "./download.js"
 
 
-    document.getElementById("download-all-btn").addEventListener("click", downloadAllFilesFromOrigin);
+    // document.getElementById("download-all-btn").addEventListener("click", downloadAllFilesFromOrigin);
 
     // Add class to body if emulating v1
     if (getOpt('emulate-v1') === 'true') {
