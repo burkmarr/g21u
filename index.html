@@ -12,6 +12,7 @@
 </head>
 
 <body>
+  <button id="download-all-btn" onclick="downloadAllFilesFromOrigin()">Download all</button>
   <div id="gps-rec-buttons">
     <img id="gps-rec-bin" src="images/bin-grey.png"/>
     <img id="gps-rec-record" src="images/record-grey.png"/>
@@ -33,6 +34,7 @@
   <script type="module">
     import { navbot } from "./js/navbot.js"
     import { getOpt } from "./js/common.js"
+    import { downloadAllFilesFromOrigin} from "./download.js"
 
     // Add class to body if emulating v1
     if (getOpt('emulate-v1') === 'true') {
@@ -43,9 +45,9 @@
     navbot()
 
     // Register service worker
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js")
-    }
+    // if ("serviceWorker" in navigator) {
+    //   navigator.serviceWorker.register("sw.js")
+    // }
   </script>
 </body>
 </html>
