@@ -141,8 +141,10 @@ export function detailsFromFilename(filename) {
   const sName = name.split('_')
   const date = `${sName[0].substring(8,10)}/${sName[0].substring(5,7)}/${sName[0].substring(0,4)}`
   const time = sName[1].replace(/-/g, ':')
+  let duplicationSuffix = '' // Indicates that file was duplicated in record details processsing
   let accuracy, altitude, gridref, lat, lon, location
   if (sName[sName.length-1].startsWith('d')) {
+    duplicationSuffix = sName[sName.length-1]
     sName.pop()
   }
   if (sName.length === 5) {
@@ -166,7 +168,7 @@ export function detailsFromFilename(filename) {
     const gr = getGr(Number(lon), Number(lat), 'wg', '', [1])
     gridref = gr.p1
   }
-  // If files have been duplidated, e.g. by multipled
+  // If files have been duplicated by operating system, e.g. by multiple
   // shares to same folder in Windows they can have a
   // suffix to indicate the duplicate number, e.g.
   // '<filename> (1).txt'. So on split this gets
@@ -185,7 +187,8 @@ export function detailsFromFilename(filename) {
     longitude: String(lon),
     location: location,
     accuracy: accuracy,
-    altitude: altitude
+    altitude: altitude,
+    duplicationSuffix: duplicationSuffix
   }
 }
 

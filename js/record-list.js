@@ -31,6 +31,7 @@ export async function initialiseList() {
   }
 
   storRecs = storRecs.sort((a,b) => {
+
     // Sort on date first and then time
     let comparison = 0
     if (a.date > b.date) {
@@ -41,14 +42,31 @@ export async function initialiseList() {
     if (comparison === 0) {
       // If record does not have time, then use
       // file time instead.
-      const aTime = a.time ? a.time : detailsFromFilename(a.filename).time
-      const bTime = b.time ? b.time : detailsFromFilename(b.filename).time
+      //const aTime = a.time ? a.time : detailsFromFilename(a.filename).time
+      //const bTime = b.time ? b.time : detailsFromFilename(b.filename).time
+      const aTime = detailsFromFilename(a.filename).time
+      const bTime = detailsFromFilename(b.filename).time
 
       if (aTime > bTime) {
         comparison = -1
       } else if (aTime < bTime) {
         comparison = 1
       } 
+    }
+    if (comparison === 0) {
+      // Date and time is the same, so this must be a record
+      // created by duplication. Ensure that they are shown
+      // in the order they were created.
+       
+      const aSuf = detailsFromFilename(a.filename).duplicationSuffix
+      const bSuf = detailsFromFilename(b.filename).duplicationSuffix
+      if (aSuf === '') {
+        comparison = 1
+      } else if (bSuf > aSuf) {
+        comparison = 1
+      } else {
+        comparison = -1
+      }
     }
     const reverse = getOpt('reverse-record-sort') === 'true'
     if (comparison && reverse) comparison = -comparison
@@ -632,6 +650,9 @@ function recordChecked(e) {
 
 async function recordSelected(target) {
   const currentSelected = document.getElementsByClassName("record-selected")[0]
+
+  console.log('Record selected', target.getAttribute('data-file-name'))
+
   if(currentSelected.getAttribute('data-file-name') !== target.getAttribute('data-file-name')) {
     currentSelected.classList.remove("record-selected")
     target.classList.add("record-selected")
