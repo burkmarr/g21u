@@ -65,7 +65,7 @@ export async function initialiseList() {
       const bSuf = detailsFromFilename(b.filename).duplicationSuffix
       if (aSuf === '') {
         comparison = 1
-      } else if (bSuf > aSuf) {
+      } else if (Number(bSuf.slice(1)) > Number(aSuf.slice(1))) {
         comparison = 1
       } else {
         comparison = -1
@@ -667,6 +667,7 @@ async function recordSelected(target) {
     target.classList.add("record-selected")
     target.focus()
     setSs( 'selectedFile', target.getAttribute('data-file-name'))
+    console.log('Selected file set to', getSs('selectedFile'))
     await setTemplate()
     await generateRecordFields()
     await populateRecordFields()

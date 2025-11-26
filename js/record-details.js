@@ -523,7 +523,7 @@ export async function populateRecordFields() {
   console.log("Template for populating record fields:", el('template-select').value)
   getFieldDefs({filename: selectedFile, template: el('template-select').value}).forEach(f => {
     if (json) {
-      console.log('Populating field', f.inputId, 'with value', json[f.jsonId])
+      //console.log('Populating field', f.inputId, 'with value', json[f.jsonId])
       el(f.inputId).value = json[f.jsonId]
       el(f.inputId).setAttribute('data-value', json[f.jsonId])
     } else {
@@ -574,7 +574,7 @@ export async function checkEditStatus() {
   // pendingEdits is a global that can be queried elsewhere
   pendingEdits = false
   getFieldDefs({template: el('template-select').value}).forEach(f => {
-    console.log ('Checking edit status for', f.inputId)
+    //console.log ('Checking edit status for', f.inputId)
     const fld = el(f.inputId)
     fld.classList.remove('edited')
     fld.classList.remove('saved')
