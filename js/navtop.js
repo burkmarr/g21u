@@ -378,3 +378,12 @@ function groupButtonSelected(e) {
   // Now run the button function (pass an argument that mimics event so button can be identified)
   const fn = navs.find(n => n.id === chosen).fn({target: {id: chosen}})
 }
+
+export function enableDisableNavTop(disable) {
+  const navtop = document.getElementById('navtop')
+  if (disable) {
+    navtop.classList.add('disabled-div')
+  } else {
+    navtop.classList.remove('disabled-div')
+  }
+}

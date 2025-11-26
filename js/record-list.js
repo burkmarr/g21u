@@ -8,6 +8,7 @@ import { el, getOpt, detailsFromFilename, getSs, setSs, generalMessage, deleteCo
 import { playBlob } from './play.js'
 import { populateRecordFields, editsPending } from './record-details.js'
 import { download, share, csv } from './svg-icons.js'
+import { enableDisableNavTop } from './navtop.js'
 
 let storRecs, audioPlayers = {}
 
@@ -44,6 +45,9 @@ export async function initialiseList() {
       // file time instead.
       //const aTime = a.time ? a.time : detailsFromFilename(a.filename).time
       //const bTime = b.time ? b.time : detailsFromFilename(b.filename).time
+      // Changed on 2025-01-15 to always use file time because record time
+      // does not includes seconds so records created within same minute
+      // are not sorted correctly.
       const aTime = detailsFromFilename(a.filename).time
       const bTime = detailsFromFilename(b.filename).time
 
@@ -94,7 +98,11 @@ export async function initialiseList() {
   el('record-list').innerHTML = ''
 
   let selectedFileDiv
+
+  createProgressBar(storRecs.length, "Regenerating record list...")
+
   for (let i=0; i<storRecs.length; i++) {
+    updateProgressBar(i+1)
     const name = storRecs[i].filename
     // Create div
     const fileDiv = document.createElement('div')
@@ -186,7 +194,10 @@ export async function initialiseList() {
     // so doing it here at end which seems to work.
     setRecordContent(name, storRecs[i])
   }
+  closeProgressBar()
   selectedFileDiv.focus()
+
+  console.log ('Record list initialised')
 }
 
 export async function setRecordContent(filename, rec) {
@@ -612,9 +623,9 @@ export async function csvConfirmCancel(e) {
     if (destination !== 'new') {
       const tmpMerge = `g21-recs-${getDateTime()}-tmp.csv`
       await mergeCsvs([newCsv, destination], tmpMerge)
-      console.log('merged')
+      //console.log('merged')
       await storDeleteFiles([newCsv, destination])
-      console.log('deleted')
+      //console.log('deleted')
       // There is an intermittent bug when doing the rename
       // NotAllowedError: Failed to execute 'move' on 'FileSystemFileHandle': The request 
       // is not allowed by the user agent or the platform in the current context.
@@ -622,7 +633,7 @@ export async function csvConfirmCancel(e) {
       // in CSV management. Difference is that in that case, the two files already exist.
       // Disabling form now.
       await storRenameFile(tmpMerge, destination)
-      console.log('renamed')
+      //console.log('renamed')
     }
     await initialiseList()
   }
@@ -651,7 +662,7 @@ function recordChecked(e) {
 async function recordSelected(target) {
   const currentSelected = document.getElementsByClassName("record-selected")[0]
 
-  console.log('Record selected', target.getAttribute('data-file-name'))
+  //console.log('Record selected', target.getAttribute('data-file-name'))
 
   if(currentSelected.getAttribute('data-file-name') !== target.getAttribute('data-file-name')) {
     currentSelected.classList.remove("record-selected")
@@ -713,13 +724,13 @@ export async function moveSelected(backward) {
 
 export function deleteConfirmCheckboxInit () {
  
-  console.log(e.target.checked)
+  //console.log(e.target.checked)
   el('delete-archive-records').innerText = e.target.checked ? 'delete' : 'archive'
 }
 
 export function deleteConfirmCheckboxChanged (e) {
  
-  console.log(e.target.checked)
+  //console.log(e.target.checked)
   el('delete-archive-records').innerText = e.target.checked ? 'delete' : 'archive'
 }
 

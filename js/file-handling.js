@@ -213,7 +213,7 @@ export async function storGetRecs () {
         // in order to set progress bar.
         ++iCount
       }
-      createProgressBar(iCount, "Getting/upating record details...")
+      createProgressBar(iCount, "Getting/updating record details...")
       ofpsEntries = storRoot.values()
       iCount=0
       for await (const entry of ofpsEntries) {
@@ -242,7 +242,7 @@ export async function storGetRecs () {
       break
     case 'idb':
       const idbKeys = await idb.keys()
-      createProgressBar(idbKeys.length, "Getting/upating record details...")
+      createProgressBar(idbKeys.length, "Getting/updating record details...")
       for (const key of idbKeys) {
         updateProgressBar(++iCount)
         const ext = key.substring(key.length - 4)
@@ -303,7 +303,7 @@ export async function storGetRecs () {
             // in order to set progress bar.
             ++iCount
           }
-          createProgressBar(iCount, "Getting/upating record details...")
+          createProgressBar(iCount, "Getting/updating record details...")
           nativeEntries = dirHandle.values()
           iCount=0
           for await (const entry of nativeEntries) {
