@@ -296,3 +296,6 @@ body:not(.small-edit) #record-details {
 #template-select {
   margin-left: 1em;
 }
+#template-select.hide {
+  display: none;
+}

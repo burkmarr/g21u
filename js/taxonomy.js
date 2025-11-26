@@ -5,7 +5,9 @@ import { checkEditStatus } from './record-details.js'
 let customTaxaCsv
 
 export async function hideTaxonMatches() {
-  el('scientific-name-input-suggestions').classList.add('hide')
+  if (el('scientific-name-input-suggestions')) {
+    el('scientific-name-input-suggestions').classList.add('hide')
+  }
   if (el('common-name-input-suggestions')) {
     el('common-name-input-suggestions').classList.add('hide')
   }
@@ -96,7 +98,7 @@ export async function displayTaxonMatches(e) {
 export async function taxonDetails() {
 
   const selectedFile = getSs('selectedFile')
-  const scientific = el('scientific-name-input').value
+  const scientific = el('scientific-name-input') ? el('scientific-name-input').value : null
   let noDataText
   if (!selectedFile) {
     noDataText = '- no record selected'

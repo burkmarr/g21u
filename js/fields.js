@@ -1,11 +1,13 @@
 import { getOpt, dateFromString, grChangePrecision, detailsFromFilename } from './common.js'
-import { storFileExists, getCSV } from './file-handling.js'
+import { storFileExists, getCSV, getRecordJson } from './file-handling.js'
 
 let locations
+const customTemplatesCsv = await getCSV('custom-templates.csv')
 
 export function getFieldDefs({
   filename = null,
-  allfields = false
+  allfields = false,
+  template = 'default'
 } = {}) {
   // Filename can be null - only affects default values
   // for some fields.
@@ -23,7 +25,8 @@ export function getFieldDefs({
       novalue: '',
       optional: false,
       forDuplication: true,
-      info: `Name of the person that made the record.`
+      info: `Name of the person that made the record.`,
+      templates: ['default']
     },
     {
       inputId: 'determiner-name-input',
@@ -35,7 +38,8 @@ export function getFieldDefs({
       novalue: '',
       optional: true,
       forDuplication: true,
-      info: `Name of the person who identified the taxon.`
+      info: `Name of the person who identified the taxon.`,
+      templates: ['default']
     },
     {
       inputId: 'record-date-input',
@@ -47,7 +51,8 @@ export function getFieldDefs({
       novalue: '',
       optional: false,
       forDuplication: true,
-      info: `Date on which the record was made.`
+      info: `Date on which the record was made.`,
+      templates: ['all']
     },
     {
       inputId: 'record-time-input',
@@ -59,7 +64,8 @@ export function getFieldDefs({
       novalue: '00:00',
       optional: true,
       forDuplication: true,
-      info: `Time at which the record was made.`
+      info: `Time at which the record was made.`,
+      templates: ['default']
     },
     {
       inputId: 'scientific-name-input',
@@ -70,7 +76,8 @@ export function getFieldDefs({
       default: '',
       novalue: '',
       optional: false,
-      info: `Scientific name of the recorded taxon. Suggested names are supplied by the NBN species search API (and optionally, your own list). `
+      info: `Scientific name of the recorded taxon. Suggested names are supplied by the NBN species search API (and optionally, your own list). `,
+      templates: ['default']
     },
     {
       inputId: 'common-name-input',
@@ -81,7 +88,8 @@ export function getFieldDefs({
       default: '',
       novalue: '',
       optional: true,
-      info: `Common (vernacular) name of the recorded taxon.  Suggested names are supplied by the NBN species search API (and optionally, your own list). `
+      info: `Common (vernacular) name of the recorded taxon.  Suggested names are supplied by the NBN species search API (and optionally, your own list). `,
+      templates: ['default']
     },
     {
       inputId: 'certainty-input',
@@ -92,7 +100,8 @@ export function getFieldDefs({
       default: '',
       novalue: '',
       optional: true,
-      info: `Certainty of taxon identification.`
+      info: `Certainty of taxon identification.`,
+      templates: ['default']
     },
     {
       inputId: 'idref-input',
@@ -103,7 +112,8 @@ export function getFieldDefs({
       default: '',
       novalue: '',
       optional: true,
-      info: `You can use this field to indicate a reference to any identification sources used.`
+      info: `You can use this field to indicate a reference to any identification sources used.`,
+      templates: ['default']
     },
     {
       inputId: 'birdbreed-input',
@@ -114,7 +124,8 @@ export function getFieldDefs({
       default: 'not recorded',
       novalue: '',
       optional: true,
-      info: `Stage of recorded taxon.`
+      info: `Stage of recorded taxon.`,
+      templates: ['default']
     },
     {
       inputId: 'stage-input',
@@ -125,7 +136,8 @@ export function getFieldDefs({
       default: 'not recorded',
       novalue: '',
       optional: true,
-      info: `Stage of recorded taxon.`
+      info: `Stage of recorded taxon.`,
+      templates: ['default']
     },
     {
       inputId: 'sex-input',
@@ -136,7 +148,8 @@ export function getFieldDefs({
       default: 'not recorded',
       novalue: '',
       optional: true,
-      info: `Sex of recorded taxon.`
+      info: `Sex of recorded taxon.`,
+      templates: ['default']
     },
 
     {
@@ -149,7 +162,8 @@ export function getFieldDefs({
       novalue: '',
       optional: true,
       info: `The quantity of the recorded taxon. This could be a number or some other
-        quantity specification such as used in the DAFOR scale, or free text.`
+        quantity specification such as used in the DAFOR scale, or free text.`,
+      templates: ['default']
     },
     
     {
@@ -163,7 +177,8 @@ export function getFieldDefs({
       optional: true,
       info: `Recording method. If you are planning to import to iRecord
         and want to use a term that's not in the list, use the <i>Recording method</i>
-        field instead.`
+        field instead.`,
+      templates: ['default']
     },
     {
       inputId: 'method-input',
@@ -175,7 +190,8 @@ export function getFieldDefs({
       novalue: '',
       optional: true,
       info: `Free text recording method. If you are planning to import to iRecord
-        it is better to use a term from <i>Observation type</i> if one matches.`
+        it is better to use a term from <i>Observation type</i> if one matches.`,
+      templates: ['default']
     },
     {
       inputId: 'idtype-input',
@@ -186,7 +202,8 @@ export function getFieldDefs({
       default: '',
       novalue: '',
       optional: true,
-      info: `You can used this to provide information on whether an insect specimen was exmined.`
+      info: `You can used this to provide information on whether an insect specimen was exmined.`,
+      templates: ['default']
     },
     {
       inputId: 'specimen-input',
@@ -197,7 +214,8 @@ export function getFieldDefs({
       default: '',
       novalue: '',
       optional: true,
-      info: `You can used this to provide information on whether a specimen was retained or not.`
+      info: `You can used this to provide information on whether a specimen was retained or not.`,
+      templates: ['default']
     },
     {
       inputId: 'habitat-input',
@@ -209,7 +227,8 @@ export function getFieldDefs({
       novalue: '',
       optional: true,
       forDuplication: true,
-      info: `Habitat in which record was made.`
+      info: `Habitat in which record was made.`,
+      templates: ['default']
     },
     {
       inputId: 'gridref-input',
@@ -222,7 +241,8 @@ export function getFieldDefs({
       optional: false,
       forDuplication: true,
       info: `OSGB grid reference for record location. Either grid reference or lat/lon is required. Which is used depends
-        upon your selection in the <i>File & geolocation handling</i> section.`
+        upon your selection in the <i>File & geolocation handling</i> section.`,
+      templates: ['all']
     },
     {
       inputId: 'lat-input',
@@ -235,7 +255,8 @@ export function getFieldDefs({
       optional: false,
       forDuplication: true,
       info: `Latitude for record location. Either grid reference or lat/lon is required. Which is used depends
-        upon your selection in the <i>File & geolocation handling</i> section.`
+        upon your selection in the <i>File & geolocation handling</i> section.`,
+      templates: ['all']
     },
     {
       inputId: 'lon-input',
@@ -248,7 +269,8 @@ export function getFieldDefs({
       optional: false,
       forDuplication: true,
       info: `Longitude for record location. Either grid reference or lat/lon is required. Which is used depends
-        upon your selection in the <i>File & geolocation handling</i> section.`
+        upon your selection in the <i>File & geolocation handling</i> section.`,
+      templates: ['all']
     },
     {
       inputId: 'location-input',
@@ -260,7 +282,8 @@ export function getFieldDefs({
       novalue: '',
       optional: false,
       forDuplication: true,
-      info: `Location name for record.`
+      info: `Location name for record.`,
+      templates: ['default']
     },
     {
       inputId: 'comment-input',
@@ -272,10 +295,23 @@ export function getFieldDefs({
       novalue: '',
       optional: true,
       forDuplication: true,
-      info: `Free form comment for record.`
+      info: `Free form comment for record.`,
+      templates: ['default']
     },
   ]
 
+  // If the custom-templates.csv files exists, then enrich the fieldDefs
+  // templates arrays with any templates that use the field
+  if(customTemplatesCsv && customTemplatesCsv.length > 0) {
+    customTemplatesCsv.forEach(t => {
+      const columnIds = t['core-column-ids'].split(' ')
+      fieldDefs.forEach(fd => {
+        if (columnIds.find(id => id === fd.jsonId)) {
+          fd.templates.push(t.template.toLowerCase().replace(/\s+/g, '-'))
+        }
+      })
+    })
+  }
 
   if (allfields) {
     return fieldDefs
@@ -297,6 +333,10 @@ export function getFieldDefs({
       // Filter on optional fields inclusion
       const optionalIncluded = getOpt('optional-fields').split(' ')
       if (fd.optional && !getOpt('optional-fields').split(' ').includes(fd.jsonId)) {
+        ret = false
+      }
+      // Filter on template
+      if (fd.templates[0] !== 'all' && !fd.templates.includes(template)) {
         ret = false
       }
       return ret

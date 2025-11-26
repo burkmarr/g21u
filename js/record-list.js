@@ -6,9 +6,8 @@ import { getFieldDefs } from './fields.js'
 import { el, getOpt, detailsFromFilename, getSs, setSs, generalMessage, deleteConfirm, flash, 
   createProgressBar, closeProgressBar, updateProgressBar, getDateTime } from './common.js'
 import { playBlob } from './play.js'
-import { populateRecordFields, editsPending } from './record-details.js'
+import { populateRecordFields, generateRecordFields, editsPending, setTemplate } from './record-details.js'
 import { download, share, csv } from './svg-icons.js'
-import { enableDisableNavTop } from './navtop.js'
 
 let storRecs, audioPlayers = {}
 
@@ -196,7 +195,6 @@ export async function initialiseList() {
   }
   closeProgressBar()
   selectedFileDiv.focus()
-
   console.log ('Record list initialised')
 }
 
@@ -669,6 +667,8 @@ async function recordSelected(target) {
     target.classList.add("record-selected")
     target.focus()
     setSs( 'selectedFile', target.getAttribute('data-file-name'))
+    await setTemplate()
+    await generateRecordFields()
     await populateRecordFields()
   }
 }
