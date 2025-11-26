@@ -37,9 +37,7 @@ export async function initRecordDetails() {
 
 async function initRecordFields() {
 
-  //if (!customInputCsv) {
   customInputCsv = await getCSV('custom-input.csv')
-  //}
 
   const parent = el('record-details')
 
@@ -48,6 +46,9 @@ async function initRecordFields() {
       <button id="record-details-playback-button"><img id="record-details-playback-image"></button>
       <button id="record-details-pause-button" disabled>Pause</button>
       <button id="record-duplicate">Duplicate</button>
+      <select id="template-select">
+        <option value="default">Biological record</option>
+      </select>
     </div>
   `
   setSs('prevSelectedFile', null)

@@ -292,3 +292,7 @@ body:not(.small-edit) #record-details {
   font-size: 0.8em;
   color: grey;
 }
+
+#template-select {
+  margin-left: 1em;
+}
