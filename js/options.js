@@ -208,7 +208,7 @@ function initFieldOptions() {
       own. (Don't enter your own term if planning to import to iRecord.)` : ''
     const mandatory = f.optional ? '' : ' <b>This field must be included</b> - you cannot switch it off.'
     p.innerHTML = `
-      <b>${f.inputLabel}</b>. ${f.info}${iRecordTerm}${iRecordText}${mandatory} (jsonId: <i>${f.jsonId}</i>)
+      <b>${f.inputLabel}</b>. ${f.info}${iRecordTerm}${iRecordText}${mandatory} (Column id: <i>${f.jsonId}</i>)
     `
     el('record-fields').appendChild(p)
 
