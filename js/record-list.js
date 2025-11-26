@@ -1,6 +1,6 @@
 import { storGetRecs, storDeleteFiles, storArchiveFiles, storSaveFile, downloadFile, 
   storFileExists, storGetFile, getRecordJson, shareRecs, recsToCsv, downloadBlob, storGetCsvs,
-  mergeCsvs, storRenameFile
+  mergeCsvs, storRenameFile, getCSV
 } from './file-handling.js'
 import { getFieldDefs } from './fields.js'
 import { el, getOpt, detailsFromFilename, getSs, setSs, generalMessage, deleteConfirm, flash, 
@@ -10,6 +10,7 @@ import { populateRecordFields, generateRecordFields, editsPending, setTemplate }
 import { download, share, csv } from './svg-icons.js'
 
 let storRecs, audioPlayers = {}
+const customTemplatesCsv = await getCSV('custom-templates.csv')
 
 export async function initialiseList() {
 
@@ -224,7 +225,13 @@ export async function setRecordContent(filename, rec) {
     html = buildText(html, `${details.longitude}/${details.latitude}`, '<br/>')
   }
   if (getOpt('emulate-v1') !== 'true') {
-    html = buildText(html, `<i>${details['scientific-name']}</i>`, '<br/>')
+    let headline
+    if (!details.metadata.template) {
+      headline = details['scientific-name']
+    } else {
+      headline = customTemplatesCsv.find(t => t.template.toLowerCase().replace(/\s/g, '') === details.metadata.template).template
+    }
+    html = buildText(html, `<i>${headline}</i>`, '<br/>')
   }
   el(`rec-text-${filename}`).innerHTML = html
 
