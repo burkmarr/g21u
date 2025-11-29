@@ -522,7 +522,7 @@ export async function populateRecordFields() {
   }
   console.log("Template for populating record fields:", el('template-select').value)
   getFieldDefs({filename: selectedFile, template: el('template-select').value}).forEach(f => {
-    if (json) {
+    if (json && json[f.jsonId] !== undefined ) {
       //console.log('Populating field', f.inputId, 'with value', json[f.jsonId])
       el(f.inputId).value = json[f.jsonId]
       el(f.inputId).setAttribute('data-value', json[f.jsonId])

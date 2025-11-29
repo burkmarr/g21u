@@ -3,6 +3,7 @@ import { storFileExists, getCSV, getRecordJson } from './file-handling.js'
 
 let locations
 const customTemplatesCsv = await getCSV('custom-templates.csv')
+const customFieldsCsv = await getCSV('custom-fields.csv')
 
 export function getFieldDefs({
   filename = null,
@@ -13,7 +14,6 @@ export function getFieldDefs({
   // for some fields.
   const filenameDetails = filename ? detailsFromFilename(filename) : null
 
-  //console.log('filenameDetails', filenameDetails) 
   const fieldDefs =  [
     {
       inputId: 'recorder-name-input',
@@ -67,6 +67,7 @@ export function getFieldDefs({
       info: `Time at which the record was made.`,
       templates: ['default']
     },
+    // This is the point at which custom fields will be inserted
     {
       inputId: 'scientific-name-input',
       inputType: 'taxon',
@@ -300,6 +301,38 @@ export function getFieldDefs({
     },
   ]
 
+  // If a custom field template is defined, then create any required custom fields
+  let customFields = []
+  if (customFieldsCsv) {
+    customFields = customFieldsCsv.map(cf => {
+
+      const templates = customTemplatesCsv ? customTemplatesCsv.filter(t => {
+        const ids = t['custom-column-ids'].split(' ')
+        return ids.find(cid => cid === cf['custom-column-id'])
+      }).map(t => t.template.toLowerCase().replace(/\s+/g, '-')) : []
+
+      return {
+        inputId: `${cf['custom-column-id']}-input`,
+        inputType: cf['type'] === 'term' ? `term-${cf['custom-column-id']}` : cf['type'],
+        inputLabel: cf['label'],
+        jsonId: cf['custom-column-id'],
+        iRecord: null,
+        default: cf.default ? cf.default : '',
+        novalue: cf.default ? cf.default : '',
+        optional: false,
+        info: '',
+        templates: templates
+      }
+    })
+  }
+  // Insert custom fields before scientific name field
+  if (customFields.length > 0) {
+    const sciNameIndex = fieldDefs.findIndex(fd => fd.jsonId === 'scientific-name') 
+    fieldDefs.splice(sciNameIndex, 0, ...customFields)
+  }
+
+  //console.log ('fieldDefs', fieldDefs)
+  
   // If the custom-templates.csv files exists, then enrich the fieldDefs
   // templates arrays with any templates that use the field
   if(customTemplatesCsv && customTemplatesCsv.length > 0) {
@@ -445,6 +478,15 @@ export async function getTermList(term) {
       'Yes'
     ]
   }
+
+  // If a custom field template is defined, then add custom termlists
+  if (customFieldsCsv) {
+    customFieldsCsv.filter(cf => cf.type === 'term').forEach(cf => {
+      terms[cf['custom-column-id']] = cf.data.split(',').map(t => t.trim())
+    })
+  }
+
+  console.log('terms', terms)
 
   if (termId === 'location') {
     // Special behaviour for location termlist
