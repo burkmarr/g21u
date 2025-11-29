@@ -40,7 +40,7 @@ async function initRecordFields() {
   customInputCsv = await getCSV('custom-input.csv')
   const customTemplatesCsv = await getCSV('custom-templates.csv')
 
-  console.log('Custom templates loaded:', customTemplatesCsv)
+  //console.log('Custom templates loaded:', customTemplatesCsv)
 
   const parent = el('record-details')
 
@@ -520,7 +520,7 @@ export async function populateRecordFields() {
     // Get corresponding record JSON if it exists
     json = await getRecordJson(`${selectedFile}.txt`)
   }
-  console.log("Template for populating record fields:", el('template-select').value)
+  //console.log("Template for populating record fields:", el('template-select').value)
   getFieldDefs({filename: selectedFile, template: el('template-select').value}).forEach(f => {
     if (json && json[f.jsonId] !== undefined ) {
       //console.log('Populating field', f.inputId, 'with value', json[f.jsonId])

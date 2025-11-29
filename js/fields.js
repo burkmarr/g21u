@@ -486,7 +486,7 @@ export async function getTermList(term) {
     })
   }
 
-  console.log('terms', terms)
+  //console.log('terms', terms)
 
   if (termId === 'location') {
     // Special behaviour for location termlist

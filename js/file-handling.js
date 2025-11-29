@@ -575,7 +575,7 @@ export async function mergeCsvs(files, name) {
   closeProgressBar()
 }
 
-export async function recsToCsv(recs) {
+export async function recsToCsvOld(recs) {
 
   createProgressBar(recs.length, "Creating CSV from records...")
 
@@ -617,12 +617,53 @@ export async function recsToCsv(recs) {
   return newName
 }
 
-export async function appendRecsToCsv(recs, csvFile) {
-  console.log('append', recs, csvFile)
+export async function recsToCsv(recs) {
 
-  // Create a temporary CSV from recs
-  // Merge with selected CSV
-  // 
+  createProgressBar(recs.length, "Creating CSV from records...")
+
+  const csvRecs = {}
+  const formattedDateTime = getDateTime(true)
+  const unformattedDateTime = getDateTime()
+  for (let i=0; i<recs.length; i++) {
+    updateProgressBar(i+1)
+    const name = recs[i]
+    const json = await getRecordJson(`${name}.txt`)
+    // Copy the record json object minus the metadata
+    // Only copy those fields that are being used by
+    // the user.
+    // Replace the field names (property keys) with the iRecord
+    // name if it exists, otherwise the caption name.
+    const cjson = {}
+    const template = json.metadata.template ? json.metadata.template : null
+    const fieldDefs = template ? getFieldDefs({template: template}) : getFieldDefs()
+    fieldDefs.forEach(f => {
+      const fldName = f.iRecord ? f.iRecord : f.inputLabel
+      cjson[fldName] = json[f.jsonId] ? json[f.jsonId] : ''
+    })
+    // Push the new json into array that will make the CSV
+    if (csvRecs[template ? template : 'biorec']) {
+      csvRecs[template ? template : 'biorec'].push(cjson)
+    } else {
+      csvRecs[template ? template : 'biorec'] = [cjson]
+    }
+
+    // Update record metadata
+    json.metadata.csvs.push(formattedDateTime)
+    const jsonString = JSON.stringify(json)
+    await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${name}.txt`)
+  }
+  const csvConfig = mkConfig({ 
+    useKeysAsHeaders: true 
+  })
+
+  Object.keys(csvRecs).forEach( async (template) => {
+    const csv = generateCsv(csvConfig)(csvRecs[template])
+    const blob = asBlob(csvConfig)(csv)
+    // The CSV file is given a name based on the current timestamp
+    const newName = `g21-recs-${template}-${unformattedDateTime}.csv`
+    await storSaveFile(blob, newName)
+  })
+  closeProgressBar()
 }
 
 export async function getRecordJson(filename) {

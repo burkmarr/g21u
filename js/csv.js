@@ -219,19 +219,16 @@ function csvRecDetails() {
     title.innerHTML = 'Record details <span class="header-note">for selected record</span>'
   }
 
+  console.log(selectedCsvRec)
   const recIndex = Number(selectedCsvRec.getAttribute('data-index'))
   const record = selectedCsvRecs[recIndex]
 
   const rows = []
-  const flds = getFieldDefs({allfields: true})
-  flds.forEach(f => {
-    const fld = f.iRecord ? f.iRecord : f.inputLabel
-    if (record.hasOwnProperty(fld)) {
-      rows.push({
-        caption: fld,
-        value: record[fld]
-      })
-    }
+  Object.keys(record).forEach(k => {
+    rows.push({
+      caption: k,
+      value: record[k]
+    })
   })
   keyValuePairTable('rec-details', rows, parent)
 }
