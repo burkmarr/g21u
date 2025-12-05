@@ -85,7 +85,7 @@ export async function initialiseList() {
     // reset it to the first record of default type
     // with no taxon name.
     // This is useful for when a record is deleted.
-    const firstNotEdited = storRecs.find(r => !r['scientific-name'] && !r.metadata.template)
+    const firstNotEdited = storRecs.find(r => !r['scientific-name'] && r.metadata.template === 'default')
     if (firstNotEdited) {
       // Select the first biological record without scientific name set 
       setSs('selectedFile', firstNotEdited.filename)
@@ -227,7 +227,7 @@ export async function setRecordContent(filename, rec) {
   }
   if (getOpt('emulate-v1') !== 'true') {
     let headline
-    if (!details.metadata.template) {
+    if (details.metadata.template === 'default') {
       headline = details['scientific-name']
     } else {
       headline = customTemplatesCsv.find(t => t.template.toLowerCase().replace(/\s/g, '-') === details.metadata.template).template

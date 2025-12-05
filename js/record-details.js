@@ -12,6 +12,9 @@ let pendingEdits = false
 let playbackPaused = false
 let customInputCsv
 
+document.getElementsByTagName('body')[0].addEventListener('click', hideTaxonMatches)
+document.getElementsByTagName('body')[0].addEventListener('click', hideTermMatches)
+
 export function editsPending() {
   return pendingEdits
 }
@@ -39,8 +42,6 @@ async function initRecordFields() {
 
   customInputCsv = await getCSV('custom-input.csv')
   const customTemplatesCsv = await getCSV('custom-templates.csv')
-
-  //console.log('Custom templates loaded:', customTemplatesCsv)
 
   const parent = el('record-details')
 
@@ -78,9 +79,7 @@ async function initRecordFields() {
   const selectedFile = getSs('selectedFile')
   if (selectedFile) {
     const json = await getRecordJson(`${selectedFile}.txt`)
-    if (json && json.metadata.template) {
-      el('template-select').value = json.metadata.template
-    }
+    el('template-select').value = json.metadata.template
   }   
 
   setSs('prevSelectedFile', null)
@@ -123,6 +122,7 @@ async function initRecordFields() {
   save.addEventListener('click', saveRecord)
   ctrl.appendChild(save)
 
+  console.log("Adding handlers")
   // Handling form focus on tab/enter press
   el('record-details').addEventListener('keypress', async function (e) {
     //console.log('keypress target', e.target.id)
@@ -130,7 +130,8 @@ async function initRecordFields() {
       // User has saved record - shift focus to next record button
       el('next-record').focus()
     } else if (e.code === 'Enter') {
-      const fieldDefs = getFieldDefs()
+      const fieldDefs = getFieldDefs({template: el('template-select').value})
+      console.log('Field defs', fieldDefs)
       if (e.shiftKey) {
         // Copy value from previous record
         const previosRecJson = await getPreviousRecJson()
@@ -259,8 +260,6 @@ export async function generateRecordFields(template) {
   // Generate the input fields
   const fieldDefs = getFieldDefs({template: template ? template : el('template-select').value})
 
-  //console.log ('Generating record fields for template:', template, fieldDefs)
-
   for (let i=0; i < fieldDefs.length; i++) {
     const f = fieldDefs[i]
     const ctrl = createInputDiv(parent, f.inputId.substring(0,f.inputId.length-6))
@@ -288,7 +287,7 @@ export async function generateRecordFields(template) {
     if (f.inputType === 'taxon') {
       input.setAttribute('type', 'text')
       input.addEventListener('input', displayTaxonMatches)
-      document.getElementsByTagName('body')[0].addEventListener('click', hideTaxonMatches)
+      //document.getElementsByTagName('body')[0].addEventListener('click', hideTaxonMatches)
   
       const ul =  document.createElement('div')
       ul.setAttribute('id', `${f.inputId}-suggestions`)
@@ -306,10 +305,16 @@ export async function generateRecordFields(template) {
     // Term lists
     // Datalist isn't customisable, so we use our own control
     if (f.inputType.startsWith('term-')) {
+
+      input.addEventListener('click', (e) => {
+        console.log('Input clicked')
+        // Stop propagation to prevent hiding the suggestion list
+        e.stopPropagation()
+      })
       input.setAttribute('type', 'text')
       input.addEventListener('input', displayTermMatches)
       input.addEventListener('focus', displayTermMatches)
-      document.getElementsByTagName('body')[0].addEventListener('click', hideTermMatches)
+      //document.getElementsByTagName('body')[0].addEventListener('click', hideTermMatches)
   
       const ul =  document.createElement('div')
       ul.setAttribute('id', `${f.inputId}-suggestions`)
@@ -324,11 +329,13 @@ export async function generateRecordFields(template) {
         li.setAttribute('tabindex', '-1') // In order to allow event handling
         li.addEventListener('click', (e) => {
           input.value = e.target.innerText
+          checkEditStatus()
           input.focus()
         })
         li.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') {
             input.value = e.target.innerText
+            checkEditStatus()
             input.focus()
             hideTermMatches()
           }
@@ -443,7 +450,6 @@ async function saveRecord() {
   const selectedFile = getSs('selectedFile')
 
   const json = await getRecordJson(`${selectedFile}.txt`)
-  //const template = json.metadata.template ? json.metadata.template : 'default'
 
   getFieldDefs({filename: selectedFile, template: el('template-select').value}).forEach(f => {
     json[f.jsonId] =  el(f.inputId).value
@@ -452,12 +458,8 @@ async function saveRecord() {
 
   // If template other than default selected, add to metadata
   const templateSelect = el('template-select')
-  if (templateSelect.value !== 'default') {
-    json.metadata.template = templateSelect.value
-  } else {
-    delete json.metadata.template
-  }
-
+  json.metadata.template = templateSelect.value
+  
   // Save the file
   const jsonString = JSON.stringify(json)
   await storSaveFile(new Blob([jsonString], { type: "text/plain" }), `${selectedFile}.txt`)
@@ -520,7 +522,6 @@ export async function populateRecordFields() {
     // Get corresponding record JSON if it exists
     json = await getRecordJson(`${selectedFile}.txt`)
   }
-  //console.log("Template for populating record fields:", el('template-select').value)
   getFieldDefs({filename: selectedFile, template: el('template-select').value}).forEach(f => {
     if (json && json[f.jsonId] !== undefined ) {
       //console.log('Populating field', f.inputId, 'with value', json[f.jsonId])
@@ -557,20 +558,13 @@ export async function setTemplate(template) {
   // Set the value of the template select control
   const selectedFile = getSs('selectedFile')
   const json = await getRecordJson(`${selectedFile}.txt`)
-
   const templateSelect = el('template-select')
-  if (json && json.metadata.template) {
-    // If templateSelect has an option for this template, select it
-    if ([...templateSelect.options].some(option => option.value === json.metadata.template)) {
-      templateSelect.value = json.metadata.template
-    } else {
-      templateSelect.value = 'default'
-    }
-  } else {
-    templateSelect.value = 'default'
-  }
+  // If templateSelect has an option for this template, select it
+  templateSelect.value = json.metadata.template
 }
+
 export async function checkEditStatus() {
+  console.log ('Checking edit status...')
   // pendingEdits is a global that can be queried elsewhere
   pendingEdits = false
   getFieldDefs({template: el('template-select').value}).forEach(f => {

@@ -4,6 +4,8 @@ import { getOpt, getDateTime, generalMessage,
 import { getFieldDefs } from './fields.js'
 import { mkConfig, generateCsv, asBlob, idb, csvParse } from './nl.min.js'
 
+const customTemplatesCsv = await getCSV('custom-templates.csv')
+
 // Function names that start with 'stor' indicate
 // functions that retrieve or write to storage and
 // are all responsive to the type of storage selected.
@@ -634,17 +636,17 @@ export async function recsToCsv(recs) {
     // Replace the field names (property keys) with the iRecord
     // name if it exists, otherwise the caption name.
     const cjson = {}
-    const template = json.metadata.template ? json.metadata.template : null
-    const fieldDefs = template ? getFieldDefs({template: template}) : getFieldDefs()
+    const fieldDefs = getFieldDefs({template: json.metadata.template})
+
     fieldDefs.forEach(f => {
       const fldName = f.iRecord ? f.iRecord : f.inputLabel
       cjson[fldName] = json[f.jsonId] ? json[f.jsonId] : ''
     })
     // Push the new json into array that will make the CSV
-    if (csvRecs[template ? template : 'biorec']) {
-      csvRecs[template ? template : 'biorec'].push(cjson)
+    if (csvRecs[json.metadata.template]) {
+      csvRecs[json.metadata.template].push(cjson)
     } else {
-      csvRecs[template ? template : 'biorec'] = [cjson]
+      csvRecs[json.metadata.template] = [cjson]
     }
 
     // Update record metadata
@@ -683,7 +685,8 @@ export async function getRecordJson(filename) {
   const metadata = {
     downloads: [],
     shares: [],
-    csvs: []
+    csvs: [],
+    template: "default"
   }
   let json
   if (!await storFileExists(filename)) {
@@ -727,6 +730,19 @@ export async function getRecordJson(filename) {
           }
         })
       }
+      // If json.metadata.template is not "default" but there is now no
+      // custom template with that name, reset to "default"
+      if (json.metadata.template !== 'default') {
+        if (customTemplatesCsv) {
+          const templateExists = customTemplatesCsv.find(t => t.template.toLowerCase().replace(/\s+/g, '-') === json.metadata.template)
+          if (!templateExists) {
+            json.metadata.template = 'default'
+          }
+        } else {
+          json.metadata.template = 'default'
+        }
+      }
+
       // Write file if necessary
       if (missingProperty) {
         const jsonString = JSON.stringify(json)
