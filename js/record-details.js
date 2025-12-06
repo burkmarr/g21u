@@ -69,6 +69,7 @@ async function initRecordFields() {
       //generalMessage(`Template changed to '${templateSelect.value}'. You can now edit the record fields as required.`)
       generateRecordFields(templateSelect.value)
       populateRecordFields()
+      saveRecord() // Save immediately to record template change
     })
   } else {
     // Hide the template select control

@@ -103,6 +103,9 @@ If there are locations that you visit frequently, you can save time when process
 
 Create a file called *custom-locations.csv* in the folder specified for *CSV folder* in your [options](/help.html?page=options) (or the *Main folder* if you haven't set the *CSV folder*). It should have just one column with the header *name*. Then on each subsequent row list the location names that you wish to include in a filterable list that will appear when you enter data in the *Location name* field.
 
+## Adding custom input form templates and input controls
+
+
 ## Adding input shortcuts
 You may often find that you need to enter similar values for a number of records. For example, if you record territorial birds singing you may often want to set the following values:
 - Breeding evidence (birds) - *02: Singing male (S)*
