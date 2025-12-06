@@ -104,7 +104,22 @@ If there are locations that you visit frequently, you can save time when process
 Create a file called *custom-locations.csv* in the folder specified for *CSV folder* in your [options](/help.html?page=options) (or the *Main folder* if you haven't set the *CSV folder*). It should have just one column with the header *name*. Then on each subsequent row list the location names that you wish to include in a filterable list that will appear when you enter data in the *Location name* field.
 
 ## Adding custom input form templates and input controls
+### Custom templates
+It is possible to create custom 'templates' describing groups of input fields other than those selected in the [options](/help.html?page=options) (which is referred to hereafter as the *default* - biological record - template). This is useful if you record things other than biological records when you are out. For example you might make notes on habitat condition in which case many of the controls you have selected for the default template can be redundant. This feature lets you define a separate group of input fields for habitat condition so that when you are processing your records and come across such a note, you can switch to the relevant template, changing the input fields for that record.
 
+To define custom templates, create a file called *custom-templates.csv* in the folder specified for *CSV folder* in your [options](/help.html?page=options) (or the *Main folder* if you haven't set the *CSV folder*). It should have three columns: *template*, *core-column-ids* and *custom-column-ids*. Each row under these columns represents a different custom template. Under the *template* column, provide a name for the template (this will appear as a selectable option in a selection control at the top of the *Record details* panel).
+
+Under the *core-column-ids* column, list the core controls that you wish to be included in the template (as a space separated list). This is the equivalent of setting the *Record fields* [options](/help.html?page=options) for the default template (the field IDs are listed for each record field on the  [options](/help.html?page=options) page). Note that the following fields are *always* included in a template and do not have to be specified under *core-column-ids* and therefore don't have to be listed: *Record date*, *Grid reference* (or lat/lon), *Location name* and *Comment*.
+
+The *custom-field-ids* column is used to list custom fields for this template. Enter a space separated list of custom field IDs in this column (see next section for where custom field IDs are defined).
+
+### Custom fields
+You can define fields which are not in the standard *Record fields* on the [options](/help.html?page=options) page. To do that you have to include another custom file called *custom-fields.csv* in your [options](/help.html?page=options) (or the *Main folder* if you haven't set the *CSV folder*). This file should have five columns: *custom-column-id*, *label*, *type*, *data* and *default*. Under *custom-column-id* provide a name for the field which must not included any spaces, eg. 'short-description'. Under *label*, provide the name that will be used on the *Record details* page. Under type, provide one of these two values: 'term' or 'text'. If you specify 'text' this will be a standard control with free-form input. If you specify 'term', this will be a termlist control, i.e. a selectable list of options. The options for a term control a provided under the *data* column, which should be a comma separated list of terms. If you want to provide a default value for the field, put it in the *default* column.
+
+### Using custom templates
+If you define one or more custom templates, then the *Record details* page will include a selection list control to the right of the duplicate button. The first (and default) option in this control is 'Biological record' which corresponds to the default template. The other options in the control correspond to the templates named in the custom template file. Selecting one of the options in this field changes the template, and therefore the fields, associated with the record.
+
+When you create CSVs from selected records, a separate CSV file is created for each template used for the selected records. The names of the CSV files incorporate the name of the template.
 
 ## Adding input shortcuts
 You may often find that you need to enter similar values for a number of records. For example, if you record territorial birds singing you may often want to set the following values:
