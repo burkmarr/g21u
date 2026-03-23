@@ -6,6 +6,7 @@ import { initLocationDetails, invalidateSize, updateMap } from './mapping.js'
 import { setRecordContent, initialiseList, moveSelected, getPreviousRecJson } from './record-list.js'
 import { getRecordJson, storSaveFile, storFileExists, storGetFile, copyRecord, getCSV } from './file-handling.js'
 import { playBlob } from './play.js'
+import { getCent, getGr } from './nl.min.js'
 
 let audioPlayer = new Audio()
 let pendingEdits = false
@@ -156,6 +157,76 @@ async function initRecordFields() {
         }
       }
 
+      // If the input field is the scientific name check to see if any grid
+      // reference modification is being made. Must be done before custom code
+      // input handling.
+      if (e.target.id === 'scientific-name-input') {
+        // A grid reference modification is signified if the first token of
+        // the value matches the specified regular expression.
+        // Matches: direction prefix + 1-4 digits + optional trailing '#'
+        
+        const parsed = parseCode(e.target.value.split(' ')[0])
+
+        if (parsed) {
+          // Remove the code from the scientific name input value
+          if (e.target.value.split(' ').length > 1) {
+            e.target.value = e.target.value.substring(e.target.value.indexOf(' ')+1)
+          } else {
+            e.target.value = ''
+          }
+          // Calculate the new grid reference based on the code and the original grid reference
+          const defsWithDefaults = getFieldDefs({filename: getSs('selectedFile')}) 
+          const originalGridref = defsWithDefaults.find(d => d.inputId === 'gridref-input').default
+          const centroid = getCent(originalGridref, 'gb')
+          const x0 = centroid.centroid[0]
+          const y0 = centroid.centroid[1]
+          const distance = parsed.offset  
+          const angle = parsed.compass * (Math.PI / 180) // Convert degrees to radians
+          const x1 = x0 + distance * Math.sin(angle)
+          const y1 = y0 + distance * Math.cos(angle)
+          // Get a new grid reference from the new coordinates
+          const grs = getGr(x1, y1, 'gb', 'gb', [10,100])
+          let newGridref
+          if (parsed.hash) {
+            newGridref = grs.p100
+          } else {
+            newGridref = grs.p10
+          }
+          // Update the grid reference input value with the new grid reference
+          el('gridref-input').value = newGridref
+        }
+
+        function parseCode(value) {
+          const re = /^(?<dir>nne|ene|ese|sse|ssw|wsw|wnw|nnw|ne|se|sw|nw|n|e|s|w)(?<num>\d{1,4})(?<hash>#?)$/i
+          const match = value.match(re)
+          if (!match) return null
+          const { dir, num, hash } = match.groups
+          const compassDegrees = {
+            n: 0,
+            nne: 22.5,
+            ne: 45,
+            ene: 67.5,
+            e: 90,
+            ese: 112.5,
+            se: 135,
+            sse: 157.5,
+            s: 180,
+            ssw: 202.5,
+            sw: 225,
+            wsw: 247.5,
+            w: 270,
+            wnw: 292.5,
+            nw: 315,
+            nnw: 337.5
+          }
+          return {
+            compass: compassDegrees[dir.toLowerCase()], // e.g. 22.5
+            offset: Number(num), // e.g. 1234
+            hash: hash === '#' // true/false
+          }
+        }
+      }
+
       // Check if input matches any custom input codes 
       let customInputMade = false
       if (customInputCsv) {
@@ -278,9 +349,11 @@ export async function generateRecordFields(template) {
       input = document.createElement('input')
       input.setAttribute('type', f.inputType)
     }
+    console.log('Creating input', f.inputId, 'of type', f.inputType)
     input.setAttribute('id', f.inputId)
     input.addEventListener('input', checkEditStatus)
     input.addEventListener('focus', hideTermMatches)
+
     ctrl.appendChild(input)
 
     // Custom control modifications
@@ -330,12 +403,14 @@ export async function generateRecordFields(template) {
         li.setAttribute('tabindex', '-1') // In order to allow event handling
         li.addEventListener('click', (e) => {
           input.value = e.target.innerText
+          customListSelectionBehaviour(f.inputId, e.target.innerText)
           checkEditStatus()
           input.focus()
         })
         li.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') {
             input.value = e.target.innerText
+            customListSelectionBehaviour(f.inputId, e.target.innerText)
             checkEditStatus()
             input.focus()
             hideTermMatches()
@@ -562,6 +637,88 @@ export async function setTemplate(template) {
   const templateSelect = el('template-select')
   // If templateSelect has an option for this template, select it
   templateSelect.value = json.metadata.template
+}
+
+function customListSelectionBehaviour(inputId, value) {
+  // If input field is birdbreed, then depending on the value set,
+  // set other fields as appropriate.
+  if (inputId === 'birdbreed-input' && value.toLowerCase() !== 'not recorded') {
+    
+    // '01: Nesting habitat (H)',
+    // '02: Singing male (S)',
+    // '03: Pair in suitable habitat (P)',
+    // '04: Permanent territory (T)',
+    // '05: Courtship and display (D)',
+    // '06: Visiting probable nest site (N)',
+    // '07: Agitated behaviour (7)',
+    // '08: Brood patch on incubating adult (I)',
+    // '09: Nest building (B)',
+    // '10: Distraction display (DD)',
+    // '11: Used nest or eggshells (11)',
+    // '12: Recently fledged (FL)',
+    // '13: Occupied nest (ON)',
+    // '14: Faecal sac or food (FF)',
+    // '15: Nest with eggs (NE)',
+    // '16: Nest with young (NY)',
+    
+    switch (value) {
+      case '01: Nesting habitat (H)':
+        el('stage-input').value = 'Adult'
+        break
+      case '02: Singing male (S)':
+        el('stage-input').value = 'Adult'
+        el('sex-input').value = 'male'
+        el('quantity-input').value = '1'
+        break
+      case '03: Pair in suitable habitat (P)':
+        el('stage-input').value = 'Adult'
+        el('sex-input').value = 'mixed'
+        el('quantity-input').value = '2'
+        break
+      case '04: Permanent territory (T)':
+        el('stage-input').value = 'Adult'
+        el('sex-input').value = 'mixed'
+        el('quantity-input').value = '2'
+        break
+      case '05: Courtship and display (D)':
+        el('stage-input').value = 'Adult'
+        el('sex-input').value = 'male'
+        el('quantity-input').value = '1'
+        break
+      case '06: Visiting probable nest site (N)':
+        el('stage-input').value = 'Adult'
+        break
+      case '07: Agitated behaviour (7)':
+        el('stage-input').value = 'Adult'
+        break
+      case '08: Brood patch on incubating adult (I)':
+        el('stage-input').value = 'Adult'
+        break
+      case '09: Nest building (B)':
+        el('stage-input').value = 'Adult'
+        break
+      case '10: Distraction display (DD)':
+        el('stage-input').value = 'Adult'
+        break
+      case '11: Used nest or eggshells (11)':
+        break
+      case '12: Recently fledged (FL)':
+        el('stage-input').value = 'Juvenile'
+        break
+      case '13: Occupied nest (ON)':
+        el('stage-input').value = 'Adult'
+        break
+      case '14: Faecal sac or food (FF)':
+        el('stage-input').value = 'Adult'
+        break
+      case '15: Nest with eggs (NE)':
+        el('stage-input').value = 'Egg'
+        break
+      case '16: Nest with young (NY)':
+        el('stage-input').value = 'Juvenile'
+        break
+    }
+  }
 }
 
 export async function checkEditStatus() {
