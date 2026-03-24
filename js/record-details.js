@@ -197,10 +197,6 @@ async function initRecordFields() {
         }
 
         function parseCode(value) {
-          const re = /^(?<dir>nne|ene|ese|sse|ssw|wsw|wnw|nnw|ne|se|sw|nw|n|e|s|w)(?<num>\d{1,4})(?<hash>#?)$/i
-          const match = value.match(re)
-          if (!match) return null
-          const { dir, num, hash } = match.groups
           const compassDegrees = {
             n: 0,
             nne: 22.5,
@@ -219,6 +215,19 @@ async function initRecordFields() {
             nw: 315,
             nnw: 337.5
           }
+
+          if (value === '#') {
+            return {
+              compass: compassDegrees.n,
+              offset: 0,
+              hash: true
+            }
+          }
+
+          const re = /^(?<dir>nne|ene|ese|sse|ssw|wsw|wnw|nnw|ne|se|sw|nw|n|e|s|w)(?<num>\d{1,4})(?<hash>#?)$/i
+          const match = value.match(re)
+          if (!match) return null
+          const { dir, num, hash } = match.groups
           return {
             compass: compassDegrees[dir.toLowerCase()], // e.g. 22.5
             offset: Number(num), // e.g. 1234
