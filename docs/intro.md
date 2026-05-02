@@ -20,5 +20,14 @@ Unlike the Gilbert 21 Desktop application which managed its own database of reco
 
 (Note however that voice recordings made with *g21u* are compatible with the old Gilbert 21 Desktop application just as voice recordings made with the old Android app can be post-processed by *g21u*.)
 
+## WARNING - don't store records on your phone for long
+When you store records on your phone you must use either the *IndexedDB* or *Object private file system (OPFS)* (see [options](/help.html?page=options) for details). Whilst both of these options give reasonably persistent storage, they can be cleared under certain conditions, notably:
+
+1. **Automatic Storage Eviction**: If your phone runs low on memory, the browser can automatically "evict" (delete) your a web app's data to free up resources. g21u is a web app and so is at risk from automatic storage eviction. It typically clears data from the least recently used websites and web apps first. *This should not be a risk to you unless your device runs critically low on memory.*
+
+2. **Manual User Action**: Clearing "Cookies and other site data" in browser settings will delete all IndexedDB databases and OPFS files for that web site or web app. So don't do this for the g21u app, unless you have already exported your data. *This is not a risk unless you proactively delete your site's data.*
+
+To minimise the risk of losing records, you are advised to build the practice of exporting your records and transferring them to a PC (where you can process them) into your workflow on a regular, e.g. daily, basis.
+
 ## Issues
 If you use this app and find any problems or want to share information that may help other users use it on particular devices, browsers or operating systems, please use the [GitHub Issues](https://github.com/burkmarr/g21u/issues) associated with this repository and open a new issue. (You need a free GitHub account to do that.)
