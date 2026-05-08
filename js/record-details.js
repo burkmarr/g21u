@@ -224,14 +224,22 @@ async function initRecordFields() {
             }
           }
 
-          const re = /^(?<dir>nne|ene|ese|sse|ssw|wsw|wnw|nnw|ne|se|sw|nw|n|e|s|w)(?<num>\d{1,4})(?<hash>#?)$/i
+          const re = /^(?:(?<dir>nne|ene|ese|sse|ssw|wsw|wnw|nnw|ne|se|sw|nw|n|e|s|w)(?<num>\d{1,4})|(?<deg>\d{1,3}|360)d(?<num>\d{1,4}))(?<hash>#?)$/i
           const match = value.match(re)
           if (!match) return null
-          const { dir, num, hash } = match.groups
-          return {
-            compass: compassDegrees[dir.toLowerCase()], // e.g. 22.5
-            offset: Number(num), // e.g. 1234
-            hash: hash === '#' // true/false
+          const { dir, num, hash, deg } = match.groups
+          if (deg !== undefined) {
+            return {
+              compass: Number(deg), // e.g. 45
+              offset: Number(num), // e.g. 1234
+              hash: hash === '#' // true/false
+            }
+          } else {
+            return {
+              compass: compassDegrees[dir.toLowerCase()], // e.g. 22.5
+              offset: Number(num), // e.g. 1234
+              hash: hash === '#' // true/false
+            }
           }
         }
       }
