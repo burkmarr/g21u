@@ -134,6 +134,8 @@ async function initRecordFields() {
     } else if (e.code === 'Enter') {
       const fieldDefs = getFieldDefs({template: el('template-select').value})
       console.log('Field defs', fieldDefs)
+      let sexOverrideFromCode = null
+      let quantityOverrideFromCode = null
       if (e.shiftKey) {
         // Copy value from previous record
         const previosRecJson = await getPreviousRecJson()
@@ -162,38 +164,54 @@ async function initRecordFields() {
       // input handling.
       if (e.target.id === 'scientific-name-input') {
         // A grid reference modification is signified if the first token of
-        // the value matches the specified regular expression.
+        // the value (or last token) matches the specified regular expression.
         // Matches: direction prefix + 1-4 digits + optional trailing '#'
-        
-        const parsed = parseCode(e.target.value.split(' ')[0])
+        // + optional dot suffix for sex/quantity (e.g. '.f3', '.34').
+
+        const tokens = e.target.value.trim().split(/\s+/).filter(Boolean)
+        let parsed = null
+        let parsedTokenIndex = -1
+
+        if (tokens.length > 0) {
+          parsed = parseCode(tokens[0])
+          if (parsed) {
+            parsedTokenIndex = 0
+          } else if (tokens.length > 1) {
+            parsed = parseCode(tokens[tokens.length - 1])
+            if (parsed) {
+              parsedTokenIndex = tokens.length - 1
+            }
+          }
+        }
 
         if (parsed) {
-          // Remove the code from the scientific name input value
-          if (e.target.value.split(' ').length > 1) {
-            e.target.value = e.target.value.substring(e.target.value.indexOf(' ')+1)
-          } else {
-            e.target.value = ''
+          // Remove the parsed notation token from the scientific name input value.
+          tokens.splice(parsedTokenIndex, 1)
+          e.target.value = tokens.join(' ')
+          // Calculate and apply a new grid reference only when a movement code was supplied.
+          if (parsed.offset !== null && parsed.compass !== null) {
+            const defsWithDefaults = getFieldDefs({filename: getSs('selectedFile')}) 
+            const originalGridref = defsWithDefaults.find(d => d.inputId === 'gridref-input').default
+            const centroid = getCent(originalGridref, 'gb')
+            const x0 = centroid.centroid[0]
+            const y0 = centroid.centroid[1]
+            const distance = parsed.offset  
+            const angle = parsed.compass * (Math.PI / 180) // Convert degrees to radians
+            const x1 = x0 + distance * Math.sin(angle)
+            const y1 = y0 + distance * Math.cos(angle)
+            // Get a new grid reference from the new coordinates
+            const grs = getGr(x1, y1, 'gb', 'gb', [10,100])
+            let newGridref
+            if (parsed.hash) {
+              newGridref = grs.p100
+            } else {
+              newGridref = grs.p10
+            }
+            // Update the grid reference input value with the new grid reference
+            el('gridref-input').value = newGridref
           }
-          // Calculate the new grid reference based on the code and the original grid reference
-          const defsWithDefaults = getFieldDefs({filename: getSs('selectedFile')}) 
-          const originalGridref = defsWithDefaults.find(d => d.inputId === 'gridref-input').default
-          const centroid = getCent(originalGridref, 'gb')
-          const x0 = centroid.centroid[0]
-          const y0 = centroid.centroid[1]
-          const distance = parsed.offset  
-          const angle = parsed.compass * (Math.PI / 180) // Convert degrees to radians
-          const x1 = x0 + distance * Math.sin(angle)
-          const y1 = y0 + distance * Math.cos(angle)
-          // Get a new grid reference from the new coordinates
-          const grs = getGr(x1, y1, 'gb', 'gb', [10,100])
-          let newGridref
-          if (parsed.hash) {
-            newGridref = grs.p100
-          } else {
-            newGridref = grs.p10
-          }
-          // Update the grid reference input value with the new grid reference
-          el('gridref-input').value = newGridref
+          sexOverrideFromCode = parsed.sex
+          quantityOverrideFromCode = parsed.quantity
         }
 
         function parseCode(value) {
@@ -216,29 +234,73 @@ async function initRecordFields() {
             nnw: 337.5
           }
 
-          if (value === '#') {
+          function parseDotSuffix(suffix) {
+            if (!suffix) {
+              return { sex: null, quantity: null }
+            }
+            const suffixMatch = suffix.match(/^(?<sex>m|f|x)?(?<quantity>\d+)?$/i)
+            if (!suffixMatch) {
+              return null
+            }
+            const { sex, quantity } = suffixMatch.groups
+            if (!sex && !quantity) {
+              return null
+            }
             return {
-              compass: compassDegrees.n,
-              offset: 0,
-              hash: true
+              sex: sex ? ({ m: 'male', f: 'female', x: 'mixed' })[sex.toLowerCase()] : null,
+              quantity: quantity ? Number(quantity) : null
             }
           }
 
-          const re = /^(?:(?<dir>nne|ene|ese|sse|ssw|wsw|wnw|nnw|ne|se|sw|nw|n|e|s|w)(?<num>\d{1,4})|(?<deg>\d{1,3}|360)d(?<num>\d{1,4}))(?<hash>#?)$/i
+          const dotOnlyMatch = value.match(/^\.(?<suffix>(?:m|f|x)?\d*|\d+)$/i)
+          if (dotOnlyMatch) {
+            const dotValues = parseDotSuffix(dotOnlyMatch.groups.suffix)
+            if (!dotValues) return null
+            return {
+              compass: null,
+              offset: null,
+              hash: false,
+              sex: dotValues.sex,
+              quantity: dotValues.quantity
+            }
+          }
+
+          const hashOnlyMatch = value.match(/^#(?:\.(?<suffix>(?:m|f|x)?\d*|\d+))?$/i)
+          if (hashOnlyMatch) {
+            const dotValues = parseDotSuffix(hashOnlyMatch.groups.suffix)
+            if (hashOnlyMatch.groups.suffix && !dotValues) return null
+            return {
+              compass: compassDegrees.n,
+              offset: 0,
+              hash: true,
+              sex: dotValues ? dotValues.sex : null,
+              quantity: dotValues ? dotValues.quantity : null
+            }
+          }
+
+          const re = /^(?:(?<dir>nne|ene|ese|sse|ssw|wsw|wnw|nnw|ne|se|sw|nw|n|e|s|w)(?<num>\d{1,4})|(?<deg>\d{1,3}|360)d(?<num>\d{1,4}))(?<hash>#?)(?:\.(?<suffix>(?:m|f|x)?\d*|\d+))?$/i
           const match = value.match(re)
           if (!match) return null
-          const { dir, num, hash, deg } = match.groups
+          const { dir, num, hash, deg, suffix } = match.groups
+          const dotValues = parseDotSuffix(suffix)
+          if (suffix && !dotValues) return null
+          const sexValue = dotValues ? dotValues.sex : null
+          const quantityValue = dotValues ? dotValues.quantity : null
           if (deg !== undefined) {
             return {
               compass: Number(deg), // e.g. 45
               offset: Number(num), // e.g. 1234
-              hash: hash === '#' // true/false
+              hash: hash === '#', // true/false
+              sex: sexValue,
+              quantity: quantityValue
             }
           } else {
             return {
               compass: compassDegrees[dir.toLowerCase()], // e.g. 22.5
               offset: Number(num), // e.g. 1234
-              hash: hash === '#' // true/false
+              hash: hash === '#', // true/false
+              sex: sexValue,
+              quantity: quantityValue
             }
           }
         }
@@ -259,6 +321,21 @@ async function initRecordFields() {
           }
         })
         checkEditStatus()
+      }
+
+      // Dot-notation sex override must win over any custom input mapping.
+      if (sexOverrideFromCode) {
+        el('sex-input').value = sexOverrideFromCode
+        checkEditStatus()
+      }
+
+      if (quantityOverrideFromCode !== null) {
+        el('quantity-input').value = String(quantityOverrideFromCode)
+        checkEditStatus()
+      }
+
+      if (e.target.id === 'scientific-name-input') {
+        taxonDetails()
       }
 
       if (customInputMade) {
@@ -384,14 +461,6 @@ export async function generateRecordFields(template) {
       ul.setAttribute('id', `${f.inputId}-suggestions`)
       ul.classList.add('term-suggestions')
       ctrl.appendChild(ul)
-
-      if (f.inputId === 'scientific-name-input') {
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            taxonDetails()
-          }
-        })
-      }
     }
     // Term lists
     // Datalist isn't customisable, so we use our own control
