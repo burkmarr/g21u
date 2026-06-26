@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>g21u diag1</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root {
+      --bg: #f2f5f7;
+      --panel: #ffffff;
+      --ink: #1b2a34;
+      --muted: #60737f;
+      --ok: #0f7b45;
+      --warn: #9a6a00;
+      --err: #b00020;
+      --accent: #0550ae;
+      --border: #d6e1e8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at top right, #dfeef7, var(--bg) 55%);
+      color: var(--ink);
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.4rem;
+    }
+
+    p {
+      margin: 6px 0;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      border-color: #6d7f8a;
+      background: #6d7f8a;
+    }
+
+    .status {
+      font-size: 0.96rem;
+      color: var(--muted);
+      min-height: 20px;
+    }
+
+    .ok {
+      color: var(--ok);
+    }
+
+    .warn {
+      color: var(--warn);
+    }
+
+    .err {
+      color: var(--err);
+    }
+
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.85rem;
+      max-height: 55vh;
+      overflow: auto;
+      background: #f8fbfd;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .kv {
+      margin-top: 10px;
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.92rem;
+    }
+
+    .kv td {
+      border-bottom: 1px solid var(--border);
+      padding: 6px 4px;
+      vertical-align: top;
+    }
+
+    .kv td:first-child {
+      color: var(--muted);
+      width: 260px;
+    }
+
+    @media (max-width: 700px) {
+      .kv td:first-child {
+        width: 160px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <section class="panel">
+      <h1>Diagnostic 1: OPFS Record ZIP Download</h1>
+      <p>
+        This page scans OPFS for record files (.wav and .txt), creates a zip file,
+        and tries to download it. It logs every step and any errors.
+      </p>
+      <div class="meta">
+        <span id="when"></span>
+        <span id="ua"></span>
+      </div>
+      <table class="kv" id="facts"></table>
+    </section>
+
+    <section class="panel">
+      <div class="controls">
+        <button id="run-user">Run Again (User Click)</button>
+        <button id="clear-log" class="secondary">Clear Log</button>
+      </div>
+      <p class="status" id="status"></p>
+      <pre id="log"></pre>
+    </section>
+  </main>
+
+  <script src="js/jszip.min.js"></script>
+  <script>
+    (function () {
+      const logEl = document.getElementById("log");
+      const statusEl = document.getElementById("status");
+      const factsEl = document.getElementById("facts");
+
+      function nowStamp() {
+        return new Date().toISOString();
+      }
+
+      function addFact(label, value) {
+        const tr = document.createElement("tr");
+        const tdL = document.createElement("td");
+        const tdV = document.createElement("td");
+        tdL.textContent = label;
+        tdV.textContent = String(value);
+        tr.appendChild(tdL);
+        tr.appendChild(tdV);
+        factsEl.appendChild(tr);
+      }
+
+      function setStatus(text, cls) {
+        statusEl.textContent = text;
+        statusEl.className = "status " + (cls || "");
+      }
+
+      function log(level, msg, err) {
+        const prefix = level.toUpperCase().padEnd(5, " ");
+        const line = "[" + nowStamp() + "] " + prefix + " " + msg;
+        logEl.textContent += line + "\n";
+        if (err) {
+          const detail = (err && err.stack) ? err.stack : String(err);
+          logEl.textContent += detail + "\n";
+          console.error("diag1", msg, err);
+        } else {
+          console.log("diag1", msg);
+        }
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      function clearLog() {
+        logEl.textContent = "";
+      }
+
+      async function getOpfsRecordFiles() {
+        const root = await navigator.storage.getDirectory();
+        const byBase = new Map();
+        let entryCount = 0;
+
+        for await (const entry of root.values()) {
+          entryCount += 1;
+          if (entry.kind !== "file") {
+            continue;
+          }
+
+          const name = entry.name;
+          const lower = name.toLowerCase();
+          if (!lower.endsWith(".wav") && !lower.endsWith(".txt")) {
+            continue;
+          }
+
+          const ext = lower.endsWith(".wav") ? "wav" : "txt";
+          const base = name.slice(0, -4);
+          if (!byBase.has(base)) {
+            byBase.set(base, {});
+          }
+          byBase.get(base)[ext] = entry;
+        }
+
+        return {
+          entryCount,
+          byBase,
+          root,
+        };
+      }
+
+      function downloadBlob(blob, fileName) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+
+        try {
+          a.dispatchEvent(new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          }));
+        } catch (e) {
+          log("warn", "dispatchEvent click failed, trying a.click()", e);
+          a.click();
+        } finally {
+          document.body.removeChild(a);
+          setTimeout(function () {
+            URL.revokeObjectURL(url);
+          }, 15000);
+        }
+      }
+
+      async function runDiagnostic(source) {
+        setStatus("Running diagnostic...", "warn");
+        log("info", "Starting diagnostic run (" + source + ")");
+
+        try {
+          if (!("storage" in navigator)) {
+            throw new Error("navigator.storage is unavailable");
+          }
+          if (!navigator.storage.getDirectory) {
+            throw new Error("navigator.storage.getDirectory() is unavailable (OPFS not supported)");
+          }
+          if (!window.JSZip) {
+            throw new Error("JSZip did not load (window.JSZip missing)");
+          }
+
+          log("info", "Checking user activation state: " + (navigator.userActivation ? navigator.userActivation.isActive : "unknown"));
+
+          const scan = await getOpfsRecordFiles();
+          const names = Array.from(scan.byBase.keys()).sort();
+
+          log("info", "OPFS entries scanned: " + scan.entryCount);
+          log("info", "Record base names found: " + names.length);
+
+          if (!names.length) {
+            setStatus("No .wav or .txt record files found in OPFS.", "warn");
+            return;
+          }
+
+          const zip = new JSZip();
+          let added = 0;
+          let skipped = 0;
+
+          for (const base of names) {
+            const rec = scan.byBase.get(base);
+
+            for (const ext of ["wav", "txt"]) {
+              const handle = rec[ext];
+              if (!handle) {
+                continue;
+              }
+
+              const fullName = base + "." + ext;
+              try {
+                const file = await handle.getFile();
+                zip.file(fullName, file, { binary: true });
+                added += 1;
+                log("info", "Added to zip: " + fullName + " (" + file.size + " bytes)");
+              } catch (e) {
+                skipped += 1;
+                log("err", "Failed to read OPFS file: " + fullName, e);
+              }
+            }
+          }
+
+          log("info", "Files added to zip: " + added + "; files skipped due to read errors: " + skipped);
+
+          if (!added) {
+            throw new Error("No files could be read from OPFS to include in zip");
+          }
+
+          log("info", "Generating zip blob...");
+          const zipBlob = await zip.generateAsync({ type: "blob" }, function (meta) {
+            if (meta && typeof meta.percent === "number") {
+              const p = Math.floor(meta.percent);
+              if (p % 20 === 0) {
+                log("info", "Zip generation progress: " + p + "%");
+              }
+            }
+          });
+
+          const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+          const zipName = "g21-diag1-opfs-" + stamp + ".zip";
+
+          log("info", "Zip generated: " + zipName + " (" + zipBlob.size + " bytes)");
+          log("info", "Attempting browser download...");
+
+          downloadBlob(zipBlob, zipName);
+
+          setStatus("Zip created and download was triggered. If no file appears, check browser download permissions/user-activation behavior.", "ok");
+          log("info", "Download trigger call finished");
+        } catch (e) {
+          setStatus("Diagnostic failed. See error log below.", "err");
+          log("err", "Diagnostic failed", e);
+        }
+      }
+
+      window.addEventListener("error", function (ev) {
+        log("err", "window error: " + ev.message, ev.error || ev.message);
+      });
+
+      window.addEventListener("unhandledrejection", function (ev) {
+        log("err", "unhandled rejection", ev.reason || ev);
+      });
+
+      document.getElementById("clear-log").addEventListener("click", function () {
+        clearLog();
+        setStatus("Log cleared.", "");
+      });
+
+      document.getElementById("run-user").addEventListener("click", function () {
+        runDiagnostic("user-click");
+      });
+
+      document.getElementById("when").textContent = "Opened: " + new Date().toString();
+      document.getElementById("ua").textContent = navigator.userAgent;
+
+      addFact("display-mode: standalone", window.matchMedia("(display-mode: standalone)").matches);
+      addFact("navigator.storage available", "storage" in navigator);
+      addFact("navigator.storage.getDirectory available", !!(navigator.storage && navigator.storage.getDirectory));
+      addFact("JSZip loaded", !!window.JSZip);
+      addFact("userActivation supported", !!navigator.userActivation);
+
+      runDiagnostic("auto");
+    })();
+  </script>
+</body>
+
+</html>
