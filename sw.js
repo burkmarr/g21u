@@ -1,5 +1,5 @@
 const VERSION = "v2.3.3"
-const BUILD = 2
+const BUILD = 3
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -68,7 +68,7 @@ const APP_STATIC_RESOURCES = [
   "images/playback-green.png",
   "images/playback-grey.png",
   "images/gilbert.png",
-  "docs/index.md",
+  "docs/Index.md",
   "docs/intro.md",
   "docs/install.md",
   "docs/options.md",
@@ -155,7 +155,13 @@ self.addEventListener("install", (event) => {
       const reloadResources = APP_STATIC_RESOURCES.map(r => new Request(r, {
         cache: 'reload',
       }))
-      cache.addAll(reloadResources)
+      const results = await Promise.allSettled(reloadResources.map(r => cache.add(r)))
+      const failures = results
+        .map((res, i) => ({ res, url: reloadResources[i].url }))
+        .filter(x => x.res.status === 'rejected')
+      if (failures.length) {
+        console.warn('Precache failures:', failures.map(f => f.url))
+      }
     })(),
   )
 })

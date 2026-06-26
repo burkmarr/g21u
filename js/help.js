@@ -15,7 +15,7 @@ if (!helpPage) {
   setSs('helpPage', helpPage)
 }
 
-const raw = await fetch(`/docs/${helpPage}.md`)
+const raw = await fetch(`docs/${helpPage}.md`)
   .then(data => data.text())
   .catch(e => {
     Promise.resolve(null)
