@@ -688,24 +688,45 @@ export async function getRecordJson(filename) {
     csvs: [],
     template: "default"
   }
+
+  function buildDefaultRecordJson() {
+    const defaultJson = {}
+    getFieldDefs({filename: filename}).forEach(f => {
+      defaultJson[f.jsonId] = f.default
+    })
+    defaultJson.metadata = {
+      downloads: [],
+      shares: [],
+      csvs: [],
+      template: "default"
+    }
+    return defaultJson
+  }
+
+  async function writeRecordJson(recordJson) {
+    const jsonString = JSON.stringify(recordJson)
+    await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
+  }
+
   let json
   if (!await storFileExists(filename)) {
     // No json text file with this filename, so create one
-    json = {}
-    // Add record fields
-    getFieldDefs({filename: filename}).forEach(f => {
-      json[f.jsonId] = f.default
-    })
-    // Add metadata
-    json.metadata = metadata
-    // Write the file
-    const jsonString = JSON.stringify(json)
-    //console.log('created'. json)
-    await storSaveFile(new Blob([jsonString], { type: "text/plain" }), filename)
+    json = buildDefaultRecordJson()
+    await writeRecordJson(json)
   } else {
     //console.log('Does exist')
     const blob = await storGetFile(filename)
-    json = JSON.parse(await blob.text())
+    try {
+      json = JSON.parse(await blob.text())
+      if (!json || typeof json !== 'object' || Array.isArray(json)) {
+        throw new Error('record json is not an object')
+      }
+    } catch (e) {
+      // Recreate invalid json as a fresh record, matching new-record behaviour.
+      console.warn(`Invalid record JSON in ${filename}; recreating defaults.`, e)
+      json = buildDefaultRecordJson()
+      await writeRecordJson(json)
+    }
     // In case property or metadata has been added to definition since this 
     // file was saved, add the property/metadata, and save it before
     // returning the json.

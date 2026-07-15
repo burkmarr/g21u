@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>g21u diag1</title>
+  <title>g21u util1</title>
   <link rel="manifest" href="manifest.json">
   <style>
     :root {
@@ -147,10 +147,13 @@
 <body>
   <main>
     <section class="panel">
-      <h1>Diagnostic 1: OPFS Record ZIP Download</h1>
+      <h1>Utility 1: OPFS Record ZIP Download</h1>
       <p>
         This page scans OPFS for record files (.wav and .txt), creates a zip file,
         and tries to download it. It logs every step and any errors.
+      </p>
+      <p>
+        Click <strong>Run</strong> to start the scan and download attempt. Nothing runs automatically when this page opens.
       </p>
       <div class="meta">
         <span id="when"></span>
@@ -161,7 +164,7 @@
 
     <section class="panel">
       <div class="controls">
-        <button id="run-user">Run Again (User Click)</button>
+        <button id="run-user">Run</button>
         <button id="clear-log" class="secondary">Clear Log</button>
       </div>
       <p class="status" id="status"></p>
@@ -203,9 +206,9 @@
         if (err) {
           const detail = (err && err.stack) ? err.stack : String(err);
           logEl.textContent += detail + "\n";
-          console.error("diag1", msg, err);
+          console.error("util1", msg, err);
         } else {
-          console.log("diag1", msg);
+          console.log("util1", msg);
         }
         logEl.scrollTop = logEl.scrollHeight;
       }
@@ -341,7 +344,7 @@
           });
 
           const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-          const zipName = "g21-diag1-opfs-" + stamp + ".zip";
+          const zipName = "g21-util1-opfs-" + stamp + ".zip";
 
           log("info", "Zip generated: " + zipName + " (" + zipBlob.size + " bytes)");
           log("info", "Attempting browser download...");
@@ -382,7 +385,7 @@
       addFact("JSZip loaded", !!window.JSZip);
       addFact("userActivation supported", !!navigator.userActivation);
 
-      runDiagnostic("auto");
+      setStatus("Ready. Click Run to start the utility.", "");
     })();
   </script>
 </body>
