@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>g21u util2</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root {
+      --bg: #f2f5f7;
+      --panel: #ffffff;
+      --ink: #1b2a34;
+      --muted: #60737f;
+      --ok: #0f7b45;
+      --warn: #9a6a00;
+      --err: #b00020;
+      --accent: #0550ae;
+      --danger: #b00020;
+      --border: #d6e1e8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at top right, #dfeef7, var(--bg) 55%);
+      color: var(--ink);
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.4rem;
+    }
+
+    p {
+      margin: 6px 0;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      border-color: #6d7f8a;
+      background: #6d7f8a;
+    }
+
+    button.danger {
+      border-color: var(--danger);
+      background: var(--danger);
+    }
+
+    .status {
+      font-size: 0.96rem;
+      color: var(--muted);
+      min-height: 20px;
+    }
+
+    .ok {
+      color: var(--ok);
+    }
+
+    .warn {
+      color: var(--warn);
+    }
+
+    .err {
+      color: var(--err);
+    }
+
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.85rem;
+      max-height: 55vh;
+      overflow: auto;
+      background: #f8fbfd;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .kv {
+      margin-top: 10px;
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.92rem;
+    }
+
+    .kv td {
+      border-bottom: 1px solid var(--border);
+      padding: 6px 4px;
+      vertical-align: top;
+    }
+
+    .kv td:first-child {
+      color: var(--muted);
+      width: 280px;
+    }
+
+    dialog {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      width: min(92vw, 440px);
+      color: var(--ink);
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.28);
+    }
+
+    .dialog-actions {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    @media (max-width: 700px) {
+      .kv td:first-child {
+        width: 180px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <section class="panel">
+      <h1>Utility 2: Delete OPFS Record Files</h1>
+      <p>
+        This utility removes all record files with .wav and .txt extensions from OPFS storage.
+      </p>
+      <p>
+        Nothing runs automatically. Click <strong>Run</strong>, then confirm with <strong>Delete</strong> in the dialog.
+      </p>
+      <div class="meta">
+        <span id="when"></span>
+        <span id="ua"></span>
+      </div>
+      <table class="kv" id="facts"></table>
+    </section>
+
+    <section class="panel">
+      <div class="controls">
+        <button id="run-user" class="danger">Run</button>
+        <button id="clear-log" class="secondary">Clear Log</button>
+      </div>
+      <p class="status" id="status"></p>
+      <pre id="log"></pre>
+    </section>
+  </main>
+
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title">
+    <h2 id="confirm-title">Delete OPFS Record Files?</h2>
+    <p>
+      This will permanently delete all .wav and .txt record files in OPFS.
+    </p>
+    <div class="dialog-actions">
+      <button id="confirm-cancel" class="secondary">Cancel</button>
+      <button id="confirm-delete" class="danger">Delete</button>
+    </div>
+  </dialog>
+
+  <script>
+    (function () {
+      const logEl = document.getElementById("log");
+      const statusEl = document.getElementById("status");
+      const factsEl = document.getElementById("facts");
+      const dialogEl = document.getElementById("confirm-dialog");
+      const runBtn = document.getElementById("run-user");
+
+      function nowStamp() {
+        return new Date().toISOString();
+      }
+
+      function addFact(label, value) {
+        const tr = document.createElement("tr");
+        const tdL = document.createElement("td");
+        const tdV = document.createElement("td");
+        tdL.textContent = label;
+        tdV.textContent = String(value);
+        tr.appendChild(tdL);
+        tr.appendChild(tdV);
+        factsEl.appendChild(tr);
+      }
+
+      function setStatus(text, cls) {
+        statusEl.textContent = text;
+        statusEl.className = "status " + (cls || "");
+      }
+
+      function log(level, msg, err) {
+        const prefix = level.toUpperCase().padEnd(5, " ");
+        const line = "[" + nowStamp() + "] " + prefix + " " + msg;
+        logEl.textContent += line + "\n";
+        if (err) {
+          const detail = (err && err.stack) ? err.stack : String(err);
+          logEl.textContent += detail + "\n";
+          console.error("util2", msg, err);
+        } else {
+          console.log("util2", msg);
+        }
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      function clearLog() {
+        logEl.textContent = "";
+      }
+
+      function isRecordName(name) {
+        const lower = name.toLowerCase();
+        return lower.endsWith(".wav") || lower.endsWith(".txt");
+      }
+
+      async function runDelete() {
+        setStatus("Deleting record files...", "warn");
+        log("info", "Starting delete run (user-confirmed)");
+
+        try {
+          if (!("storage" in navigator)) {
+            throw new Error("navigator.storage is unavailable");
+          }
+          if (!navigator.storage.getDirectory) {
+            throw new Error("navigator.storage.getDirectory() is unavailable (OPFS not supported)");
+          }
+
+          const root = await navigator.storage.getDirectory();
+          const targets = [];
+          let scanned = 0;
+
+          for await (const entry of root.values()) {
+            scanned += 1;
+            if (entry.kind !== "file") {
+              continue;
+            }
+            if (isRecordName(entry.name)) {
+              targets.push(entry.name);
+            }
+          }
+
+          log("info", "OPFS entries scanned: " + scanned);
+          log("info", "Record files matched for deletion: " + targets.length);
+
+          if (!targets.length) {
+            setStatus("No .wav or .txt record files found in OPFS.", "warn");
+            return;
+          }
+
+          let deleted = 0;
+          let failed = 0;
+
+          for (const name of targets.sort()) {
+            try {
+              await root.removeEntry(name);
+              deleted += 1;
+              log("info", "Deleted: " + name);
+            } catch (e) {
+              failed += 1;
+              log("err", "Failed to delete: " + name, e);
+            }
+          }
+
+          if (failed) {
+            setStatus("Delete completed with errors. Deleted " + deleted + ", failed " + failed + ".", "err");
+          } else {
+            setStatus("Delete completed. Deleted " + deleted + " record file(s).", "ok");
+          }
+
+          log("info", "Delete run finished: deleted=" + deleted + ", failed=" + failed);
+        } catch (e) {
+          setStatus("Delete failed. See error log below.", "err");
+          log("err", "Delete run failed", e);
+        } finally {
+          runBtn.disabled = false;
+        }
+      }
+
+      function openConfirmDialog() {
+        if (dialogEl.showModal) {
+          dialogEl.showModal();
+          return;
+        }
+
+        // Fallback for older browsers without <dialog> support.
+        const ok = window.confirm("Delete all .wav and .txt files from OPFS?");
+        if (ok) {
+          runBtn.disabled = true;
+          runDelete();
+        } else {
+          setStatus("Delete canceled.", "");
+          log("info", "Delete canceled by user");
+        }
+      }
+
+      window.addEventListener("error", function (ev) {
+        log("err", "window error: " + ev.message, ev.error || ev.message);
+      });
+
+      window.addEventListener("unhandledrejection", function (ev) {
+        log("err", "unhandled rejection", ev.reason || ev);
+      });
+
+      runBtn.addEventListener("click", function () {
+        openConfirmDialog();
+      });
+
+      document.getElementById("confirm-cancel").addEventListener("click", function () {
+        dialogEl.close("cancel");
+        setStatus("Delete canceled.", "");
+        log("info", "Delete canceled by user");
+      });
+
+      document.getElementById("confirm-delete").addEventListener("click", function () {
+        dialogEl.close("delete");
+        runBtn.disabled = true;
+        runDelete();
+      });
+
+      document.getElementById("clear-log").addEventListener("click", function () {
+        clearLog();
+        setStatus("Log cleared.", "");
+      });
+
+      document.getElementById("when").textContent = "Opened: " + new Date().toString();
+      document.getElementById("ua").textContent = navigator.userAgent;
+
+      addFact("display-mode: standalone", window.matchMedia("(display-mode: standalone)").matches);
+      addFact("navigator.storage available", "storage" in navigator);
+      addFact("navigator.storage.getDirectory available", !!(navigator.storage && navigator.storage.getDirectory));
+      addFact("userActivation supported", !!navigator.userActivation);
+
+      setStatus("Ready. Click Run to begin, then confirm Delete.", "");
+    })();
+  </script>
+</body>
+
+</html>
