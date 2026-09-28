@@ -1,5 +1,5 @@
 const VERSION = "v2.3.3"
-const BUILD = 3
+const BUILD = 4
 const CACHE_NAME = `g21-${VERSION}-${BUILD}`
 const APP_STATIC_RESOURCES = [
   "./",
@@ -12,6 +12,7 @@ const APP_STATIC_RESOURCES = [
   "help.html",
   "util1.html",
   "util2.html",
+  "util3.html",
   "help.html?page=index",
   "help.html?page=intro",
   "help.html?page=install",

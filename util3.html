@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>g21u util3</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root {
+      --bg: #f2f5f7;
+      --panel: #ffffff;
+      --ink: #1b2a34;
+      --muted: #60737f;
+      --ok: #0f7b45;
+      --warn: #9a6a00;
+      --err: #b00020;
+      --accent: #0550ae;
+      --border: #d6e1e8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at top right, #dfeef7, var(--bg) 55%);
+      color: var(--ink);
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.4rem;
+    }
+
+    p {
+      margin: 6px 0;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      border-color: #6d7f8a;
+      background: #6d7f8a;
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    .status {
+      font-size: 0.96rem;
+      color: var(--muted);
+      min-height: 20px;
+    }
+
+    .ok {
+      color: var(--ok);
+    }
+
+    .warn {
+      color: var(--warn);
+    }
+
+    .err {
+      color: var(--err);
+    }
+
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.85rem;
+      max-height: 55vh;
+      overflow: auto;
+      background: #f8fbfd;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <section class="panel">
+      <h1>Utility 3: OPFS WAV Timestamp CSV</h1>
+      <p>
+        Scans OPFS for .wav files and downloads a CSV with each file name and its last-modified
+        time as Unix epoch milliseconds.
+      </p>
+      <p>Nothing runs automatically. Click <strong>Run</strong> to scan and download the CSV.</p>
+    </section>
+
+    <section class="panel">
+      <div class="controls">
+        <button id="run-user">Run</button>
+        <button id="clear-log" class="secondary">Clear Log</button>
+      </div>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+      <pre id="log" aria-label="Utility log"></pre>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const logEl = document.getElementById("log");
+      const statusEl = document.getElementById("status");
+      const runBtn = document.getElementById("run-user");
+
+      function log(level, message, err) {
+        const line = "[" + new Date().toISOString() + "] " + level.toUpperCase().padEnd(5, " ") + " " + message;
+        logEl.textContent += line + "\n";
+        if (err) {
+          logEl.textContent += ((err && err.stack) ? err.stack : String(err)) + "\n";
+          console.error("util3", message, err);
+        } else {
+          console.log("util3", message);
+        }
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      function setStatus(text, cls) {
+        statusEl.textContent = text;
+        statusEl.className = "status " + (cls || "");
+      }
+
+      function escapeCsv(value) {
+        return '"' + String(value).replace(/"/g, '""') + '"';
+      }
+
+      async function scanDirectory(directory, path, files, errors) {
+        for await (const [name, handle] of directory.entries()) {
+          const relativeName = path ? path + "/" + name : name;
+          if (handle.kind === "directory") {
+            try {
+              await scanDirectory(handle, relativeName, files, errors);
+            } catch (err) {
+              errors.push(relativeName);
+              log("err", "Could not scan directory: " + relativeName, err);
+            }
+          } else if (name.toLowerCase().endsWith(".wav")) {
+            try {
+              const file = await handle.getFile();
+              files.push({ name: relativeName, lastModified: file.lastModified });
+              log("info", "Found " + relativeName + " (last modified: " + file.lastModified + ")");
+            } catch (err) {
+              errors.push(relativeName);
+              log("err", "Could not read file: " + relativeName, err);
+            }
+          }
+        }
+      }
+
+      function downloadCsv(csv) {
+        const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "opfs-wav-last-modified.csv";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(function () {
+          URL.revokeObjectURL(url);
+        }, 15000);
+      }
+
+      async function run() {
+        runBtn.disabled = true;
+        setStatus("Scanning OPFS...", "warn");
+        log("info", "Starting OPFS WAV scan");
+
+        try {
+          if (!navigator.storage || typeof navigator.storage.getDirectory !== "function") {
+            throw new Error("OPFS is unavailable. Open this page in a supported secure context.");
+          }
+
+          const files = [];
+          const errors = [];
+          const root = await navigator.storage.getDirectory();
+          await scanDirectory(root, "", files, errors);
+          files.sort(function (a, b) {
+            return a.name.localeCompare(b.name);
+          });
+
+          const rows = [
+            ["File name", "Last modified (Unix epoch ms)"].map(escapeCsv).join(","),
+            ...files.map(function (file) {
+              return [file.name, file.lastModified].map(escapeCsv).join(",");
+            }),
+          ];
+          downloadCsv(rows.join("\r\n") + "\r\n");
+
+          log("info", "WAV files exported: " + files.length + "; scan errors: " + errors.length);
+          if (errors.length) {
+            setStatus("CSV downloaded with " + files.length + " WAV file(s); " + errors.length + " item(s) could not be read.", "warn");
+          } else if (!files.length) {
+            setStatus("No .wav files found. Downloaded a CSV containing the column headers.", "warn");
+          } else {
+            setStatus("CSV downloaded with " + files.length + " WAV file(s).", "ok");
+          }
+        } catch (err) {
+          setStatus("Scan or download failed: " + err.message, "err");
+          log("err", "OPFS WAV export failed", err);
+        } finally {
+          runBtn.disabled = false;
+        }
+      }
+
+      runBtn.addEventListener("click", run);
+      document.getElementById("clear-log").addEventListener("click", function () {
+        logEl.textContent = "";
+      });
+    })();
+  </script>
+</body>
+
+</html>
